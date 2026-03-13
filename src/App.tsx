@@ -1,0 +1,199 @@
+import { useState } from 'react';
+import { useGame } from './context/GameContext';
+import Board from './components/Board';
+import { useNetworking } from './hooks/useNetworking';
+import { Dice5, Send, Users, Handshake } from 'lucide-react';
+import { GAME_CONFIG } from './config/gameConfig';
+import TradeModal, { type TradeOffer } from './components/TradeModal';
+
+function App() {
+  const { gameState, myId } = useGame();
+  const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking();
+  const [joinId, setJoinId] = useState('');
+  const [chatMsg, setChatMsg] = useState('');
+  const [isTradeOpen, setIsTradeOpen] = useState(false);
+
+  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+  const isMyTurn = currentPlayer?.id === myId;
+
+  const handleRoll = () => sendAction({ type: 'ROLL' });
+  const handleBuy = () => sendAction({ type: 'BUY' });
+  const handleEndTurn = () => sendAction({ type: 'END_TURN' });
+
+  const handleSendChat = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatMsg.trim()) return;
+    sendAction({ type: 'CHAT', message: chatMsg });
+    setChatMsg('');
+  };
+
+  const handleProposeTrade = (partnerId: string, offer: TradeOffer) => {
+    sendAction({ type: 'PROPOSE_TRADE', partnerId, offer });
+    setIsTradeOpen(false);
+  };
+
+  return (
+    <div className="min-h-screen p-4 flex flex-col items-center">
+      {gameState.status === 'LOBBY' ? (
+        <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
+          <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">Misr-opoly</h1>
+
+          <div className="space-y-4">
+            <button
+              onClick={createLobby}
+              className="w-full bg-egyptian-gold text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors"
+            >
+              CREATE NEW LOBBY
+            </button>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Lobby ID"
+                value={joinId}
+                onChange={(e) => setJoinId(e.target.value)}
+                className="flex-1 border p-2 rounded-lg"
+              />
+              <button
+                onClick={() => joinLobby(joinId)}
+                className="bg-egyptian-blue text-white px-4 py-2 rounded-lg font-bold"
+              >
+                JOIN
+              </button>
+            </div>
+
+            {lobbyId && (
+              <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
+                <span className="text-xs text-slate-500 uppercase block">Share this ID</span>
+                <span className="font-mono font-bold select-all">{lobbyId}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex gap-8 w-full max-w-7xl justify-center">
+          <TradeModal
+            isOpen={isTradeOpen}
+            onClose={() => setIsTradeOpen(false)}
+            players={gameState.players}
+            myId={myId}
+            allTiles={gameState.tiles}
+            onPropose={handleProposeTrade}
+          />
+
+          {/* Left Panel: Player Info */}
+          <div className="w-64 space-y-4">
+            <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue">
+              <h3 className="font-bold flex items-center gap-2 mb-2">
+                <Users size={18} /> PLAYERS
+              </h3>
+              <div className="space-y-2">
+                {gameState.players.map((p, i) => (
+                  <div key={p.id} className={`flex justify-between items-center p-2 rounded ${i === gameState.currentPlayerIndex ? 'bg-egyptian-gold/20' : ''}`}>
+                    <span className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+                      {p.name} {p.id === myId ? '(You)' : ''}
+                    </span>
+                    <span className="font-bold text-xs">{p.balance} {GAME_CONFIG.CURRENCY}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold">
+              <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">Game Logs</h3>
+              <div className="h-48 overflow-y-auto text-[10px] space-y-1 pr-2">
+                {gameState.logs.map((log, i) => (
+                  <div key={i} className={`border-b border-slate-100 pb-1 ${log.startsWith('[CHAT]') ? 'text-egyptian-blue font-semibold' : ''}`}>{log}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Center: Board */}
+          <Board />
+
+          {/* Right Panel: Controls & Chat */}
+          <div className="w-64 space-y-4">
+             <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center">
+                <div className="mb-4">
+                  <span className="text-xs text-slate-500 uppercase">Current Turn</span>
+                  <div className="font-bold text-lg">{currentPlayer?.name || 'Waiting...'}</div>
+                </div>
+
+                <div className="space-y-2">
+                  {gameState.turnPhase === 'ROLL' && (
+                    <button
+                      onClick={handleRoll}
+                      disabled={!isMyTurn}
+                      className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                    >
+                      <Dice5 /> ROLL DICE
+                    </button>
+                  )}
+
+                  {gameState.turnPhase === 'ACTION' && (
+                    <div className="space-y-2">
+                      {gameState.tiles[currentPlayer.position]?.price && !gameState.players.some(p => p.properties.includes(currentPlayer.position)) && (
+                         <button
+                          onClick={handleBuy}
+                          disabled={!isMyTurn || currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)}
+                          className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700"
+                        >
+                          BUY FOR {gameState.tiles[currentPlayer.position].price}
+                        </button>
+                      )}
+                      <button
+                        onClick={handleEndTurn}
+                        disabled={!isMyTurn}
+                        className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600"
+                      >
+                        SKIP / END TURN
+                      </button>
+                    </div>
+                  )}
+
+                  {gameState.turnPhase === 'END' && (
+                    <button
+                      onClick={handleEndTurn}
+                      disabled={!isMyTurn}
+                      className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold"
+                    >
+                      END TURN
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => setIsTradeOpen(true)}
+                    className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all"
+                  >
+                    <Handshake size={18} /> PROPOSE TRADE
+                  </button>
+                </div>
+             </div>
+
+             <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400">
+               <div className="h-40 flex flex-col">
+                  <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2">
+                    <div className="text-slate-400 italic">Chat system ready...</div>
+                  </div>
+                  <form onSubmit={handleSendChat} className="flex gap-1">
+                    <input
+                      type="text"
+                      className="flex-1 border text-xs p-1 rounded"
+                      placeholder="Type a message..."
+                      value={chatMsg}
+                      onChange={(e) => setChatMsg(e.target.value)}
+                    />
+                    <button type="submit" className="p-1 bg-slate-200 rounded"><Send size={14}/></button>
+                  </form>
+               </div>
+             </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;

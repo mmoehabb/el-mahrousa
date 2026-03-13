@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --egyptian-gold: #D4AF37;
+  --egyptian-blue: #1034A6;
+  --sand: #F4A460;
+}
+
+body {
+  background-color: #fff7ed;
+  color: #0f172a;
+  background-image: url('https://www.transparenttextures.com/patterns/papyrus.png');
+}
+
+.board-tile {
+  border-width: 1px;
+  border-color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  position: relative;
+}
+
+.egyptian-pattern {
+  background-color: #f3f4f6;
+  background-image: linear-gradient(30deg, #d4af37 12%, transparent 12.5%, transparent 87%, #d4af37 87.5%, #d4af37), linear-gradient(150deg, #d4af37 12%, transparent 12.5%, transparent 87%, #d4af37 87.5%, #d4af37), linear-gradient(30deg, #d4af37 12%, transparent 12.5%, transparent 87%, #d4af37 87.5%, #d4af37), linear-gradient(150deg, #d4af37 12%, transparent 12.5%, transparent 87%, #d4af37 87.5%, #d4af37), linear-gradient(60deg, #d4af3777 25%, transparent 25.5%, transparent 75%, #d4af3777 75%, #d4af3777), linear-gradient(60deg, #d4af3777 25%, transparent 25.5%, transparent 75%, #d4af3777 75%, #d4af3777);
+  background-size: 80px 140px;
+  background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+}
