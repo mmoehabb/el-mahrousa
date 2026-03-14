@@ -83,10 +83,47 @@ export const useNetworking = () => {
     }
   }, [isHost, myId, handleAction, lobbyId]);
 
+  const peerRef = useRef<Peer | null>(null);
+
   useEffect(() => {
-    const newPeer = new Peer(myId);
+    // If we already have a peer and it's open, don't recreate it
+    // This helps mitigate StrictMode double-mounting destroying the connection
+    if (peerRef.current && !peerRef.current.destroyed) {
+      return;
+    }
+
+    const newPeer = new Peer(myId, {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+      }
+    });
+
+    peerRef.current = newPeer;
+
     newPeer.on('open', () => {
       setPeer(newPeer);
+    });
+
+    newPeer.on('disconnected', () => {
+      console.warn('PeerJS disconnected, attempting to reconnect...');
+      if (peerRef.current && !peerRef.current.destroyed && peerRef.current.disconnected) {
+        peerRef.current.reconnect();
+      }
+    });
+
+    newPeer.on('error', (err) => {
+      console.error('PeerJS error:', err);
+      if (err.type === 'network' || err.type === 'server-error') {
+        setTimeout(() => {
+          if (peerRef.current && !peerRef.current.destroyed && peerRef.current.disconnected) {
+            peerRef.current.reconnect();
+          }
+        }, 3000);
+      }
     });
 
     newPeer.on('connection', (conn) => {
@@ -101,10 +138,24 @@ export const useNetworking = () => {
           handleAction(data.action, conn.peer);
         }
       });
+
+      conn.on('close', () => {
+        delete connections.current[conn.peer];
+      });
+
+      conn.on('error', (err) => {
+        console.error('Connection error:', err);
+      });
     });
 
     return () => {
-      newPeer.destroy();
+      // In StrictMode development, we avoid immediately destroying the peer
+      // to prevent the "interrupted while loading" WebSocket error.
+      // We will only destroy it if myId changes.
+      if (import.meta.env.MODE !== 'development') {
+        newPeer.destroy();
+        peerRef.current = null;
+      }
     };
   }, [isHost, myId, setGameState, handleAction]);
 
@@ -126,7 +177,8 @@ export const useNetworking = () => {
 
   const joinLobby = useCallback((id: string) => {
     if (!peer) return;
-    const conn = peer.connect(id);
+    const conn = peer.connect(id, { reliable: true });
+
     conn.on('open', () => {
       connections.current[id] = conn;
       setLobbyId(id);
@@ -141,7 +193,17 @@ export const useNetworking = () => {
         setGameState(data.state);
       }
     });
-  }, [peer, setGameState, setIsHost]);
+
+    conn.on('close', () => {
+      console.warn('Disconnected from host.');
+      delete connections.current[id];
+      // Optionally could alert the user they have disconnected
+    });
+
+    conn.on('error', (err) => {
+      console.error('Connection error with host:', err);
+    });
+  }, [peer, setGameState, setIsHost, playerName]);
 
   return { createLobby, joinLobby, lobbyId, sendAction };
 };
