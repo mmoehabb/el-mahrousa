@@ -5,7 +5,8 @@ import { useNetworking } from './hooks/useNetworking'
 import { Dice5, Send, Users, Handshake } from 'lucide-react'
 import { useEffect } from 'react'
 import { GAME_CONFIG } from './config/gameConfig'
-import TradeModal, { type TradeOffer } from './components/TradeModal'
+import TradeModal from './components/TradeModal'
+import { type TradeOffer } from './types/game'
 import LoginScreen from './components/LoginScreen'
 
 function App() {
@@ -285,9 +286,7 @@ function App() {
                 {gameState.turnPhase === 'ACTION' && (
                   <div className="space-y-2">
                     {gameState.tiles[currentPlayer.position]?.price &&
-                      !gameState.players.some((p) =>
-                        p.properties.includes(currentPlayer.position),
-                      ) && (
+                      !gameState.propertyOwners[currentPlayer.position] && (
                         <button
                           onClick={handleBuy}
                           disabled={

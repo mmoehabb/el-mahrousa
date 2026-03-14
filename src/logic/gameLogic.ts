@@ -1,6 +1,6 @@
-import type { GameState, Player, Tile } from '../types/game.ts'
-import { GAME_CONFIG } from '../config/gameConfig.ts'
-import { BOARD_DATA } from '../config/gameConfig.ts'
+import type { GameState, Player, Tile, TradeOffer } from '../types/game'
+import { GAME_CONFIG } from '../config/gameConfig'
+import { BOARD_DATA } from '../config/gameConfig'
 
 export const createInitialState = (): GameState => ({
   players: [],
@@ -9,6 +9,7 @@ export const createInitialState = (): GameState => ({
   status: 'LOBBY',
   turnPhase: 'ROLL',
   lastDice: [1, 1],
+  propertyOwners: {},
   logs: ['Welcome to Misr-opoly!'],
   countdown: null,
   chatMessages: [],
@@ -20,7 +21,7 @@ export const rollDice = (): [number, number] => {
 
 export const moveOneStep = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
-  let newPosition = (player.position + 1) % state.tiles.length
+  const newPosition = (player.position + 1) % state.tiles.length
 
   const newState = { ...state }
   const newPlayers = [...state.players]
@@ -66,9 +67,10 @@ export const applyLandingLogic = (state: GameState): GameState => {
     ]
     newState.turnPhase = 'END'
   } else if (tile.type === 'PROPERTY' || tile.type === 'AIRPORT' || tile.type === 'UTILITY') {
-    const owner = state.players.find((p) => p.properties.includes(tile.id))
+    const ownerId = state.propertyOwners[tile.id]
+    const owner = ownerId ? state.players.find((p) => p.id === ownerId) : null
     if (owner && owner.id !== player.id && !owner.isBankrupt) {
-      const rent = calculateRent(tile, owner, state.tiles)
+      const rent = calculateRent(tile, owner, state.tiles, state.propertyOwners)
       const newPlayers = [...state.players]
 
       newPlayers[state.currentPlayerIndex] = {
@@ -103,13 +105,18 @@ export const applyLandingLogic = (state: GameState): GameState => {
   return newState
 }
 
-const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): number => {
+const calculateRent = (
+  tile: Tile,
+  owner: Player,
+  allTiles: Tile[],
+  propertyOwners: Record<number, string>,
+): number => {
   if (tile.type === 'PROPERTY') {
     return tile.rent ? tile.rent[0] : 0
   }
   if (tile.type === 'AIRPORT') {
     const airportCount = allTiles.filter(
-      (t) => t.type === 'AIRPORT' && owner.properties.includes(t.id),
+      (t) => t.type === 'AIRPORT' && propertyOwners[t.id] === owner.id,
     ).length
     return 25 * Math.pow(2, airportCount - 1)
   }
@@ -120,7 +127,7 @@ export const buyProperty = (state: GameState, tileId: number): GameState => {
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[tileId]
 
-  const isOwned = state.players.some((p) => p.properties.includes(tileId))
+  const isOwned = !!state.propertyOwners[tileId]
   if (isOwned || !tile.price || player.balance < tile.price) return state
 
   const newPlayers = [...state.players]
@@ -133,6 +140,10 @@ export const buyProperty = (state: GameState, tileId: number): GameState => {
   return {
     ...state,
     players: newPlayers,
+    propertyOwners: {
+      ...state.propertyOwners,
+      [tileId]: player.id,
+    },
     logs: [
       `${player.name} bought ${tile.name} for ${tile.price} ${GAME_CONFIG.CURRENCY}`,
       ...state.logs,
@@ -160,7 +171,7 @@ export const executeTrade = (
   state: GameState,
   p1Id: string,
   p2Id: string,
-  offer: any,
+  offer: TradeOffer,
 ): GameState => {
   const newPlayers = state.players.map((p) => {
     if (p.id === p1Id) {
@@ -184,9 +195,18 @@ export const executeTrade = (
     return p
   })
 
+  const newPropertyOwners = { ...state.propertyOwners }
+  offer.myProperties.forEach((id: number) => {
+    newPropertyOwners[id] = p2Id
+  })
+  offer.partnerProperties.forEach((id: number) => {
+    newPropertyOwners[id] = p1Id
+  })
+
   return {
     ...state,
     players: newPlayers,
+    propertyOwners: newPropertyOwners,
     logs: [`Trade executed between ${p1Id} and ${p2Id}`, ...state.logs],
   }
 }
