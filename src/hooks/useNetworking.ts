@@ -7,7 +7,7 @@ import { rollDice, movePlayer, buyProperty, endTurn, executeTrade } from '../log
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080'];
 
 export const useNetworking = () => {
-  const { gameState, setGameState, isHost, setIsHost, myId } = useGame();
+  const { gameState, setGameState, isHost, setIsHost, myId, playerName } = useGame();
   const [peer, setPeer] = useState<Peer | null>(null);
   const connections = useRef<{ [id: string]: DataConnection }>({});
   const [lobbyId, setLobbyId] = useState<string>('');
@@ -52,6 +52,21 @@ export const useNetworking = () => {
         case 'PROPOSE_TRADE':
           nextState = executeTrade(nextState, from, action.partnerId, action.offer);
           break;
+        case 'JOIN':
+          if (!prev.players.find(p => p.id === from)) {
+            const newPlayer: Player = {
+              id: from,
+              name: action.name || `Player ${prev.players.length + 1}`,
+              balance: 1500,
+              position: 0,
+              properties: [],
+              isBankrupt: false,
+              color: COLORS[prev.players.length % COLORS.length]
+            };
+            nextState = { ...nextState, players: [...prev.players, newPlayer] };
+            nextState.logs = [`${newPlayer.name} joined the game.`, ...nextState.logs];
+          }
+          break;
       }
       return nextState;
     });
@@ -77,22 +92,6 @@ export const useNetworking = () => {
     newPeer.on('connection', (conn) => {
       conn.on('open', () => {
         connections.current[conn.peer] = conn;
-
-        if (isHost) {
-          setGameState(prev => {
-            if (prev.players.find(p => p.id === conn.peer)) return prev;
-            const newPlayer: Player = {
-              id: conn.peer,
-              name: `Player ${prev.players.length + 1}`,
-              balance: 1500,
-              position: 0,
-              properties: [],
-              isBankrupt: false,
-              color: COLORS[prev.players.length % COLORS.length]
-            };
-            return { ...prev, players: [...prev.players, newPlayer] };
-          });
-        }
       });
 
       conn.on('data', (data: any) => {
@@ -121,9 +120,9 @@ export const useNetworking = () => {
     setGameState(prev => ({
       ...prev,
       status: 'PLAYING',
-      players: [{ id: myId, name: 'Host', balance: 1500, position: 0, properties: [], isBankrupt: false, color: COLORS[0] }]
+      players: [{ id: myId, name: playerName || 'Host', balance: 1500, position: 0, properties: [], isBankrupt: false, color: COLORS[0] }]
     }));
-  }, [myId, setIsHost, setGameState]);
+  }, [myId, setIsHost, setGameState, playerName]);
 
   const joinLobby = useCallback((id: string) => {
     if (!peer) return;
@@ -132,6 +131,9 @@ export const useNetworking = () => {
       connections.current[id] = conn;
       setLobbyId(id);
       setIsHost(false);
+
+      // Send JOIN action to the host right after connecting
+      conn.send({ type: 'ACTION', action: { type: 'JOIN', name: playerName } });
     });
 
     conn.on('data', (data: any) => {

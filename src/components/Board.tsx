@@ -45,8 +45,8 @@ const Board: React.FC = () => {
 
         {/* Center */}
         <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/30 rounded-lg">
-           <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md">MISR-OPOLY</h1>
-           <div className="text-egyptian-gold font-bold">مصـر-وبولـي</div>
+           <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md">EL-MAHROUSA</h1>
+           <div className="text-egyptian-gold font-bold">المحروسة</div>
         </div>
       </div>
     </div>
