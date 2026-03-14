@@ -10,6 +10,7 @@ export const createInitialState = (): GameState => ({
   turnPhase: 'ROLL',
   lastDice: [1, 1],
   logs: ['Welcome to Misr-opoly!'],
+  countdown: null,
   chatMessages: [],
 });
 
@@ -46,7 +47,7 @@ export const moveOneStep = (state: GameState): GameState => {
 export const applyLandingLogic = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex];
   const tile = state.tiles[player.position];
-  let newState = { ...state };
+  const newState = { ...state };
 
   if (tile.type === 'TAX') {
     const taxAmount = tile.price || 0;

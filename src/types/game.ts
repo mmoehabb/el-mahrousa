@@ -30,10 +30,11 @@ export interface GameState {
   players: Player[];
   currentPlayerIndex: number;
   tiles: Tile[];
-  status: 'LOBBY' | 'PLAYING' | 'FINISHED';
+  status: 'LOBBY' | 'PLAYING' | 'FINISHED' | "WAITING";
   turnPhase: 'ROLL' | 'ROLLING' | 'MOVING' | 'ACTION' | 'END';
   lastDice: [number, number];
   stepsLeft?: number;
   logs: string[];
+  countdown?: number | null;
   chatMessages: ChatMessage[];
 }
