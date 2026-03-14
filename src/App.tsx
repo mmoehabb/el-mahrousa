@@ -3,11 +3,13 @@ import { useGame } from './context/GameContext';
 import Board from './components/Board';
 import { useNetworking } from './hooks/useNetworking';
 import { Dice5, Send, Users, Handshake } from 'lucide-react';
+import { useEffect } from 'react';
 import { GAME_CONFIG } from './config/gameConfig';
 import TradeModal, { type TradeOffer } from './components/TradeModal';
+import LoginScreen from './components/LoginScreen';
 
 function App() {
-  const { gameState, myId } = useGame();
+  const { gameState, myId, playerName } = useGame();
   const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking();
   const [joinId, setJoinId] = useState('');
   const [chatMsg, setChatMsg] = useState('');
@@ -27,16 +29,42 @@ function App() {
     setChatMsg('');
   };
 
+  const [showCopied, setShowCopied] = useState(false);
+
   const handleProposeTrade = (partnerId: string, offer: TradeOffer) => {
     sendAction({ type: 'PROPOSE_TRADE', partnerId, offer });
     setIsTradeOpen(false);
   };
 
+  useEffect(() => {
+    if (playerName && gameState.status === 'LOBBY') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const lobbyFromUrl = urlParams.get('lobby');
+      if (lobbyFromUrl) {
+        joinLobby(lobbyFromUrl);
+        // Clean up the URL
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, [playerName, gameState.status, joinLobby]);
+
+  const handleShareLink = () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    });
+  };
+
+  if (!playerName) {
+    return <LoginScreen />;
+  }
+
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
       {gameState.status === 'LOBBY' ? (
         <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
-          <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">Misr-opoly</h1>
+          <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">El-Mahrousa</h1>
 
           <div className="space-y-4">
             <button
@@ -63,9 +91,17 @@ function App() {
             </div>
 
             {lobbyId && (
-              <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
-                <span className="text-xs text-slate-500 uppercase block">Share this ID</span>
-                <span className="font-mono font-bold select-all">{lobbyId}</span>
+              <div className="space-y-2">
+                <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
+                  <span className="text-xs text-slate-500 uppercase block">Share this ID</span>
+                  <span className="font-mono font-bold select-all">{lobbyId}</span>
+                </div>
+                <button
+                  onClick={handleShareLink}
+                  className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors relative"
+                >
+                  {showCopied ? 'COPIED!' : 'SHARE LINK'}
+                </button>
               </div>
             )}
           </div>
@@ -168,6 +204,13 @@ function App() {
                     className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all"
                   >
                     <Handshake size={18} /> PROPOSE TRADE
+                  </button>
+
+                  <button
+                    onClick={() => window.location.href = '/'}
+                    className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4"
+                  >
+                    LEAVE GAME
                   </button>
                 </div>
              </div>
