@@ -34,6 +34,7 @@ export interface GameState {
   turnPhase: 'ROLL' | 'ROLLING' | 'MOVING' | 'ACTION' | 'END'
   lastDice: [number, number]
   stepsLeft?: number
+  propertyOwners: Record<number, string>
   logs: string[]
   countdown?: number | null
   chatMessages: ChatMessage[]
