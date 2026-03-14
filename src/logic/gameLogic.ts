@@ -1,6 +1,6 @@
-import type { GameState, Player, Tile } from '../types/game'
-import { GAME_CONFIG } from '../config/gameConfig'
-import { BOARD_DATA } from '../config/gameConfig'
+import type { GameState, Player, Tile } from '../types/game.ts'
+import { GAME_CONFIG } from '../config/gameConfig.ts'
+import { BOARD_DATA } from '../config/gameConfig.ts'
 
 export const createInitialState = (): GameState => ({
   players: [],
