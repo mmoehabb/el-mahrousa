@@ -89,21 +89,6 @@ function App() {
                 JOIN
               </button>
             </div>
-
-            {lobbyId && (
-              <div className="space-y-2">
-                <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
-                  <span className="text-xs text-slate-500 uppercase block">Share this ID</span>
-                  <span className="font-mono font-bold select-all">{lobbyId}</span>
-                </div>
-                <button
-                  onClick={handleShareLink}
-                  className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors relative"
-                >
-                  {showCopied ? 'COPIED!' : 'SHARE LINK'}
-                </button>
-              </div>
-            )}
           </div>
         </div>
       ) : (
@@ -123,6 +108,7 @@ function App() {
               <h3 className="font-bold flex items-center gap-2 mb-2">
                 <Users size={18} /> PLAYERS
               </h3>
+
               <div className="space-y-2">
                 {gameState.players.map((p, i) => (
                   <div key={p.id} className={`flex justify-between items-center p-2 rounded ${i === gameState.currentPlayerIndex ? 'bg-egyptian-gold/20' : ''}`}>
@@ -134,6 +120,21 @@ function App() {
                   </div>
                 ))}
               </div>
+
+              {lobbyId && (
+                <div className="space-y-2">
+                  <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
+                    <span className="text-xs text-slate-500 uppercase block">Share this ID</span>
+                    <span className="font-mono font-bold select-all">{lobbyId}</span>
+                  </div>
+                  <button
+                    onClick={handleShareLink}
+                    className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors relative"
+                  >
+                    {showCopied ? 'COPIED!' : 'SHARE LINK'}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold">
