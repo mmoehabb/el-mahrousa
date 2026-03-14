@@ -21,7 +21,7 @@ describe('rollDice', () => {
     }
   })
 
-  test('should be deterministic with mocked Math.random', (t) => {
+  test('should be deterministic with mocked Math.random', () => {
     const randomMock = mock.method(Math, 'random')
 
     try {

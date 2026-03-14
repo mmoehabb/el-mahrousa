@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import type { Player, Tile, TradeOffer } from '../types/game'
+import type { Player, Tile } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { X } from 'lucide-react'
 
@@ -10,6 +10,13 @@ interface TradeModalProps {
   myId: string
   allTiles: Tile[]
   onPropose: (partnerId: string, offer: TradeOffer) => void
+}
+
+export interface TradeOffer {
+  myCash: number
+  partnerCash: number
+  myProperties: number[]
+  partnerProperties: number[]
 }
 
 const TradeModal: React.FC<TradeModalProps> = ({
