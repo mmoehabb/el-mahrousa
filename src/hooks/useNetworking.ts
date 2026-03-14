@@ -92,29 +92,14 @@ export const useNetworking = () => {
       return;
     }
 
+    // Connect to our local signaling server instead of the public PeerJS cloud.
+    // In production, host should be updated to point to the deployed server.
+    const isProd = import.meta.env.MODE === 'production';
     const newPeer = new Peer(myId, {
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' },
-          {
-            urls: 'turn:openrelay.metered.ca:80',
-            username: 'openrelayproject',
-            credential: 'openrelayproject',
-          },
-          {
-            urls: 'turn:openrelay.metered.ca:443',
-            username: 'openrelayproject',
-            credential: 'openrelayproject',
-          },
-          {
-            urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-            username: 'openrelayproject',
-            credential: 'openrelayproject',
-          }
-        ]
-      }
+      host: isProd ? window.location.hostname : 'localhost',
+      port: isProd ? Number(window.location.port || (window.location.protocol === 'https:' ? 443 : 80)) : 9000,
+      path: '/myapp',
+      secure: window.location.protocol === 'https:'
     });
 
     peerRef.current = newPeer;
