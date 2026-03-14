@@ -20,7 +20,7 @@ export const rollDice = (): [number, number] => {
 
 export const moveOneStep = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
-  let newPosition = (player.position + 1) % state.tiles.length
+  const newPosition = (player.position + 1) % state.tiles.length
 
   const newState = { ...state }
   const newPlayers = [...state.players]
@@ -160,7 +160,7 @@ export const executeTrade = (
   state: GameState,
   p1Id: string,
   p2Id: string,
-  offer: any,
+  offer: { myCash: number, partnerCash: number, myProperties: number[], partnerProperties: number[] },
 ): GameState => {
   const newPlayers = state.players.map((p) => {
     if (p.id === p1Id) {

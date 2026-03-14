@@ -30,7 +30,7 @@ const Board: React.FC = () => {
       gameState.turnPhase === 'ACTION' ||
       gameState.turnPhase === 'END'
     ) {
-      setDisplayDice(gameState.lastDice)
+      setTimeout(() => setDisplayDice(gameState.lastDice), 0)
     }
     return () => clearInterval(interval)
   }, [gameState.turnPhase, gameState.lastDice])
