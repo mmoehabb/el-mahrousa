@@ -28,13 +28,14 @@ export const useNetworking = () => {
       const currentPlayer = nextState.players[nextState.currentPlayerIndex];
 
       switch (action.type) {
-        case 'ROLL':
+        case 'ROLL': {
           if (currentPlayer.id !== from) return prev;
           const [d1, d2] = rollDice();
           nextState = { ...nextState, lastDice: [d1, d2] };
           nextState.logs = [`${currentPlayer.name} rolled ${d1 + d2}`, ...nextState.logs];
           nextState = movePlayer(nextState, d1 + d2);
           break;
+        }
         case 'BUY':
           if (currentPlayer.id !== from) return prev;
           nextState = buyProperty(nextState, currentPlayer.position);
@@ -43,12 +44,11 @@ export const useNetworking = () => {
           if (currentPlayer.id !== from) return prev;
           nextState = endTurn(nextState);
           break;
-        case 'CHAT':
-          {
-            const sender = nextState.players.find(p => p.id === from)?.name || 'Unknown';
-            nextState.logs = [`[CHAT] ${sender}: ${action.message}`, ...nextState.logs];
-          }
+        case 'CHAT': {
+          const sender = nextState.players.find(p => p.id === from)?.name || 'Unknown';
+          nextState.logs = [`[CHAT] ${sender}: ${action.message}`, ...nextState.logs];
           break;
+        }
         case 'PROPOSE_TRADE':
           nextState = executeTrade(nextState, from, action.partnerId, action.offer);
           break;
@@ -67,6 +67,48 @@ export const useNetworking = () => {
             nextState.logs = [`${newPlayer.name} joined the game.`, ...nextState.logs];
           }
           break;
+        case 'START_COUNTDOWN':
+          if (nextState.status === 'WAITING' && nextState.countdown === null) {
+            nextState.countdown = 5;
+            nextState.logs = ['Host started the game countdown.', ...nextState.logs];
+          }
+          break;
+        case 'TICK_COUNTDOWN':
+          if (nextState.status === 'WAITING' && typeof nextState.countdown === 'number') {
+            nextState.countdown -= 1;
+            if (nextState.countdown <= 0) {
+              nextState.status = 'PLAYING';
+              nextState.countdown = null;
+              nextState.logs = ['Game started!', ...nextState.logs];
+            }
+          }
+          break;
+        case 'CANCEL_COUNTDOWN':
+          if (nextState.status === 'WAITING' && nextState.countdown !== null) {
+            nextState.countdown = null;
+            nextState.logs = ['Host cancelled the game start.', ...nextState.logs];
+          }
+          break;
+        case 'PLAYER_DISCONNECT': {
+          const disconnectedPlayer = nextState.players.find(p => p.id === from);
+          if (disconnectedPlayer) {
+            nextState.players = nextState.players.filter(p => p.id !== from);
+            nextState.logs = [`${disconnectedPlayer.name} left the game.`, ...nextState.logs];
+
+            if (nextState.status === 'WAITING' && nextState.countdown !== null) {
+              nextState.countdown = null;
+              nextState.logs = ['Countdown cancelled because a player disconnected.', ...nextState.logs];
+            }
+
+            // If there are players left, adjust currentPlayerIndex if needed
+            if (nextState.players.length > 0) {
+               if (nextState.currentPlayerIndex >= nextState.players.length) {
+                  nextState.currentPlayerIndex = 0;
+               }
+            }
+          }
+          break;
+        }
       }
       return nextState;
     });
@@ -101,6 +143,13 @@ export const useNetworking = () => {
           handleAction(data.action, conn.peer);
         }
       });
+
+      conn.on('close', () => {
+        delete connections.current[conn.peer];
+        if (isHost) {
+          handleAction({ type: 'PLAYER_DISCONNECT' }, conn.peer);
+        }
+      });
     });
 
     return () => {
@@ -119,7 +168,8 @@ export const useNetworking = () => {
     setLobbyId(myId);
     setGameState(prev => ({
       ...prev,
-      status: 'PLAYING',
+      status: 'WAITING',
+      countdown: null,
       players: [{ id: myId, name: playerName || 'Host', balance: 1500, position: 0, properties: [], isBankrupt: false, color: COLORS[0] }]
     }));
   }, [myId, setIsHost, setGameState, playerName]);
@@ -141,7 +191,7 @@ export const useNetworking = () => {
         setGameState(data.state);
       }
     });
-  }, [peer, setGameState, setIsHost]);
+  }, [peer, setGameState, setIsHost, playerName]);
 
   return { createLobby, joinLobby, lobbyId, sendAction };
 };

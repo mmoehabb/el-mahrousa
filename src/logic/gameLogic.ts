@@ -10,6 +10,7 @@ export const createInitialState = (): GameState => ({
   turnPhase: 'ROLL',
   lastDice: [1, 1],
   logs: ['Welcome to Misr-opoly!'],
+  countdown: null,
 });
 
 export const rollDice = (): [number, number] => {
@@ -18,7 +19,7 @@ export const rollDice = (): [number, number] => {
 
 export const movePlayer = (state: GameState, steps: number): GameState => {
   const player = state.players[state.currentPlayerIndex];
-  let newPosition = (player.position + steps) % state.tiles.length;
+  const newPosition = (player.position + steps) % state.tiles.length;
 
   const newState = { ...state };
   const newPlayers = [...state.players];
@@ -47,7 +48,7 @@ export const movePlayer = (state: GameState, steps: number): GameState => {
 const applyLandingLogic = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex];
   const tile = state.tiles[player.position];
-  let newState = { ...state };
+  const newState = { ...state };
 
   if (tile.type === 'TAX') {
     const taxAmount = tile.price || 0;

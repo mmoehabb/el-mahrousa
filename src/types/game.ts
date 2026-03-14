@@ -25,8 +25,9 @@ export interface GameState {
   players: Player[];
   currentPlayerIndex: number;
   tiles: Tile[];
-  status: 'LOBBY' | 'PLAYING' | 'FINISHED';
+  status: 'LOBBY' | 'WAITING' | 'PLAYING' | 'FINISHED';
   turnPhase: 'ROLL' | 'ACTION' | 'END';
   lastDice: [number, number];
   logs: string[];
+  countdown?: number | null;
 }
