@@ -18,6 +18,25 @@ function App() {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
   const isMyTurn = currentPlayer?.id === myId;
 
+  // Handle auto-advance for dice roll and movement animations
+  useEffect(() => {
+    if (!isMyTurn || gameState.status !== 'PLAYING') return;
+
+    if (gameState.turnPhase === 'ROLLING') {
+      const timer = setTimeout(() => {
+        sendAction({ type: 'FINISH_ROLL' });
+      }, 1500); // Wait 1.5s for dice animation
+      return () => clearTimeout(timer);
+    }
+
+    if (gameState.turnPhase === 'MOVING') {
+      const timer = setTimeout(() => {
+        sendAction({ type: 'MOVE_STEP' });
+      }, 300); // 300ms per step hop
+      return () => clearTimeout(timer);
+    }
+  }, [gameState.turnPhase, gameState.stepsLeft, isMyTurn, sendAction, gameState.status]);
+
   const handleRoll = () => sendAction({ type: 'ROLL' });
   const handleBuy = () => sendAction({ type: 'BUY' });
   const handleEndTurn = () => sendAction({ type: 'END_TURN' });
