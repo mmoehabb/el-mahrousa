@@ -30,7 +30,7 @@ const Board: React.FC = () => {
       gameState.turnPhase === 'ACTION' ||
       gameState.turnPhase === 'END'
     ) {
-      setTimeout(() => setDisplayDice(gameState.lastDice), 0)
+      setDisplayDice(gameState.lastDice)
     }
     return () => clearInterval(interval)
   }, [gameState.turnPhase, gameState.lastDice])
@@ -51,11 +51,7 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: i + 1, gridRowStart: 1 }}
           >
-            <TileComponent
-              tile={tile}
-              players={gameState.players}
-              propertyOwners={gameState.propertyOwners}
-            />
+            <TileComponent tile={tile} players={gameState.players} />
           </div>
         ))}
 
@@ -66,11 +62,7 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: 1, gridRowStart: i + 2 }}
           >
-            <TileComponent
-              tile={tile}
-              players={gameState.players}
-              propertyOwners={gameState.propertyOwners}
-            />
+            <TileComponent tile={tile} players={gameState.players} />
           </div>
         ))}
 
@@ -81,11 +73,7 @@ const Board: React.FC = () => {
             className="col-start-7"
             style={{ gridColumnStart: 7, gridRowStart: i + 2 }}
           >
-            <TileComponent
-              tile={tile}
-              players={gameState.players}
-              propertyOwners={gameState.propertyOwners}
-            />
+            <TileComponent tile={tile} players={gameState.players} />
           </div>
         ))}
 
@@ -96,11 +84,7 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: i + 1, gridRowStart: 7 }}
           >
-            <TileComponent
-              tile={tile}
-              players={gameState.players}
-              propertyOwners={gameState.propertyOwners}
-            />
+            <TileComponent tile={tile} players={gameState.players} />
           </div>
         ))}
 
