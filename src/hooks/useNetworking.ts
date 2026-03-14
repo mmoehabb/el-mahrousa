@@ -20,6 +20,7 @@ export const useNetworking = () => {
     });
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAction = useCallback((action: any, from: string) => {
     if (!isHost) return;
 
@@ -28,12 +29,13 @@ export const useNetworking = () => {
       const currentPlayer = nextState.players[nextState.currentPlayerIndex];
 
       switch (action.type) {
-        case 'ROLL':
+        case 'ROLL': {
           if (currentPlayer.id !== from) return prev;
           const [d1, d2] = rollDice();
           nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' };
           nextState.logs = [`${currentPlayer.name} rolled ${d1 + d2}`, ...nextState.logs];
           break;
+        }
         case 'FINISH_ROLL':
           if (nextState.turnPhase !== 'ROLLING') return prev;
           nextState = { ...nextState, turnPhase: 'MOVING', stepsLeft: nextState.lastDice[0] + nextState.lastDice[1] };
@@ -127,6 +129,7 @@ export const useNetworking = () => {
     });
   }, [isHost, setGameState]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sendAction = useCallback((action: any) => {
     if (isHost) {
       handleAction(action, myId);
@@ -149,6 +152,7 @@ export const useNetworking = () => {
         connections.current[conn.peer] = conn;
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       conn.on('data', (data: any) => {
         if (data.type === 'SYNC') {
           setGameState(data.state);
@@ -199,6 +203,7 @@ export const useNetworking = () => {
       conn.send({ type: 'ACTION', action: { type: 'JOIN', name: playerName } });
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     conn.on('data', (data: any) => {
       if (data.type === 'SYNC') {
         setGameState(data.state);

@@ -29,7 +29,7 @@ const Board: React.FC = () => {
         ]);
       }, 100);
     } else if (gameState.turnPhase === 'MOVING' || gameState.turnPhase === 'ACTION' || gameState.turnPhase === 'END') {
-      setDisplayDice(gameState.lastDice);
+      setTimeout(() => setDisplayDice(gameState.lastDice), 0);
     }
     return () => clearInterval(interval);
   }, [gameState.turnPhase, gameState.lastDice]);
