@@ -10,6 +10,7 @@ export const createInitialState = (): GameState => ({
   turnPhase: 'ROLL',
   lastDice: [1, 1],
   logs: ['Welcome to Misr-opoly!'],
+  chatMessages: [],
 });
 
 export const rollDice = (): [number, number] => {

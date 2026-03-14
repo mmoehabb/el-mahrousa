@@ -21,6 +21,11 @@ export interface Player {
   color: string;
 }
 
+export interface ChatMessage {
+  sender: string;
+  message: string;
+}
+
 export interface GameState {
   players: Player[];
   currentPlayerIndex: number;
@@ -29,4 +34,5 @@ export interface GameState {
   turnPhase: 'ROLL' | 'ACTION' | 'END';
   lastDice: [number, number];
   logs: string[];
+  chatMessages: ChatMessage[];
 }
