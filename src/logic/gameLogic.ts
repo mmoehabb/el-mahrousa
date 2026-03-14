@@ -10,15 +10,17 @@ export const createInitialState = (): GameState => ({
   turnPhase: 'ROLL',
   lastDice: [1, 1],
   logs: ['Welcome to Misr-opoly!'],
+  countdown: null,
+  chatMessages: [],
 });
 
 export const rollDice = (): [number, number] => {
   return [Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1];
 };
 
-export const movePlayer = (state: GameState, steps: number): GameState => {
+export const moveOneStep = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex];
-  const newPosition = (player.position + steps) % state.tiles.length;
+  let newPosition = (player.position + 1) % state.tiles.length;
 
   const newState = { ...state };
   const newPlayers = [...state.players];
@@ -39,12 +41,10 @@ export const movePlayer = (state: GameState, steps: number): GameState => {
   }
 
   newState.players = newPlayers;
-  newState.turnPhase = 'ACTION';
-
-  return applyLandingLogic(newState);
+  return newState;
 };
 
-const applyLandingLogic = (state: GameState): GameState => {
+export const applyLandingLogic = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex];
   const tile = state.tiles[player.position];
   const newState = { ...state };

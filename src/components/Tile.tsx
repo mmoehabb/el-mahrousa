@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Tile, Player } from '../types/game';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { motion } from 'framer-motion';
 
 interface TileProps {
   tile: Tile;
@@ -29,10 +30,12 @@ const TileComponent: React.FC<TileProps> = ({ tile, players }) => {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-1 justify-center mb-1">
+      <div className="flex flex-wrap gap-1 justify-center mb-1 relative z-20">
         {tilePlayers.map(p => (
-          <div
+          <motion.div
             key={p.id}
+            layoutId={`player-${p.id}`}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="w-3 h-3 rounded-full border border-white shadow-sm"
             style={{ backgroundColor: p.color }}
             title={p.name}

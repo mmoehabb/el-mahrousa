@@ -17,7 +17,7 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [gameState, setGameState] = useState<GameState>(createInitialState());
   const [isHost, setIsHost] = useState(false);
-  const [myId] = useState(Math.random().toString(36).substring(7));
+  const [myId] = useState(() => Math.random().toString(36).substring(7));
   const [playerName, setPlayerName] = useState(() => sessionStorage.getItem('playerName') || '');
 
   const handleSetPlayerName = (name: string) => {
@@ -32,6 +32,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useGame = () => {
   const context = useContext(GameContext);
   if (!context) throw new Error('useGame must be used within a GameProvider');
