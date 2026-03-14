@@ -46,7 +46,7 @@ export const useNetworking = () => {
         case 'CHAT':
           {
             const sender = nextState.players.find(p => p.id === from)?.name || 'Unknown';
-            nextState.logs = [`[CHAT] ${sender}: ${action.message}`, ...nextState.logs];
+            nextState.chatMessages = [...nextState.chatMessages, { sender, message: action.message }];
           }
           break;
         case 'PROPOSE_TRADE':
