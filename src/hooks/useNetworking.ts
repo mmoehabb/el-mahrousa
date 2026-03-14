@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Peer, { type DataConnection } from 'peerjs'
 import { useGame } from '../context/GameContext'
-import type { GameState, Player } from '../types/game'
+import type { GameState, Player, GameAction } from '../types/game'
 import {
   rollDice,
   moveOneStep,
@@ -12,6 +12,10 @@ import {
 } from '../logic/gameLogic'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
+
+type PeerMessage =
+  | { type: 'SYNC'; state: GameState }
+  | { type: 'ACTION'; action: GameAction }
 
 export const useNetworking = () => {
   const { gameState, setGameState, isHost, setIsHost, myId, playerName } = useGame()
@@ -28,8 +32,7 @@ export const useNetworking = () => {
   }, [])
 
   const handleAction = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (action: any, from: string) => {
+    (action: GameAction, from: string) => {
       if (!isHost) return
 
       setGameState((prev) => {
@@ -150,8 +153,7 @@ export const useNetworking = () => {
   )
 
   const sendAction = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (action: any) => {
+    (action: GameAction) => {
       if (isHost) {
         handleAction(action, myId)
       } else {
@@ -175,12 +177,12 @@ export const useNetworking = () => {
         connections.current[conn.peer] = conn
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      conn.on('data', (data: any) => {
-        if (data.type === 'SYNC') {
-          setGameState(data.state)
-        } else if (data.type === 'ACTION' && isHost) {
-          handleAction(data.action, conn.peer)
+      conn.on('data', (data: unknown) => {
+        const message = data as PeerMessage
+        if (message.type === 'SYNC') {
+          setGameState(message.state)
+        } else if (message.type === 'ACTION' && isHost) {
+          handleAction(message.action, conn.peer)
         }
       })
 
@@ -237,10 +239,10 @@ export const useNetworking = () => {
         conn.send({ type: 'ACTION', action: { type: 'JOIN', name: playerName } })
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      conn.on('data', (data: any) => {
-        if (data.type === 'SYNC') {
-          setGameState(data.state)
+      conn.on('data', (data: unknown) => {
+        const message = data as PeerMessage
+        if (message.type === 'SYNC') {
+          setGameState(message.state)
         }
       })
     },
