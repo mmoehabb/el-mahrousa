@@ -40,12 +40,13 @@ export const useNetworking = () => {
         const currentPlayer = nextState.players[nextState.currentPlayerIndex]
 
         switch (action.type) {
-          case 'ROLL':
+          case 'ROLL': {
             if (currentPlayer.id !== from) return prev
             const [d1, d2] = rollDice()
             nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' }
             nextState.logs = [`${currentPlayer.name} rolled ${d1 + d2}`, ...nextState.logs]
             break
+          }
           case 'FINISH_ROLL':
             if (nextState.turnPhase !== 'ROLLING') return prev
             nextState = {

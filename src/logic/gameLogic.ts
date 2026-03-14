@@ -20,7 +20,7 @@ export const rollDice = (): [number, number] => {
 
 export const moveOneStep = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
-  let newPosition = (player.position + 1) % state.tiles.length
+  const newPosition = (player.position + 1) % state.tiles.length
 
   const newState = { ...state }
   const newPlayers = [...state.players]
