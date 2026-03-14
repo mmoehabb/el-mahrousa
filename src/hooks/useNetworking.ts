@@ -126,6 +126,16 @@ export const useNetworking = () => {
             const disconnectedPlayer = nextState.players.find((p) => p.id === from)
             if (disconnectedPlayer) {
               nextState.players = nextState.players.filter((p) => p.id !== from)
+
+              const newPropertyOwners = { ...nextState.propertyOwners }
+              Object.keys(newPropertyOwners).forEach((key) => {
+                const tileId = Number(key)
+                if (newPropertyOwners[tileId] === from) {
+                  delete newPropertyOwners[tileId]
+                }
+              })
+              nextState.propertyOwners = newPropertyOwners
+
               nextState.logs = [`${disconnectedPlayer.name} left the game.`, ...nextState.logs]
 
               if (nextState.status === 'WAITING' && nextState.countdown !== null) {

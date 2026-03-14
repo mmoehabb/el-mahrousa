@@ -6,11 +6,13 @@ import { motion } from 'framer-motion'
 interface TileProps {
   tile: Tile
   players: Player[]
+  propertyOwners: Record<number, string>
 }
 
-const TileComponent: React.FC<TileProps> = ({ tile, players }) => {
+const TileComponent: React.FC<TileProps> = ({ tile, players, propertyOwners }) => {
   const tilePlayers = players.filter((p) => p.position === tile.id)
-  const owner = players.find((p) => p.properties.includes(tile.id))
+  const ownerId = propertyOwners[tile.id]
+  const owner = ownerId ? players.find((p) => p.id === ownerId) : null
 
   return (
     <div className="board-tile min-w-[100px] min-h-[100px] bg-white/80 backdrop-blur-sm">

@@ -286,9 +286,7 @@ function App() {
                 {gameState.turnPhase === 'ACTION' && (
                   <div className="space-y-2">
                     {gameState.tiles[currentPlayer.position]?.price &&
-                      !gameState.players.some((p) =>
-                        p.properties.includes(currentPlayer.position),
-                      ) && (
+                      !gameState.propertyOwners[currentPlayer.position] && (
                         <button
                           onClick={handleBuy}
                           disabled={

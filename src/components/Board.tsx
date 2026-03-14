@@ -51,7 +51,11 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: i + 1, gridRowStart: 1 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              players={gameState.players}
+              propertyOwners={gameState.propertyOwners}
+            />
           </div>
         ))}
 
@@ -62,7 +66,11 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: 1, gridRowStart: i + 2 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              players={gameState.players}
+              propertyOwners={gameState.propertyOwners}
+            />
           </div>
         ))}
 
@@ -73,7 +81,11 @@ const Board: React.FC = () => {
             className="col-start-7"
             style={{ gridColumnStart: 7, gridRowStart: i + 2 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              players={gameState.players}
+              propertyOwners={gameState.propertyOwners}
+            />
           </div>
         ))}
 
@@ -84,7 +96,11 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: i + 1, gridRowStart: 7 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              players={gameState.players}
+              propertyOwners={gameState.propertyOwners}
+            />
           </div>
         ))}
 
