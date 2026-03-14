@@ -26,7 +26,8 @@ export interface GameState {
   currentPlayerIndex: number;
   tiles: Tile[];
   status: 'LOBBY' | 'PLAYING' | 'FINISHED';
-  turnPhase: 'ROLL' | 'ACTION' | 'END';
+  turnPhase: 'ROLL' | 'ROLLING' | 'MOVING' | 'ACTION' | 'END';
   lastDice: [number, number];
+  stepsLeft?: number;
   logs: string[];
 }

@@ -1,10 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import TileComponent from './Tile';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const DiceFace: React.FC<{ value: number }> = ({ value }) => {
+  const dots = Array(value).fill(0);
+  return (
+    <div className="w-12 h-12 bg-white rounded-xl shadow-lg border-2 border-slate-200 flex flex-wrap justify-center items-center p-1 gap-1">
+      {dots.map((_, i) => (
+        <div key={i} className="w-2.5 h-2.5 bg-egyptian-blue rounded-full" />
+      ))}
+    </div>
+  );
+};
 
 const Board: React.FC = () => {
   const { gameState } = useGame();
   const tiles = gameState.tiles;
+  const [displayDice, setDisplayDice] = useState<[number, number]>([1, 1]);
+
+  useEffect(() => {
+    let interval: number;
+    if (gameState.turnPhase === 'ROLLING') {
+      interval = setInterval(() => {
+        setDisplayDice([
+          Math.floor(Math.random() * 6) + 1,
+          Math.floor(Math.random() * 6) + 1,
+        ]);
+      }, 100);
+    } else if (gameState.turnPhase === 'MOVING' || gameState.turnPhase === 'ACTION' || gameState.turnPhase === 'END') {
+      setDisplayDice(gameState.lastDice);
+    }
+    return () => clearInterval(interval);
+  }, [gameState.turnPhase, gameState.lastDice]);
 
   // Split tiles for the 4 sides of the 6x6 board
   const bottomRow = tiles.slice(0, 7).reverse(); // 0 to 6
@@ -44,9 +72,27 @@ const Board: React.FC = () => {
         ))}
 
         {/* Center */}
-        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/30 rounded-lg">
-           <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md">EL-MAHROUSA</h1>
-           <div className="text-egyptian-gold font-bold">المحروسة</div>
+        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/30 rounded-lg relative">
+           <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md z-10">EL-MAHROUSA</h1>
+           <div className="text-egyptian-gold font-bold z-10">المحروسة</div>
+
+           <AnimatePresence>
+             {(gameState.turnPhase === 'ROLLING' || gameState.turnPhase === 'MOVING') && (
+               <motion.div
+                 initial={{ scale: 0, opacity: 0 }}
+                 animate={{ scale: 1, opacity: 1 }}
+                 exit={{ scale: 0, opacity: 0 }}
+                 className="absolute bottom-10 flex gap-4 bg-white/50 p-4 rounded-2xl backdrop-blur-md border border-white/50 shadow-xl"
+               >
+                 <motion.div animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}} transition={{ repeat: Infinity, duration: 0.5, ease: "linear" }}>
+                    <DiceFace value={displayDice[0]} />
+                 </motion.div>
+                 <motion.div animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}} transition={{ repeat: Infinity, duration: 0.5, ease: "linear" }}>
+                    <DiceFace value={displayDice[1]} />
+                 </motion.div>
+               </motion.div>
+             )}
+           </AnimatePresence>
         </div>
       </div>
     </div>
