@@ -18,6 +18,25 @@ function App() {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
   const isMyTurn = currentPlayer?.id === myId;
 
+  // Handle auto-advance for dice roll and movement animations
+  useEffect(() => {
+    if (!isMyTurn || gameState.status !== 'PLAYING') return;
+
+    if (gameState.turnPhase === 'ROLLING') {
+      const timer = setTimeout(() => {
+        sendAction({ type: 'FINISH_ROLL' });
+      }, 1500); // Wait 1.5s for dice animation
+      return () => clearTimeout(timer);
+    }
+
+    if (gameState.turnPhase === 'MOVING') {
+      const timer = setTimeout(() => {
+        sendAction({ type: 'MOVE_STEP' });
+      }, 300); // 300ms per step hop
+      return () => clearTimeout(timer);
+    }
+  }, [gameState.turnPhase, gameState.stepsLeft, isMyTurn, sendAction, gameState.status]);
+
   const handleRoll = () => sendAction({ type: 'ROLL' });
   const handleBuy = () => sendAction({ type: 'BUY' });
   const handleEndTurn = () => sendAction({ type: 'END_TURN' });
@@ -216,7 +235,7 @@ function App() {
               <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">Game Logs</h3>
               <div className="h-48 overflow-y-auto text-[10px] space-y-1 pr-2">
                 {gameState.logs.map((log, i) => (
-                  <div key={i} className={`border-b border-slate-100 pb-1 ${log.startsWith('[CHAT]') ? 'text-egyptian-blue font-semibold' : ''}`}>{log}</div>
+                  <div key={i} className="border-b border-slate-100 pb-1">{log}</div>
                 ))}
               </div>
             </div>
@@ -293,8 +312,17 @@ function App() {
 
              <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400">
                <div className="h-40 flex flex-col">
-                  <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2">
-                    <div className="text-slate-400 italic">Chat system ready...</div>
+                  <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2 pr-1">
+                    {gameState.chatMessages.length === 0 ? (
+                      <div className="text-slate-400 italic">Chat system ready...</div>
+                    ) : (
+                      gameState.chatMessages.map((msg, i) => (
+                        <div key={i} className="mb-1">
+                          <span className="font-bold text-egyptian-blue">{msg.sender}: </span>
+                          <span>{msg.message}</span>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <form onSubmit={handleSendChat} className="flex gap-1">
                     <input

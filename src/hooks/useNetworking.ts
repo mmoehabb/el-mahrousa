@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Peer, { type DataConnection } from 'peerjs';
 import { useGame } from '../context/GameContext';
 import type { GameState, Player } from '../types/game';
-import { rollDice, movePlayer, buyProperty, endTurn, executeTrade } from '../logic/gameLogic';
+import { rollDice, moveOneStep, applyLandingLogic, buyProperty, endTurn, executeTrade } from '../logic/gameLogic';
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080'];
 
@@ -28,14 +28,25 @@ export const useNetworking = () => {
       const currentPlayer = nextState.players[nextState.currentPlayerIndex];
 
       switch (action.type) {
-        case 'ROLL': {
+        case 'ROLL':
           if (currentPlayer.id !== from) return prev;
           const [d1, d2] = rollDice();
-          nextState = { ...nextState, lastDice: [d1, d2] };
+          nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' };
           nextState.logs = [`${currentPlayer.name} rolled ${d1 + d2}`, ...nextState.logs];
-          nextState = movePlayer(nextState, d1 + d2);
           break;
-        }
+        case 'FINISH_ROLL':
+          if (nextState.turnPhase !== 'ROLLING') return prev;
+          nextState = { ...nextState, turnPhase: 'MOVING', stepsLeft: nextState.lastDice[0] + nextState.lastDice[1] };
+          break;
+        case 'MOVE_STEP':
+          if (nextState.turnPhase !== 'MOVING' || (nextState.stepsLeft || 0) <= 0) return prev;
+          nextState = moveOneStep(nextState);
+          nextState.stepsLeft = (nextState.stepsLeft || 1) - 1;
+          if (nextState.stepsLeft === 0) {
+            nextState.turnPhase = 'ACTION';
+            nextState = applyLandingLogic(nextState);
+          }
+          break;
         case 'BUY':
           if (currentPlayer.id !== from) return prev;
           nextState = buyProperty(nextState, currentPlayer.position);
@@ -44,11 +55,13 @@ export const useNetworking = () => {
           if (currentPlayer.id !== from) return prev;
           nextState = endTurn(nextState);
           break;
-        case 'CHAT': {
-          const sender = nextState.players.find(p => p.id === from)?.name || 'Unknown';
-          nextState.logs = [`[CHAT] ${sender}: ${action.message}`, ...nextState.logs];
+
+        case 'CHAT':
+          {
+            const sender = nextState.players.find(p => p.id === from)?.name || 'Unknown';
+            nextState.chatMessages = [...nextState.chatMessages, { sender, message: action.message }];
+          }
           break;
-        }
         case 'PROPOSE_TRADE':
           nextState = executeTrade(nextState, from, action.partnerId, action.offer);
           break;

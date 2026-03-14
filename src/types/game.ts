@@ -21,13 +21,20 @@ export interface Player {
   color: string;
 }
 
+export interface ChatMessage {
+  sender: string;
+  message: string;
+}
+
 export interface GameState {
   players: Player[];
   currentPlayerIndex: number;
   tiles: Tile[];
-  status: 'LOBBY' | 'WAITING' | 'PLAYING' | 'FINISHED';
-  turnPhase: 'ROLL' | 'ACTION' | 'END';
+  status: 'LOBBY' | 'PLAYING' | 'FINISHED' | "WAITING";
+  turnPhase: 'ROLL' | 'ROLLING' | 'MOVING' | 'ACTION' | 'END';
   lastDice: [number, number];
+  stepsLeft?: number;
   logs: string[];
   countdown?: number | null;
+  chatMessages: ChatMessage[];
 }
