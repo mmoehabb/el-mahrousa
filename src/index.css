@@ -20,13 +20,13 @@ body {
 body.font-english-pixel {
   font-family: var(--font-english-pixel);
   /* Pixel fonts are generally harder to read when very small, so boost base slightly */
-  font-size: 0.7rem;
+  font-size: 0.6rem;
 }
 
 body.font-arabic-pixel {
   font-family: var(--font-arabic-pixel);
   /* Arabic pixel fonts like Lalezar often need a size boost to match English visual weight */
-  font-size: 1.1rem;
+  font-size: 1.25rem;
 }
 
 .board-tile {
