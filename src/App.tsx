@@ -148,7 +148,7 @@ function App() {
 
           <div className="space-y-6">
             <div className="p-4 bg-slate-100 rounded-lg border border-dashed border-slate-400 text-center">
-              <span className="text-sm text-slate-500 uppercase block mb-1">Lobby ID</span>
+              <span className="text-sm text-slate-500 uppercase block mb-1">{t('waiting.lobbyIdLabel')}</span>
               <span className="font-mono text-xl font-bold select-all block mb-2">{lobbyId}</span>
               <button
                 onClick={handleShareLink}
