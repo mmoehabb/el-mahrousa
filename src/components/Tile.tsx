@@ -15,19 +15,19 @@ const TileComponent: React.FC<TileProps> = ({ tile, players }) => {
   const owner = players.find((p) => p.properties.includes(tile.id))
 
   return (
-    <div className="board-tile min-w-[100px] min-h-[100px] bg-white/80 backdrop-blur-sm">
+    <div className="board-tile min-w-[100px] min-h-[100px] bg-white/80 backdrop-blur-sm border border-slate-200">
       {tile.color && (
         <div
           className="absolute top-0 left-0 right-0 h-4 border-b border-slate-400"
           style={{ backgroundColor: tile.color }}
         />
       )}
-      <div className="mt-5 font-bold uppercase tracking-tighter text-[9px]">
+      <div className="mt-5 font-bold uppercase tracking-tighter text-[9px] font-arabic-pixel">
         {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
       </div>
 
       {tile.price && (
-        <div className="text-[8px] text-slate-600">
+        <div className="text-[8px] text-slate-600 font-english-pixel">
           {tile.price} {GAME_CONFIG.CURRENCY}
         </div>
       )}
@@ -41,6 +41,9 @@ const TileComponent: React.FC<TileProps> = ({ tile, players }) => {
             className="w-3 h-3 rounded-full border border-white shadow-sm"
             style={{ backgroundColor: p.color }}
             title={p.name}
+            role="img"
+            aria-label={`${p.name} piece`}
+            tabIndex={0}
           />
         ))}
       </div>

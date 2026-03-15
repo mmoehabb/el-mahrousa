@@ -37,7 +37,7 @@ const LoginScreen: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold">
-        <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue uppercase tracking-widest">
+        <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue uppercase tracking-widest font-english-pixel">
           {t('login.title')}
         </h1>
         <p className="text-center text-slate-500 mb-6">{t('login.subtitle')}</p>
@@ -49,7 +49,7 @@ const LoginScreen: React.FC = () => {
               value={name}
               onChange={handleChange}
               placeholder={t('login.namePlaceholder')}
-              className={`w-full border-2 p-3 rounded-lg outline-none transition-colors ${
+              className={`w-full border border-2 p-3 rounded-lg outline-none transition-colors ${
                 error
                   ? 'border-red-500 focus:border-red-600'
                   : 'border-slate-200 focus:border-egyptian-blue'
@@ -71,7 +71,7 @@ const LoginScreen: React.FC = () => {
           <button
             type="submit"
             disabled={!name.trim()}
-            className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 active:scale-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-none"
           >
             {t('login.playGuestBtn')}
           </button>

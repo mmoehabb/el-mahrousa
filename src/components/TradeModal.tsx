@@ -118,15 +118,10 @@ const TradeModal: React.FC<TradeModalProps> = ({
           <div className="flex-1 space-y-4">
             <h3 className="font-bold border-b pb-1 text-sm">{t('trade.yourOffer')}</h3>
             <div className="space-y-2">
-              <label className="text-xs text-slate-500 block">
-                {t('game.currency', {
-                  amount: GAME_CONFIG.CURRENCY,
-                  currency: GAME_CONFIG.CURRENCY,
-                })}
-              </label>
+              <label className="text-xs text-slate-500 block">{GAME_CONFIG.CURRENCY}</label>
               <input
                 type="number"
-                className="w-full border rounded p-1 text-sm"
+                className="w-full border border-slate-200 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
                 value={offer.myCash}
                 onChange={(e) => setOffer({ ...offer, myCash: parseInt(e.target.value) || 0 })}
               />
@@ -137,23 +132,24 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 <p className="text-xs text-slate-400 italic">{t('trade.noProperties')}</p>
               ) : (
                 me.properties.map((pid) => (
-                  <div
-                    key={pid}
-                    onClick={() => toggleProperty(pid, true)}
-                    onKeyDown={(e) => e.key === 'Enter' && toggleProperty(pid, true)}
-                    role="checkbox"
-                    aria-checked={offer.myProperties.includes(pid)}
-                    tabIndex={0}
-                    className={`text-[10px] p-1 border rounded cursor-pointer ${offer.myProperties.includes(pid) ? 'bg-egyptian-gold/20 border-egyptian-gold' : ''}`}
-                  >
-                    {allTiles[pid].name}
+                  <div key={pid} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`my-property-${pid}`}
+                      checked={offer.myProperties.includes(pid)}
+                      onChange={(e) => toggleProperty(pid, e.target.checked)}
+                      className="w-3 h-3 text-egyptian-gold focus:ring-2 focus:ring-egyptian-gold"
+                    />
+                    <label htmlFor={`my-property-${pid}`} className="text-[10px] cursor-pointer">
+                      {allTiles[pid].name}
+                    </label>
                   </div>
                 ))
               )}
             </div>
           </div>
 
-          <div className="flex items-center justify-center text-2xl">↔</div>
+          <div className="flex items-center justify-center text-2xl mx-4">↔</div>
 
           {/* Partner side */}
           <div className="flex-1 space-y-4">
@@ -176,15 +172,10 @@ const TradeModal: React.FC<TradeModalProps> = ({
             {partner && (
               <>
                 <div className="space-y-2">
-                  <label className="text-xs text-slate-500 block">
-                    {t('game.currency', {
-                      amount: GAME_CONFIG.CURRENCY,
-                      currency: GAME_CONFIG.CURRENCY,
-                    })}
-                  </label>
+                  <label className="text-xs text-slate-500 block">{GAME_CONFIG.CURRENCY}</label>
                   <input
                     type="number"
-                    className="w-full border rounded p-1 text-sm"
+                    className="w-full border border-slate-200 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
                     value={offer.partnerCash}
                     onChange={(e) =>
                       setOffer({ ...offer, partnerCash: parseInt(e.target.value) || 0 })
@@ -197,16 +188,20 @@ const TradeModal: React.FC<TradeModalProps> = ({
                     <p className="text-xs text-slate-400 italic">{t('trade.noProperties')}</p>
                   ) : (
                     partner.properties.map((pid) => (
-                      <div
-                        key={pid}
-                        onClick={() => toggleProperty(pid, false)}
-                        onKeyDown={(e) => e.key === 'Enter' && toggleProperty(pid, false)}
-                        role="checkbox"
-                        aria-checked={offer.partnerProperties.includes(pid)}
-                        tabIndex={0}
-                        className={`text-[10px] p-1 border rounded cursor-pointer ${offer.partnerProperties.includes(pid) ? 'bg-egyptian-gold/20 border-egyptian-gold' : ''}`}
-                      >
-                        {allTiles[pid].name}
+                      <div key={pid} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`partner-property-${pid}`}
+                          checked={offer.partnerProperties.includes(pid)}
+                          onChange={(e) => toggleProperty(pid, e.target.checked)}
+                          className="w-3 h-3 text-egyptian-gold focus:ring-2 focus:ring-egyptian-gold"
+                        />
+                        <label
+                          htmlFor={`partner-property-${pid}`}
+                          className="text-[10px] cursor-pointer"
+                        >
+                          {allTiles[pid].name}
+                        </label>
                       </div>
                     ))
                   )}
@@ -217,12 +212,15 @@ const TradeModal: React.FC<TradeModalProps> = ({
         </div>
 
         <div className="p-4 bg-slate-50 border-t flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-bold text-slate-600">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-bold text-slate-600 border border-slate-200 rounded hover:border-egyptian-blue active:scale-95"
+          >
             {t('trade.cancel')}
           </button>
           <button
             onClick={() => onPropose(partnerId, offer)}
-            className="px-4 py-2 text-sm font-bold bg-egyptian-gold text-white rounded shadow hover:bg-yellow-600"
+            className="px-4 py-2 text-sm font-bold bg-egyptian-gold text-white rounded shadow hover:bg-yellow-600 border-none"
           >
             {t('trade.proposeBtn')}
           </button>
