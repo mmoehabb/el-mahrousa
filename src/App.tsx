@@ -1,70 +1,103 @@
-import { useState } from 'react';
-import { useGame } from './context/GameContext';
-import Board from './components/Board';
-import { useNetworking } from './hooks/useNetworking';
-import { Dice5, Send, Users, Handshake } from 'lucide-react';
-import { useEffect } from 'react';
-import { GAME_CONFIG } from './config/gameConfig';
-import TradeModal, { type TradeOffer } from './components/TradeModal';
-import LoginScreen from './components/LoginScreen';
+import { useState } from 'react'
+import { useGame } from './context/GameContext'
+import Board from './components/Board'
+import { useNetworking } from './hooks/useNetworking'
+import { Dice5, Send, Users, Handshake } from 'lucide-react'
+import { useEffect } from 'react'
+import { GAME_CONFIG } from './config/gameConfig'
+import TradeModal, { type TradeOffer } from './components/TradeModal'
+import LoginScreen from './components/LoginScreen'
 
 function App() {
-  const { gameState, myId, playerName } = useGame();
-  const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking();
-  const [joinId, setJoinId] = useState('');
-  const [chatMsg, setChatMsg] = useState('');
-  const [isTradeOpen, setIsTradeOpen] = useState(false);
+  const { gameState, myId, playerName, isHost } = useGame()
+  const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking()
+  const [joinId, setJoinId] = useState('')
+  const [chatMsg, setChatMsg] = useState('')
+  const [isTradeOpen, setIsTradeOpen] = useState(false)
 
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  const isMyTurn = currentPlayer?.id === myId;
+  const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+  const isMyTurn = currentPlayer?.id === myId
 
-  const handleRoll = () => sendAction({ type: 'ROLL' });
-  const handleBuy = () => sendAction({ type: 'BUY' });
-  const handleEndTurn = () => sendAction({ type: 'END_TURN' });
+  // Handle auto-advance for dice roll and movement animations
+  useEffect(() => {
+    if (!isMyTurn || gameState.status !== 'PLAYING') return
+
+    if (gameState.turnPhase === 'ROLLING') {
+      const timer = setTimeout(() => {
+        sendAction({ type: 'FINISH_ROLL' })
+      }, 1500) // Wait 1.5s for dice animation
+      return () => clearTimeout(timer)
+    }
+
+    if (gameState.turnPhase === 'MOVING') {
+      const timer = setTimeout(() => {
+        sendAction({ type: 'MOVE_STEP' })
+      }, 300) // 300ms per step hop
+      return () => clearTimeout(timer)
+    }
+  }, [gameState.turnPhase, gameState.stepsLeft, isMyTurn, sendAction, gameState.status])
+
+  const handleRoll = () => sendAction({ type: 'ROLL' })
+  const handleBuy = () => sendAction({ type: 'BUY' })
+  const handleEndTurn = () => sendAction({ type: 'END_TURN' })
 
   const handleSendChat = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatMsg.trim()) return;
-    sendAction({ type: 'CHAT', message: chatMsg });
-    setChatMsg('');
-  };
+    e.preventDefault()
+    if (!chatMsg.trim()) return
+    sendAction({ type: 'CHAT', message: chatMsg })
+    setChatMsg('')
+  }
 
-  const [showCopied, setShowCopied] = useState(false);
+  const [showCopied, setShowCopied] = useState(false)
 
   const handleProposeTrade = (partnerId: string, offer: TradeOffer) => {
-    sendAction({ type: 'PROPOSE_TRADE', partnerId, offer });
-    setIsTradeOpen(false);
-  };
+    sendAction({ type: 'PROPOSE_TRADE', partnerId, offer })
+    setIsTradeOpen(false)
+  }
 
   useEffect(() => {
     if (playerName && gameState.status === 'LOBBY') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const lobbyFromUrl = urlParams.get('lobby');
+      const urlParams = new URLSearchParams(window.location.search)
+      const lobbyFromUrl = urlParams.get('lobby')
       if (lobbyFromUrl) {
-        joinLobby(lobbyFromUrl);
+        joinLobby(lobbyFromUrl)
         // Clean up the URL
-        window.history.replaceState({}, '', window.location.pathname);
+        window.history.replaceState({}, '', window.location.pathname)
       }
     }
-  }, [playerName, gameState.status, joinLobby]);
+  }, [playerName, gameState.status, joinLobby])
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>
+    if (isHost && gameState.status === 'WAITING' && gameState.countdown !== null) {
+      interval = setInterval(() => {
+        sendAction({ type: 'TICK_COUNTDOWN' })
+      }, 1000)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [isHost, gameState.status, gameState.countdown, sendAction])
 
   const handleShareLink = () => {
-    const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`
     navigator.clipboard.writeText(shareUrl).then(() => {
-      setShowCopied(true);
-      setTimeout(() => setShowCopied(false), 2000);
-    });
-  };
+      setShowCopied(true)
+      setTimeout(() => setShowCopied(false), 2000)
+    })
+  }
 
   if (!playerName) {
-    return <LoginScreen />;
+    return <LoginScreen />
   }
 
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
       {gameState.status === 'LOBBY' ? (
         <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
-          <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">El-Mahrousa</h1>
+          <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">
+            El-Mahrousa
+          </h1>
 
           <div className="space-y-4">
             <button
@@ -91,6 +124,77 @@ function App() {
             </div>
           </div>
         </div>
+      ) : gameState.status === 'WAITING' ? (
+        <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
+          <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">
+            Waiting Room
+          </h1>
+
+          <div className="space-y-6">
+            <div className="p-4 bg-slate-100 rounded-lg border border-dashed border-slate-400 text-center">
+              <span className="text-sm text-slate-500 uppercase block mb-1">Lobby ID</span>
+              <span className="font-mono text-xl font-bold select-all block mb-2">{lobbyId}</span>
+              <button
+                onClick={handleShareLink}
+                className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors"
+              >
+                {showCopied ? 'COPIED!' : 'SHARE LINK'}
+              </button>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg border border-slate-200">
+              <h3 className="font-bold flex items-center gap-2 mb-3 text-egyptian-blue">
+                <Users size={18} /> PLAYERS ({gameState.players.length})
+              </h3>
+              <div className="space-y-2">
+                {gameState.players.map((p) => (
+                  <div key={p.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
+                    <span className="font-semibold">
+                      {p.name} {p.id === myId ? '(You)' : ''}
+                    </span>
+                    {p.id === gameState.players[0].id && (
+                      <span className="text-xs bg-egyptian-gold text-white px-2 py-0.5 rounded ml-auto">
+                        HOST
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 text-center">
+              {isHost ? (
+                gameState.countdown === null ? (
+                  <button
+                    onClick={() => sendAction({ type: 'START_COUNTDOWN' })}
+                    className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors text-lg"
+                  >
+                    START GAME
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="text-2xl font-black text-egyptian-red animate-pulse">
+                      Starting in {gameState.countdown}...
+                    </div>
+                    <button
+                      onClick={() => sendAction({ type: 'CANCEL_COUNTDOWN' })}
+                      className="w-full bg-slate-300 text-slate-700 py-2 rounded-lg font-bold hover:bg-slate-400 transition-colors"
+                    >
+                      CANCEL
+                    </button>
+                  </div>
+                )
+              ) : (
+                <div className="p-4 bg-blue-50 text-blue-800 rounded-lg font-semibold animate-pulse">
+                  {gameState.countdown !== null
+                    ? `Game starting in ${gameState.countdown}...`
+                    : 'Waiting for host to start the game...'}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="flex gap-8 w-full max-w-7xl justify-center">
           <TradeModal
@@ -111,12 +215,17 @@ function App() {
 
               <div className="space-y-2">
                 {gameState.players.map((p, i) => (
-                  <div key={p.id} className={`flex justify-between items-center p-2 rounded ${i === gameState.currentPlayerIndex ? 'bg-egyptian-gold/20' : ''}`}>
+                  <div
+                    key={p.id}
+                    className={`flex justify-between items-center p-2 rounded ${i === gameState.currentPlayerIndex ? 'bg-egyptian-gold/20' : ''}`}
+                  >
                     <span className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
                       {p.name} {p.id === myId ? '(You)' : ''}
                     </span>
-                    <span className="font-bold text-xs">{p.balance} {GAME_CONFIG.CURRENCY}</span>
+                    <span className="font-bold text-xs">
+                      {p.balance} {GAME_CONFIG.CURRENCY}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -138,10 +247,14 @@ function App() {
             </div>
 
             <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold">
-              <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">Game Logs</h3>
+              <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
+                Game Logs
+              </h3>
               <div className="h-48 overflow-y-auto text-[10px] space-y-1 pr-2">
                 {gameState.logs.map((log, i) => (
-                  <div key={i} className={`border-b border-slate-100 pb-1 ${log.startsWith('[CHAT]') ? 'text-egyptian-blue font-semibold' : ''}`}>{log}</div>
+                  <div key={i} className="border-b border-slate-100 pb-1">
+                    {log}
+                  </div>
                 ))}
               </div>
             </div>
@@ -152,92 +265,110 @@ function App() {
 
           {/* Right Panel: Controls & Chat */}
           <div className="w-64 space-y-4">
-             <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center">
-                <div className="mb-4">
-                  <span className="text-xs text-slate-500 uppercase">Current Turn</span>
-                  <div className="font-bold text-lg">{currentPlayer?.name || 'Waiting...'}</div>
-                </div>
+            <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center">
+              <div className="mb-4">
+                <span className="text-xs text-slate-500 uppercase">Current Turn</span>
+                <div className="font-bold text-lg">{currentPlayer?.name || 'Waiting...'}</div>
+              </div>
 
-                <div className="space-y-2">
-                  {gameState.turnPhase === 'ROLL' && (
-                    <button
-                      onClick={handleRoll}
-                      disabled={!isMyTurn}
-                      className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
-                    >
-                      <Dice5 /> ROLL DICE
-                    </button>
-                  )}
+              <div className="space-y-2">
+                {gameState.turnPhase === 'ROLL' && (
+                  <button
+                    onClick={handleRoll}
+                    disabled={!isMyTurn}
+                    className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                  >
+                    <Dice5 /> ROLL DICE
+                  </button>
+                )}
 
-                  {gameState.turnPhase === 'ACTION' && (
-                    <div className="space-y-2">
-                      {gameState.tiles[currentPlayer.position]?.price && !gameState.players.some(p => p.properties.includes(currentPlayer.position)) && (
-                         <button
+                {gameState.turnPhase === 'ACTION' && (
+                  <div className="space-y-2">
+                    {gameState.tiles[currentPlayer.position]?.price &&
+                      !gameState.players.some((p) =>
+                        p.properties.includes(currentPlayer.position),
+                      ) && (
+                        <button
                           onClick={handleBuy}
-                          disabled={!isMyTurn || currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)}
+                          disabled={
+                            !isMyTurn ||
+                            currentPlayer.balance <
+                              (gameState.tiles[currentPlayer.position].price || 0)
+                          }
                           className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700"
                         >
                           BUY FOR {gameState.tiles[currentPlayer.position].price}
                         </button>
                       )}
-                      <button
-                        onClick={handleEndTurn}
-                        disabled={!isMyTurn}
-                        className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600"
-                      >
-                        SKIP / END TURN
-                      </button>
-                    </div>
-                  )}
-
-                  {gameState.turnPhase === 'END' && (
                     <button
                       onClick={handleEndTurn}
                       disabled={!isMyTurn}
-                      className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold"
+                      className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600"
                     >
-                      END TURN
+                      SKIP / END TURN
                     </button>
-                  )}
-
-                  <button
-                    onClick={() => setIsTradeOpen(true)}
-                    className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all"
-                  >
-                    <Handshake size={18} /> PROPOSE TRADE
-                  </button>
-
-                  <button
-                    onClick={() => window.location.href = '/'}
-                    className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4"
-                  >
-                    LEAVE GAME
-                  </button>
-                </div>
-             </div>
-
-             <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400">
-               <div className="h-40 flex flex-col">
-                  <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2">
-                    <div className="text-slate-400 italic">Chat system ready...</div>
                   </div>
-                  <form onSubmit={handleSendChat} className="flex gap-1">
-                    <input
-                      type="text"
-                      className="flex-1 border text-xs p-1 rounded"
-                      placeholder="Type a message..."
-                      value={chatMsg}
-                      onChange={(e) => setChatMsg(e.target.value)}
-                    />
-                    <button type="submit" className="p-1 bg-slate-200 rounded"><Send size={14}/></button>
-                  </form>
-               </div>
-             </div>
+                )}
+
+                {gameState.turnPhase === 'END' && (
+                  <button
+                    onClick={handleEndTurn}
+                    disabled={!isMyTurn}
+                    className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold"
+                  >
+                    END TURN
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setIsTradeOpen(true)}
+                  className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all"
+                >
+                  <Handshake size={18} /> PROPOSE TRADE
+                </button>
+
+                <button
+                  onClick={() => (window.location.href = '/')}
+                  className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4"
+                >
+                  LEAVE GAME
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400">
+              <div className="h-40 flex flex-col">
+                <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2 pr-1">
+                  {gameState.chatMessages.length === 0 ? (
+                    <div className="text-slate-400 italic">Chat system ready...</div>
+                  ) : (
+                    gameState.chatMessages.map((msg, i) => (
+                      <div key={i} className="mb-1">
+                        <span className="font-bold text-egyptian-blue">{msg.sender}: </span>
+                        <span>{msg.message}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <form onSubmit={handleSendChat} className="flex gap-1">
+                  <input
+                    type="text"
+                    className="flex-1 border text-xs p-1 rounded"
+                    placeholder="Type a message..."
+                    value={chatMsg}
+                    onChange={(e) => setChatMsg(e.target.value)}
+                  />
+                  <button type="submit" className="p-1 bg-slate-200 rounded">
+                    <Send size={14} />
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
