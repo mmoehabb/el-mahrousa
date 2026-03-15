@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 
 @theme {
+  --font-english-pixel: 'Press Start 2P', system-ui, sans-serif;
+  --font-arabic-pixel: 'Lalezar', system-ui, sans-serif;
+
   --color-egyptian-gold: #d4af37;
   --color-egyptian-blue: #1034a6;
   --color-egyptian-red: #e0115f;
@@ -12,6 +15,18 @@ body {
   background-color: #fff7ed;
   color: #0f172a;
   background-image: var(--background-image-papyrus);
+}
+
+body.font-english-pixel {
+  font-family: var(--font-english-pixel);
+  /* Pixel fonts are generally harder to read when very small, so boost base slightly */
+  font-size: 0.9rem;
+}
+
+body.font-arabic-pixel {
+  font-family: var(--font-arabic-pixel);
+  /* Arabic pixel fonts like Lalezar often need a size boost to match English visual weight */
+  font-size: 1.1rem;
 }
 
 .board-tile {

@@ -7,9 +7,11 @@ import { useEffect } from 'react'
 import { GAME_CONFIG } from './config/gameConfig'
 import TradeModal, { type TradeOffer } from './components/TradeModal'
 import LoginScreen from './components/LoginScreen'
+import { useTranslation } from 'react-i18next'
 
 function App() {
   const { gameState, myId, playerName, isHost } = useGame()
+  const { t, i18n } = useTranslation()
   const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking()
   const [joinId, setJoinId] = useState('')
   const [chatMsg, setChatMsg] = useState('')
@@ -91,13 +93,26 @@ function App() {
     return <LoginScreen />
   }
 
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')
+  }
+
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
       {gameState.status === 'LOBBY' ? (
-        <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
-          <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">
-            El-Mahrousa
-          </h1>
+        <>
+          <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto">
+            <button
+              onClick={toggleLanguage}
+              className="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg font-bold transition-colors"
+            >
+              {i18n.language === 'en' ? 'عربي' : 'English'}
+            </button>
+          </div>
+          <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
+            <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">
+              {t('lobby.title')}
+            </h1>
 
           <div className="space-y-4">
             <button
@@ -124,6 +139,7 @@ function App() {
             </div>
           </div>
         </div>
+        </>
       ) : gameState.status === 'WAITING' ? (
         <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
           <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">
@@ -138,7 +154,7 @@ function App() {
                 onClick={handleShareLink}
                 className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors"
               >
-                {showCopied ? 'COPIED!' : 'SHARE LINK'}
+                {showCopied ? t('game.copiedBtn') : t('game.shareLinkBtn')}
               </button>
             </div>
 
@@ -151,10 +167,10 @@ function App() {
                   <div key={p.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
                     <span className="font-semibold">
-                      {p.name} {p.id === myId ? '(You)' : ''}
+                      {p.name} {p.id === myId ? t('waiting.you') : ''}
                     </span>
                     {p.id === gameState.players[0].id && (
-                      <span className="text-xs bg-egyptian-gold text-white px-2 py-0.5 rounded ml-auto">
+                      <span className="text-xs bg-egyptian-gold text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto">
                         HOST
                       </span>
                     )}
@@ -175,7 +191,7 @@ function App() {
                 ) : (
                   <div className="space-y-3">
                     <div className="text-2xl font-black text-egyptian-red animate-pulse">
-                      Starting in {gameState.countdown}...
+                      {t('waiting.startingIn', { count: gameState.countdown })}
                     </div>
                     <button
                       onClick={() => sendAction({ type: 'CANCEL_COUNTDOWN' })}
@@ -188,8 +204,8 @@ function App() {
               ) : (
                 <div className="p-4 bg-blue-50 text-blue-800 rounded-lg font-semibold animate-pulse">
                   {gameState.countdown !== null
-                    ? `Game starting in ${gameState.countdown}...`
-                    : 'Waiting for host to start the game...'}
+                    ? t('waiting.startingIn', { count: gameState.countdown })
+                    : t('waiting.waitingForHost')}
                 </div>
               )}
             </div>
@@ -208,7 +224,7 @@ function App() {
 
           {/* Left Panel: Player Info */}
           <div className="w-64 space-y-4">
-            <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue">
+            <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue rtl:border-r-4 rtl:border-l-0">
               <h3 className="font-bold flex items-center gap-2 mb-2">
                 <Users size={18} /> PLAYERS
               </h3>
@@ -221,7 +237,7 @@ function App() {
                   >
                     <span className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-                      {p.name} {p.id === myId ? '(You)' : ''}
+                      {p.name} {p.id === myId ? t('waiting.you') : ''}
                     </span>
                     <span className="font-bold text-xs">
                       {p.balance} {GAME_CONFIG.CURRENCY}
@@ -233,29 +249,49 @@ function App() {
               {lobbyId && (
                 <div className="space-y-2">
                   <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
-                    <span className="text-xs text-slate-500 uppercase block">Share this ID</span>
+                    <span className="text-xs text-slate-500 uppercase block">{t('game.shareIdLabel')}</span>
                     <span className="font-mono font-bold select-all">{lobbyId}</span>
                   </div>
                   <button
                     onClick={handleShareLink}
                     className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors relative"
                   >
-                    {showCopied ? 'COPIED!' : 'SHARE LINK'}
+                    {showCopied ? t('game.copiedBtn') : t('game.shareLinkBtn')}
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold">
+            <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold rtl:border-r-4 rtl:border-l-0">
               <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
                 Game Logs
               </h3>
-              <div className="h-48 overflow-y-auto text-[10px] space-y-1 pr-2">
-                {gameState.logs.map((log, i) => (
-                  <div key={i} className="border-b border-slate-100 pb-1">
-                    {log}
-                  </div>
-                ))}
+              <div className="h-48 overflow-y-auto text-[10px] space-y-1 pr-2 rtl:pr-0 rtl:pl-2">
+                {gameState.logs.map((log, i) => {
+                  if (typeof log === 'string') {
+                    return (
+                      <div key={i} className="border-b border-slate-100 pb-1">
+                        {log}
+                      </div>
+                    )
+                  }
+                  if (log.key) {
+                    const translatedParams = { ...log.params }
+                    if (translatedParams.property) {
+                      translatedParams.property = t(`cities.${translatedParams.property}`)
+                    }
+                    return (
+                      <div key={i} className="border-b border-slate-100 pb-1">
+                        {t(`logs.${log.key}`, translatedParams) as string}
+                      </div>
+                    )
+                  }
+                  return (
+                    <div key={i} className="border-b border-slate-100 pb-1">
+                      {JSON.stringify(log)}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -265,10 +301,10 @@ function App() {
 
           {/* Right Panel: Controls & Chat */}
           <div className="w-64 space-y-4">
-            <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center">
+            <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
               <div className="mb-4">
-                <span className="text-xs text-slate-500 uppercase">Current Turn</span>
-                <div className="font-bold text-lg">{currentPlayer?.name || 'Waiting...'}</div>
+                <span className="text-xs text-slate-500 uppercase">{t('game.currentTurnLabel')}</span>
+                <div className="font-bold text-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
               </div>
 
               <div className="space-y-2">
@@ -336,11 +372,11 @@ function App() {
               </div>
             </div>
 
-            <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400">
+            <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 rtl:border-l-4 rtl:border-r-0">
               <div className="h-40 flex flex-col">
-                <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2 pr-1">
+                <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2 pr-1 rtl:pr-0 rtl:pl-1">
                   {gameState.chatMessages.length === 0 ? (
-                    <div className="text-slate-400 italic">Chat system ready...</div>
+                    <div className="text-slate-400 italic">{t('game.chatReady')}</div>
                   ) : (
                     gameState.chatMessages.map((msg, i) => (
                       <div key={i} className="mb-1">
@@ -354,11 +390,11 @@ function App() {
                   <input
                     type="text"
                     className="flex-1 border text-xs p-1 rounded"
-                    placeholder="Type a message..."
+                    placeholder={t('game.chatPlaceholder')}
                     value={chatMsg}
                     onChange={(e) => setChatMsg(e.target.value)}
                   />
-                  <button type="submit" className="p-1 bg-slate-200 rounded">
+                  <button type="submit" className="p-1 bg-slate-200 rounded rtl:rotate-180">
                     <Send size={14} />
                   </button>
                 </form>

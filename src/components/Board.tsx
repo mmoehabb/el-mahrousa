@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useGame } from '../context/GameContext'
 import TileComponent from './Tile'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const DiceFace: React.FC<{ value: number }> = ({ value }) => {
@@ -15,25 +16,25 @@ const DiceFace: React.FC<{ value: number }> = ({ value }) => {
 }
 
 const Board: React.FC = () => {
+  const { t } = useTranslation()
   const { gameState } = useGame()
   const tiles = gameState.tiles
-  const [displayDice, setDisplayDice] = useState<[number, number]>([1, 1])
+
+  const isRolling = gameState.turnPhase === 'ROLLING'
+  const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
 
   useEffect(() => {
     let interval: number
-    if (gameState.turnPhase === 'ROLLING') {
+    if (isRolling) {
       interval = setInterval(() => {
-        setDisplayDice([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1])
+        setRollingDice([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1])
       }, 100)
-    } else if (
-      gameState.turnPhase === 'MOVING' ||
-      gameState.turnPhase === 'ACTION' ||
-      gameState.turnPhase === 'END'
-    ) {
-      setDisplayDice(gameState.lastDice)
     }
     return () => clearInterval(interval)
-  }, [gameState.turnPhase, gameState.lastDice])
+  }, [isRolling])
+
+  const effectiveDisplayDice = isRolling ? rollingDice : gameState.lastDice
+
 
   // Split tiles for the 4 sides of the 6x6 board
   const bottomRow = tiles.slice(0, 7).reverse() // 0 to 6
@@ -93,7 +94,7 @@ const Board: React.FC = () => {
           <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md z-10">
             EL-MAHROUSA
           </h1>
-          <div className="text-egyptian-gold font-bold z-10">المحروسة</div>
+          <div className="text-egyptian-gold font-bold z-10">{t('lobby.titleAr')}</div>
 
           <AnimatePresence>
             {(gameState.turnPhase === 'ROLLING' || gameState.turnPhase === 'MOVING') && (
@@ -107,13 +108,13 @@ const Board: React.FC = () => {
                   animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
                   transition={{ repeat: Infinity, duration: 0.5, ease: 'linear' }}
                 >
-                  <DiceFace value={displayDice[0]} />
+                  <DiceFace value={effectiveDisplayDice[0]} />
                 </motion.div>
                 <motion.div
                   animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}}
                   transition={{ repeat: Infinity, duration: 0.5, ease: 'linear' }}
                 >
-                  <DiceFace value={displayDice[1]} />
+                  <DiceFace value={effectiveDisplayDice[1]} />
                 </motion.div>
               </motion.div>
             )}

@@ -26,6 +26,8 @@ export interface ChatMessage {
   message: string
 }
 
+export type GameLog = string | { key: string; params: Record<string, string | number> };
+
 export interface GameState {
   players: Player[]
   currentPlayerIndex: number
@@ -34,7 +36,7 @@ export interface GameState {
   turnPhase: 'ROLL' | 'ROLLING' | 'MOVING' | 'ACTION' | 'END'
   lastDice: [number, number]
   stepsLeft?: number
-  logs: string[]
+  logs: GameLog[]
   countdown?: number | null
   chatMessages: ChatMessage[]
 }

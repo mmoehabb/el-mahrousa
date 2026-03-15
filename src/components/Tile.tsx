@@ -1,6 +1,7 @@
 import React from 'react'
 import type { Tile, Player } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 
 interface TileProps {
@@ -9,6 +10,7 @@ interface TileProps {
 }
 
 const TileComponent: React.FC<TileProps> = ({ tile, players }) => {
+  const { t } = useTranslation()
   const tilePlayers = players.filter((p) => p.position === tile.id)
   const owner = players.find((p) => p.properties.includes(tile.id))
 
@@ -20,7 +22,7 @@ const TileComponent: React.FC<TileProps> = ({ tile, players }) => {
           style={{ backgroundColor: tile.color }}
         />
       )}
-      <div className="mt-5 font-bold uppercase tracking-tighter text-[9px]">{tile.name}</div>
+      <div className="mt-5 font-bold uppercase tracking-tighter text-[9px]">{t(`cities.${tile.name}`)}</div>
 
       {tile.price && (
         <div className="text-[8px] text-slate-600">

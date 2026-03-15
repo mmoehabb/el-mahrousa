@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import type { Player, Tile } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface TradeModalProps {
   isOpen: boolean
@@ -27,6 +28,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
   allTiles,
   onPropose,
 }) => {
+  const { t } = useTranslation()
   const me = players.find((p) => p.id === myId)
   const others = players.filter((p) => p.id !== myId)
 
@@ -57,7 +59,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="bg-egyptian-blue text-white p-4 flex justify-between items-center">
-          <h2 className="font-bold uppercase">Trade Proposal</h2>
+          <h2 className="font-bold uppercase">{t('trade.title')}</h2>
           <button onClick={onClose}>
             <X />
           </button>
@@ -66,7 +68,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
         <div className="p-4 flex gap-4 overflow-y-auto">
           {/* My side */}
           <div className="flex-1 space-y-4">
-            <h3 className="font-bold border-b pb-1 text-sm">Your Offer</h3>
+            <h3 className="font-bold border-b pb-1 text-sm">{t('trade.yourOffer')}</h3>
             <div className="space-y-2">
               <label className="text-xs text-slate-500 block">Cash ({GAME_CONFIG.CURRENCY})</label>
               <input
@@ -77,7 +79,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-slate-500 block">Properties</label>
+              <label className="text-xs text-slate-500 block">{t('trade.properties')}</label>
               {me.properties.map((pid) => (
                 <div
                   key={pid}
@@ -126,7 +128,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-500 block">Properties</label>
+                  <label className="text-xs text-slate-500 block">{t('trade.properties')}</label>
                   {partner.properties.map((pid) => (
                     <div
                       key={pid}
