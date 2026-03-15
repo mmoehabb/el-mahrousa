@@ -1,7 +1,7 @@
-# Misr-opoly (Egyptian Monopoly)
+# El-Mahrousa (Egyptian Monopoly)
 
 ## Abstract
-Misr-opoly (المحروسة) is a localized, streamlined version of the classic Monopoly game tailored for the Egyptian market. It features Egyptian cities, currency (EGP), and a 24-tile board for faster, more engaging gameplay. The game supports real-time multiplayer over a Peer-to-Peer (P2P) network using WebRTC, allowing players to connect and play directly with each other without a centralized game server.
+El-Mahrousa (المحروسة) is a localized, streamlined version of the classic Monopoly game tailored for the Egyptian market. It features Egyptian cities, currency (EGP), and a 24-tile board for faster, more engaging gameplay. The game supports real-time multiplayer over a Peer-to-Peer (P2P) network using WebRTC, allowing players to connect and play directly with each other without a centralized game server.
 
 ## How to Play
 - **Objective:** Be the last player standing (Bankrupt mode) or accumulate the highest net worth.
