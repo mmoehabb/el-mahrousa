@@ -20,7 +20,7 @@ body {
 body.font-english-pixel {
   font-family: var(--font-english-pixel);
   /* Pixel fonts are generally harder to read when very small, so boost base slightly */
-  font-size: 0.9rem;
+  font-size: 0.7rem;
 }
 
 body.font-arabic-pixel {
