@@ -1,23 +1,21 @@
-import React, { useState } from 'react'
-import { useGame } from '../context/GameContext'
+import React, { useState } from 'react';
+import { useGame } from '../context/GameContext';
 
 const LoginScreen: React.FC = () => {
-  const { setPlayerName } = useGame()
-  const [name, setName] = useState('')
+  const { setPlayerName } = useGame();
+  const [name, setName] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (name.trim()) {
-      setPlayerName(name.trim())
+      setPlayerName(name.trim());
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold">
-        <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue uppercase tracking-widest">
-          El-Mahrousa
-        </h1>
+        <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue uppercase tracking-widest">El-Mahrousa</h1>
         <p className="text-center text-slate-500 mb-6">Enter your name to join the game</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,7 +40,7 @@ const LoginScreen: React.FC = () => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginScreen
+export default LoginScreen;
