@@ -13,13 +13,17 @@
     "joinIdPlaceholder": "Lobby ID...",
     "joinBtn": "JOIN",
     "createNewLobby": "CREATE NEW LOBBY",
-    "lobbyIdInput": "Lobby ID"
+    "lobbyIdInput": "Lobby ID",
+    "errorEmpty": "Please enter a Lobby ID"
   },
   "login": {
     "title": "El-Mahrousa",
     "subtitle": "Enter your name to join the game",
     "namePlaceholder": "Your Name",
-    "playGuestBtn": "PLAY AS GUEST"
+    "playGuestBtn": "PLAY AS GUEST",
+    "errorInvalid": "Please enter a valid name",
+    "errorTooLong": "Name must be {{max}} characters or less",
+    "charCount": "{{current}}/{{max}}"
   },
   "waiting": {
     "title": "Waiting Room",
@@ -70,7 +74,8 @@
     "theyWant": "They Want",
     "rejectBtn": "REJECT",
     "modifyBtn": "MODIFY",
-    "acceptBtn": "ACCEPT"
+    "acceptBtn": "ACCEPT",
+    "noProperties": "No properties"
   },
   "logs": {
     "started": "Game started!",

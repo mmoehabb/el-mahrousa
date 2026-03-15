@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useGame } from './context/GameContext'
 import Board from './components/Board'
 import { useNetworking } from './hooks/useNetworking'
@@ -9,13 +9,21 @@ import TradeModal, { type TradeOffer } from './components/TradeModal'
 import LoginScreen from './components/LoginScreen'
 import { useTranslation } from 'react-i18next'
 
+const MAX_CHAT_LENGTH = 200
+
+const sanitizeMessage = (msg: string): string => {
+  return msg.slice(0, MAX_CHAT_LENGTH).replace(/[<>&"'`]/g, '')
+}
+
 function App() {
   const { gameState, myId, playerName, isHost } = useGame()
   const { t, i18n } = useTranslation()
   const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking()
   const [joinId, setJoinId] = useState('')
+  const [joinError, setJoinError] = useState('')
   const [chatMsg, setChatMsg] = useState('')
   const [isTradeOpen, setIsTradeOpen] = useState(false)
+  const isRollingRef = useRef(false)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const isMyTurn = currentPlayer?.id === myId
@@ -39,14 +47,22 @@ function App() {
     }
   }, [gameState.turnPhase, gameState.stepsLeft, isMyTurn, sendAction, gameState.status])
 
-  const handleRoll = () => sendAction({ type: 'ROLL' })
+  const handleRoll = () => {
+    if (isRollingRef.current) return
+    isRollingRef.current = true
+    sendAction({ type: 'ROLL' })
+    setTimeout(() => {
+      isRollingRef.current = false
+    }, 2000)
+  }
   const handleBuy = () => sendAction({ type: 'BUY' })
   const handleEndTurn = () => sendAction({ type: 'END_TURN' })
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!chatMsg.trim()) return
-    sendAction({ type: 'CHAT', message: chatMsg })
+    const sanitized = sanitizeMessage(chatMsg)
+    if (!sanitized.trim()) return
+    sendAction({ type: 'CHAT', message: sanitized })
     setChatMsg('')
   }
 
@@ -55,6 +71,16 @@ function App() {
   const handleProposeTrade = (partnerId: string, offer: TradeOffer) => {
     sendAction({ type: 'PROPOSE_TRADE', partnerId, offer })
     setIsTradeOpen(false)
+  }
+
+  const handleJoinLobby = () => {
+    const sanitizedId = joinId.trim().replace(/[<>&"'`]/g, '')
+    if (!sanitizedId) {
+      setJoinError(t('lobby.errorEmpty'))
+      return
+    }
+    setJoinError('')
+    joinLobby(sanitizedId)
   }
 
   useEffect(() => {
@@ -125,15 +151,26 @@ function App() {
               </button>
 
               <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder={t('lobby.lobbyIdInput')}
-                  value={joinId}
-                  onChange={(e) => setJoinId(e.target.value)}
-                  className="flex-1 border p-2 rounded-lg"
-                />
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder={t('lobby.lobbyIdInput')}
+                    value={joinId}
+                    onChange={(e) => {
+                      setJoinId(e.target.value)
+                      setJoinError('')
+                    }}
+                    className={`w-full border p-2 rounded-lg ${joinError ? 'border-red-500' : ''}`}
+                    aria-describedby={joinError ? 'join-error' : undefined}
+                  />
+                  {joinError && (
+                    <p id="join-error" className="text-red-500 text-xs mt-1" role="alert">
+                      {joinError}
+                    </p>
+                  )}
+                </div>
                 <button
-                  onClick={() => joinLobby(joinId)}
+                  onClick={handleJoinLobby}
                   className="bg-egyptian-blue text-white px-4 py-2 rounded-lg font-bold"
                 >
                   {t('lobby.joinBtn')}
@@ -153,7 +190,12 @@ function App() {
               <span className="text-sm text-slate-500 uppercase block mb-1">
                 {t('waiting.lobbyIdLabel')}
               </span>
-              <span className="font-mono text-xl font-bold select-all block mb-2">{lobbyId}</span>
+              <span
+                className="font-mono text-xl font-bold select-all block mb-2 truncate"
+                title={lobbyId}
+              >
+                {lobbyId}
+              </span>
               <button
                 onClick={handleShareLink}
                 className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors"
@@ -169,8 +211,11 @@ function App() {
               <div className="space-y-2">
                 {gameState.players.map((p) => (
                   <div key={p.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
-                    <span className="font-semibold">
+                    <div
+                      className="w-3 h-3 rounded-full shrink-0"
+                      style={{ backgroundColor: p.color }}
+                    />
+                    <span className="font-semibold truncate" title={p.name}>
                       {p.name} {p.id === myId ? t('waiting.you') : ''}
                     </span>
                     {p.id === gameState.players[0].id && (
@@ -237,13 +282,18 @@ function App() {
                 {gameState.players.map((p, i) => (
                   <div
                     key={p.id}
-                    className={`flex justify-between items-center p-2 rounded ${i === gameState.currentPlayerIndex ? 'bg-egyptian-gold/20' : ''}`}
+                    className={`flex justify-between items-center p-2 rounded min-w-0 ${i === gameState.currentPlayerIndex ? 'bg-egyptian-gold/20' : ''}`}
                   >
-                    <span className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-                      {p.name} {p.id === myId ? t('waiting.you') : ''}
+                    <span className="flex items-center gap-2 min-w-0">
+                      <div
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: p.color }}
+                      />
+                      <span className="truncate" title={p.name}>
+                        {p.name} {p.id === myId ? t('waiting.you') : ''}
+                      </span>
                     </span>
-                    <span className="font-bold text-xs">
+                    <span className="font-bold text-xs shrink-0">
                       {p.balance} {GAME_CONFIG.CURRENCY}
                     </span>
                   </div>

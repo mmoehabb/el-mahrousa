@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import type { Player, Tile } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { X } from 'lucide-react'
@@ -31,6 +31,8 @@ const TradeModal: React.FC<TradeModalProps> = ({
   const { t } = useTranslation()
   const me = players.find((p) => p.id === myId)
   const others = players.filter((p) => p.id !== myId)
+  const modalRef = useRef<HTMLDivElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   const [partnerId, setPartnerId] = useState(others[0]?.id || '')
   const [offer, setOffer] = useState<TradeOffer>({
@@ -39,6 +41,42 @@ const TradeModal: React.FC<TradeModalProps> = ({
     myProperties: [],
     partnerProperties: [],
   })
+
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus()
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return
+
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        )
+        const firstElement = focusableElements[0] as HTMLElement
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault()
+          lastElement.focus()
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault()
+          firstElement.focus()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
 
   if (!isOpen || !me) return null
 
@@ -56,11 +94,21 @@ const TradeModal: React.FC<TradeModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="trade-modal-title"
+    >
+      <div
+        ref={modalRef}
+        className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+      >
         <div className="bg-egyptian-blue text-white p-4 flex justify-between items-center">
-          <h2 className="font-bold uppercase">{t('trade.title')}</h2>
-          <button onClick={onClose}>
+          <h2 id="trade-modal-title" className="font-bold uppercase">
+            {t('trade.title')}
+          </h2>
+          <button ref={closeButtonRef} onClick={onClose} aria-label={t('trade.cancel')}>
             <X />
           </button>
         </div>
@@ -85,15 +133,23 @@ const TradeModal: React.FC<TradeModalProps> = ({
             </div>
             <div className="space-y-1">
               <label className="text-xs text-slate-500 block">{t('trade.properties')}</label>
-              {me.properties.map((pid) => (
-                <div
-                  key={pid}
-                  onClick={() => toggleProperty(pid, true)}
-                  className={`text-[10px] p-1 border rounded cursor-pointer ${offer.myProperties.includes(pid) ? 'bg-egyptian-gold/20 border-egyptian-gold' : ''}`}
-                >
-                  {allTiles[pid].name}
-                </div>
-              ))}
+              {me.properties.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">{t('trade.noProperties')}</p>
+              ) : (
+                me.properties.map((pid) => (
+                  <div
+                    key={pid}
+                    onClick={() => toggleProperty(pid, true)}
+                    onKeyDown={(e) => e.key === 'Enter' && toggleProperty(pid, true)}
+                    role="checkbox"
+                    aria-checked={offer.myProperties.includes(pid)}
+                    tabIndex={0}
+                    className={`text-[10px] p-1 border rounded cursor-pointer ${offer.myProperties.includes(pid) ? 'bg-egyptian-gold/20 border-egyptian-gold' : ''}`}
+                  >
+                    {allTiles[pid].name}
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -137,15 +193,23 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs text-slate-500 block">{t('trade.properties')}</label>
-                  {partner.properties.map((pid) => (
-                    <div
-                      key={pid}
-                      onClick={() => toggleProperty(pid, false)}
-                      className={`text-[10px] p-1 border rounded cursor-pointer ${offer.partnerProperties.includes(pid) ? 'bg-egyptian-gold/20 border-egyptian-gold' : ''}`}
-                    >
-                      {allTiles[pid].name}
-                    </div>
-                  ))}
+                  {partner.properties.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">{t('trade.noProperties')}</p>
+                  ) : (
+                    partner.properties.map((pid) => (
+                      <div
+                        key={pid}
+                        onClick={() => toggleProperty(pid, false)}
+                        onKeyDown={(e) => e.key === 'Enter' && toggleProperty(pid, false)}
+                        role="checkbox"
+                        aria-checked={offer.partnerProperties.includes(pid)}
+                        tabIndex={0}
+                        className={`text-[10px] p-1 border rounded cursor-pointer ${offer.partnerProperties.includes(pid) ? 'bg-egyptian-gold/20 border-egyptian-gold' : ''}`}
+                      >
+                        {allTiles[pid].name}
+                      </div>
+                    ))
+                  )}
                 </div>
               </>
             )}

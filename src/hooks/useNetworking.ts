@@ -16,6 +16,8 @@ const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 export const useNetworking = () => {
   const { gameState, setGameState, isHost, setIsHost, myId, playerName } = useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
+  const [connectionError, setConnectionError] = useState<string | null>(null)
+  const [isConnecting, setIsConnecting] = useState(false)
   const connections = useRef<{ [id: string]: DataConnection }>({})
   const [lobbyId, setLobbyId] = useState<string>('')
 
@@ -168,11 +170,30 @@ export const useNetworking = () => {
     const newPeer = new Peer(myId)
     newPeer.on('open', () => {
       setPeer(newPeer)
+      setConnectionError(null)
+    })
+
+    newPeer.on('error', (err) => {
+      console.error('Peer connection error:', err)
+      if (err.type === 'peer-unavailable') {
+        setConnectionError('Lobby not found. Please check the ID and try again.')
+      } else if (err.type === 'network' || err.type === 'server-error') {
+        setConnectionError('Connection failed. Please check your internet and try again.')
+      } else if (err.type === 'unavailable-id') {
+        setConnectionError('This name is already in use. Please refresh and try again.')
+      } else {
+        setConnectionError('Connection error. Please try again.')
+      }
     })
 
     newPeer.on('connection', (conn) => {
       conn.on('open', () => {
         connections.current[conn.peer] = conn
+      })
+
+      conn.on('error', (err) => {
+        console.error('Connection error:', err)
+        setConnectionError('Failed to connect to player. Please try again.')
       })
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -226,15 +247,35 @@ export const useNetworking = () => {
 
   const joinLobby = useCallback(
     (id: string) => {
-      if (!peer) return
-      const conn = peer.connect(id)
+      if (!peer) {
+        setConnectionError('Not connected yet. Please wait and try again.')
+        return
+      }
+      setIsConnecting(true)
+      setConnectionError(null)
+      const conn = peer.connect(id, { reliable: true })
+
+      const timeout = setTimeout(() => {
+        setConnectionError('Connection timed out. Please try again.')
+        setIsConnecting(false)
+        conn.close()
+      }, 10000)
+
       conn.on('open', () => {
+        clearTimeout(timeout)
         connections.current[id] = conn
         setLobbyId(id)
         setIsHost(false)
-
+        setIsConnecting(false)
         // Send JOIN action to the host right after connecting
         conn.send({ type: 'ACTION', action: { type: 'JOIN', name: playerName } })
+      })
+
+      conn.on('error', (err) => {
+        clearTimeout(timeout)
+        setIsConnecting(false)
+        console.error('Join connection error:', err)
+        setConnectionError('Failed to join lobby. Please check the ID and try again.')
       })
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -243,9 +284,22 @@ export const useNetworking = () => {
           setGameState(data.state)
         }
       })
+
+      conn.on('close', () => {
+        clearTimeout(timeout)
+        setIsConnecting(false)
+      })
     },
     [peer, setGameState, setIsHost, playerName],
   )
 
-  return { createLobby, joinLobby, lobbyId, sendAction }
+  return {
+    createLobby,
+    joinLobby,
+    lobbyId,
+    sendAction,
+    connectionError,
+    setConnectionError,
+    isConnecting,
+  }
 }

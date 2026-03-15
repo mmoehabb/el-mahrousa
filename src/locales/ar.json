@@ -13,13 +13,17 @@
     "joinIdPlaceholder": "رمز الغرفة...",
     "joinBtn": "انضمام",
     "createNewLobby": "إنشاء غرفة جديدة",
-    "lobbyIdInput": "رمز الغرفة"
+    "lobbyIdInput": "رمز الغرفة",
+    "errorEmpty": "يرجى إدخال رمز الغرفة"
   },
   "login": {
     "title": "المحروسة",
     "subtitle": "أدخل اسمك للانضمام للعبة",
     "namePlaceholder": "اسمك",
-    "playGuestBtn": "العب كضيف"
+    "playGuestBtn": "العب كضيف",
+    "errorInvalid": "يرجى إدخال اسم صالح",
+    "errorTooLong": "يجب أن يكون الاسم {{max}} حرفًا أو أقل",
+    "charCount": "{{current}}/{{max}}"
   },
   "waiting": {
     "title": "غرفة الانتظار",
@@ -69,7 +73,8 @@
     "theyWant": "هم يريدون",
     "rejectBtn": "رفض",
     "modifyBtn": "تعديل",
-    "acceptBtn": "قبول"
+    "acceptBtn": "قبول",
+    "noProperties": "لا توجد ممتلكات"
   },
   "logs": {
     "started": "بدأت اللعبة!",
