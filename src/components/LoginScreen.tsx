@@ -18,7 +18,7 @@ const LoginScreen: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold">
         <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue uppercase tracking-widest">
-          El-Mahrousa
+          {t('login.title')}
         </h1>
         <p className="text-center text-slate-500 mb-6">{t('login.subtitle')}</p>
 
@@ -39,7 +39,7 @@ const LoginScreen: React.FC = () => {
             disabled={!name.trim()}
             className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            PLAY AS GUEST
+            {t('login.playGuestBtn')}
           </button>
         </form>
       </div>

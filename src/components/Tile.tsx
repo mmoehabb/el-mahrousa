@@ -22,7 +22,9 @@ const TileComponent: React.FC<TileProps> = ({ tile, players }) => {
           style={{ backgroundColor: tile.color }}
         />
       )}
-      <div className="mt-5 font-bold uppercase tracking-tighter text-[9px]">{t(`cities.${tile.name}`)}</div>
+      <div className="mt-5 font-bold uppercase tracking-tighter text-[9px]">
+        {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
+      </div>
 
       {tile.price && (
         <div className="text-[8px] text-slate-600">

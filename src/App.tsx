@@ -106,7 +106,9 @@ function App() {
               onClick={toggleLanguage}
               className="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg font-bold transition-colors"
             >
-              {i18n.language === 'en' ? 'عربي' : 'English'}
+              {i18n.language === 'en'
+                ? t('common.languageToggle.ar')
+                : t('common.languageToggle.en')}
             </button>
           </div>
           <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
@@ -114,41 +116,43 @@ function App() {
               {t('lobby.title')}
             </h1>
 
-          <div className="space-y-4">
-            <button
-              onClick={createLobby}
-              className="w-full bg-egyptian-gold text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors"
-            >
-              CREATE NEW LOBBY
-            </button>
-
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Lobby ID"
-                value={joinId}
-                onChange={(e) => setJoinId(e.target.value)}
-                className="flex-1 border p-2 rounded-lg"
-              />
+            <div className="space-y-4">
               <button
-                onClick={() => joinLobby(joinId)}
-                className="bg-egyptian-blue text-white px-4 py-2 rounded-lg font-bold"
+                onClick={createLobby}
+                className="w-full bg-egyptian-gold text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors"
               >
-                JOIN
+                {t('lobby.createNewLobby')}
               </button>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder={t('lobby.lobbyIdInput')}
+                  value={joinId}
+                  onChange={(e) => setJoinId(e.target.value)}
+                  className="flex-1 border p-2 rounded-lg"
+                />
+                <button
+                  onClick={() => joinLobby(joinId)}
+                  className="bg-egyptian-blue text-white px-4 py-2 rounded-lg font-bold"
+                >
+                  {t('lobby.joinBtn')}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
         </>
       ) : gameState.status === 'WAITING' ? (
         <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
           <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">
-            Waiting Room
+            {t('waiting.title')}
           </h1>
 
           <div className="space-y-6">
             <div className="p-4 bg-slate-100 rounded-lg border border-dashed border-slate-400 text-center">
-              <span className="text-sm text-slate-500 uppercase block mb-1">{t('waiting.lobbyIdLabel')}</span>
+              <span className="text-sm text-slate-500 uppercase block mb-1">
+                {t('waiting.lobbyIdLabel')}
+              </span>
               <span className="font-mono text-xl font-bold select-all block mb-2">{lobbyId}</span>
               <button
                 onClick={handleShareLink}
@@ -160,7 +164,7 @@ function App() {
 
             <div className="bg-white p-4 rounded-lg border border-slate-200">
               <h3 className="font-bold flex items-center gap-2 mb-3 text-egyptian-blue">
-                <Users size={18} /> PLAYERS ({gameState.players.length})
+                <Users size={18} /> {t('waiting.playersCount', { count: gameState.players.length })}
               </h3>
               <div className="space-y-2">
                 {gameState.players.map((p) => (
@@ -171,7 +175,7 @@ function App() {
                     </span>
                     {p.id === gameState.players[0].id && (
                       <span className="text-xs bg-egyptian-gold text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto">
-                        HOST
+                        {t('waiting.host')}
                       </span>
                     )}
                   </div>
@@ -186,7 +190,7 @@ function App() {
                     onClick={() => sendAction({ type: 'START_COUNTDOWN' })}
                     className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors text-lg"
                   >
-                    START GAME
+                    {t('waiting.startGameBtn')}
                   </button>
                 ) : (
                   <div className="space-y-3">
@@ -197,7 +201,7 @@ function App() {
                       onClick={() => sendAction({ type: 'CANCEL_COUNTDOWN' })}
                       className="w-full bg-slate-300 text-slate-700 py-2 rounded-lg font-bold hover:bg-slate-400 transition-colors"
                     >
-                      CANCEL
+                      {t('waiting.cancelBtn')}
                     </button>
                   </div>
                 )
@@ -226,7 +230,7 @@ function App() {
           <div className="w-64 space-y-4">
             <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue rtl:border-r-4 rtl:border-l-0">
               <h3 className="font-bold flex items-center gap-2 mb-2">
-                <Users size={18} /> PLAYERS
+                <Users size={18} /> {t('game.players')}
               </h3>
 
               <div className="space-y-2">
@@ -249,7 +253,9 @@ function App() {
               {lobbyId && (
                 <div className="space-y-2">
                   <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
-                    <span className="text-xs text-slate-500 uppercase block">{t('game.shareIdLabel')}</span>
+                    <span className="text-xs text-slate-500 uppercase block">
+                      {t('game.shareIdLabel')}
+                    </span>
                     <span className="font-mono font-bold select-all">{lobbyId}</span>
                   </div>
                   <button
@@ -264,7 +270,7 @@ function App() {
 
             <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold rtl:border-r-4 rtl:border-l-0">
               <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
-                Game Logs
+                {t('game.gameLogs')}
               </h3>
               <div className="h-48 overflow-y-auto text-[10px] space-y-1 pr-2 rtl:pr-0 rtl:pl-2">
                 {gameState.logs.map((log, i) => {
@@ -278,7 +284,10 @@ function App() {
                   if (log.key) {
                     const translatedParams = { ...log.params }
                     if (translatedParams.property) {
-                      translatedParams.property = t(`cities.${translatedParams.property}`)
+                      const propName = String(translatedParams.property)
+                      translatedParams.property = t(
+                        `tiles.${propName.toLowerCase().replace(/ /g, '-')}`,
+                      )
                     }
                     return (
                       <div key={i} className="border-b border-slate-100 pb-1">
@@ -303,8 +312,12 @@ function App() {
           <div className="w-64 space-y-4">
             <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
               <div className="mb-4">
-                <span className="text-xs text-slate-500 uppercase">{t('game.currentTurnLabel')}</span>
-                <div className="font-bold text-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
+                <span className="text-xs text-slate-500 uppercase">
+                  {t('game.currentTurnLabel')}
+                </span>
+                <div className="font-bold text-lg">
+                  {currentPlayer?.name || t('game.waitingTurn')}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -314,7 +327,7 @@ function App() {
                     disabled={!isMyTurn}
                     className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
                   >
-                    <Dice5 /> ROLL DICE
+                    <Dice5 /> {t('game.rollDiceBtn')}
                   </button>
                 )}
 
@@ -333,7 +346,9 @@ function App() {
                           }
                           className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700"
                         >
-                          BUY FOR {gameState.tiles[currentPlayer.position].price}
+                          {t('game.buyForBtn', {
+                            price: gameState.tiles[currentPlayer.position].price,
+                          })}
                         </button>
                       )}
                     <button
@@ -341,7 +356,7 @@ function App() {
                       disabled={!isMyTurn}
                       className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600"
                     >
-                      SKIP / END TURN
+                      {t('game.skipEndTurnBtn')}
                     </button>
                   </div>
                 )}
@@ -352,7 +367,7 @@ function App() {
                     disabled={!isMyTurn}
                     className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold"
                   >
-                    END TURN
+                    {t('game.endTurnBtn')}
                   </button>
                 )}
 
@@ -367,7 +382,7 @@ function App() {
                   onClick={() => (window.location.href = '/')}
                   className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4"
                 >
-                  LEAVE GAME
+                  {t('game.leaveGameBtn')}
                 </button>
               </div>
             </div>

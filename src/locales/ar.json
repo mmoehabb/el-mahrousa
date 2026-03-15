@@ -1,11 +1,19 @@
 {
+  "common": {
+    "languageToggle": {
+      "en": "English",
+      "ar": "عربي"
+    }
+  },
   "lobby": {
     "title": "المحروسة",
     "titleEn": "EL-MAHROUSA",
     "titleAr": "المحروسة",
     "createBtn": "إنشاء لعبة",
     "joinIdPlaceholder": "رمز الغرفة...",
-    "joinBtn": "انضمام"
+    "joinBtn": "انضمام",
+    "createNewLobby": "إنشاء غرفة جديدة",
+    "lobbyIdInput": "رمز الغرفة"
   },
   "login": {
     "title": "المحروسة",
@@ -21,6 +29,7 @@
     "players": "اللاعبين",
     "you": "(أنت)",
     "host": "المضيف",
+    "playersCount": "اللاعبين {{count}}",
     "startGameBtn": "ابدأ اللعبة",
     "startingIn": "تبدأ في {{count}}...",
     "cancelBtn": "إلغاء",
@@ -28,6 +37,8 @@
   },
   "game": {
     "playersTitle": "اللاعبين",
+    "players": "اللاعبين",
+    "gameLogs": "سجل اللعبة",
     "you": "(أنت)",
     "shareIdLabel": "شارك رمز الغرفة",
     "shareLinkBtn": "شارك الرابط",
@@ -37,10 +48,11 @@
     "waitingTurn": "في الانتظار...",
     "rollDiceBtn": "ارمِ النرد",
     "buyForBtn": "شراء بـ {{price}}",
-    "skipEndTurnBtn": "تخطي وإنهاء الدور",
+    "skipEndTurnBtn": "تخطي / إنهاء الدور",
     "endTurnBtn": "إنهاء الدور",
     "proposeTradeBtn": "اقتراح مقايضة",
     "leaveGameBtn": "مغادرة اللعبة",
+    "currency": "نقود ({{amount}} {{currency}})",
     "chatReady": "المحادثة جاهزة...",
     "chatPlaceholder": "اكتب رسالة..."
   },
@@ -70,34 +82,28 @@
     "tradeAccepted": "{{name}} قبل مقايضة من {{partner}}",
     "tradeRejected": "{{name}} رفض مقايضة من {{partner}}"
   },
-  "cities": {
-    "Start": "البداية",
-    "Shobra": "شبرا",
-    "Giza": "الجيزة",
-    "Dokki": "الدقي",
-    "Mohandeseen": "المهندسين",
-    "Zamalek": "الزمالك",
-    "Heliopolis": "مصر الجديدة",
-    "Nasr City": "مدينة نصر",
-    "Maadi": "المعادي",
-    "New Cairo": "القاهرة الجديدة",
-    "Sheikh Zayed": "الشيخ زايد",
-    "October": "٦ أكتوبر",
-    "Alexandria": "الإسكندرية",
-    "Sidi Gaber": "سيدي جابر",
-    "Smouha": "سموحة",
-    "Borg El Arab": "برج العرب",
-    "Mansoura": "المنصورة",
-    "Tanta": "طنطا",
-    "Port Said": "بورسعيد",
-    "Ismailia": "الإسماعيلية",
-    "Suez": "السويس",
-    "Hurghada": "الغردقة",
-    "Sharm El Sheikh": "شرم الشيخ",
-    "Luxor": "الأقصر",
-    "Aswan": "أسوان",
-    "Jail": "السجن",
-    "Free Parking": "موقف مجاني",
-    "Go To Jail": "اذهب للسجن"
+  "tiles": {
+    "go": "الانطلاق",
+    "zamalek": "الزمالك",
+    "sodfa": "صدفة",
+    "garden-city": "جاردن سيتي",
+    "income-tax": "ضريبة الدخل",
+    "cairo-airport": "مطار القاهرة",
+    "prison": "السجن",
+    "stanley": "ستانلي",
+    "agami": "اغامي",
+    "hazak": "حظك",
+    "gleem": "جليم باي",
+    "suez-canal": "قناة السويس",
+    "vacation": "إجازة",
+    "karnak": "كرنك",
+    "valley-of-kings": "وادي الملوك",
+    "philae": "فيله",
+    "egyptair": "مصر للطيران",
+    "go-to-prison": "اذهب للسجن",
+    "el-gouna": "الجونة",
+    "sahl-hasheesh": "سهل هشيش",
+    "super-tax": "ضريبة إضافية",
+    "telecom-egypt": "المصرية للاتصالات"
   }
 }

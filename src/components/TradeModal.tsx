@@ -70,7 +70,12 @@ const TradeModal: React.FC<TradeModalProps> = ({
           <div className="flex-1 space-y-4">
             <h3 className="font-bold border-b pb-1 text-sm">{t('trade.yourOffer')}</h3>
             <div className="space-y-2">
-              <label className="text-xs text-slate-500 block">Cash ({GAME_CONFIG.CURRENCY})</label>
+              <label className="text-xs text-slate-500 block">
+                {t('game.currency', {
+                  amount: GAME_CONFIG.CURRENCY,
+                  currency: GAME_CONFIG.CURRENCY,
+                })}
+              </label>
               <input
                 type="number"
                 className="w-full border rounded p-1 text-sm"
@@ -116,7 +121,10 @@ const TradeModal: React.FC<TradeModalProps> = ({
               <>
                 <div className="space-y-2">
                   <label className="text-xs text-slate-500 block">
-                    Cash ({GAME_CONFIG.CURRENCY})
+                    {t('game.currency', {
+                      amount: GAME_CONFIG.CURRENCY,
+                      currency: GAME_CONFIG.CURRENCY,
+                    })}
                   </label>
                   <input
                     type="number"
@@ -146,13 +154,13 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
         <div className="p-4 bg-slate-50 border-t flex justify-end gap-2">
           <button onClick={onClose} className="px-4 py-2 text-sm font-bold text-slate-600">
-            Cancel
+            {t('trade.cancel')}
           </button>
           <button
             onClick={() => onPropose(partnerId, offer)}
             className="px-4 py-2 text-sm font-bold bg-egyptian-gold text-white rounded shadow hover:bg-yellow-600"
           >
-            PROPOSE TRADE
+            {t('trade.proposeBtn')}
           </button>
         </div>
       </div>
