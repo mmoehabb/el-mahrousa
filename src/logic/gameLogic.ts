@@ -9,7 +9,7 @@ export const createInitialState = (): GameState => ({
   status: 'LOBBY',
   turnPhase: 'ROLL',
   lastDice: [1, 1],
-  logs: ['Welcome to Misr-opoly!'],
+  logs: ['started'],
   countdown: null,
   chatMessages: [],
 })
@@ -33,7 +33,7 @@ export const moveOneStep = (state: GameState): GameState => {
       balance: player.balance + GAME_CONFIG.GO_REWARD,
     }
     newState.logs = [
-      `${player.name} passed GO and collected ${GAME_CONFIG.GO_REWARD} ${GAME_CONFIG.CURRENCY}`,
+      { key: 'passedStart', params: { name: player.name, amount: GAME_CONFIG.GO_REWARD } },
       ...newState.logs,
     ]
   } else {
@@ -84,7 +84,7 @@ export const applyLandingLogic = (state: GameState): GameState => {
 
       newState.players = newPlayers
       newState.logs = [
-        `${player.name} paid ${rent} ${GAME_CONFIG.CURRENCY} rent to ${owner.name}`,
+        { key: 'paidRent', params: { name: player.name, amount: rent, owner: owner.name } },
         ...newState.logs,
       ]
       newState.turnPhase = 'END'
@@ -134,7 +134,7 @@ export const buyProperty = (state: GameState, tileId: number): GameState => {
     ...state,
     players: newPlayers,
     logs: [
-      `${player.name} bought ${tile.name} for ${tile.price} ${GAME_CONFIG.CURRENCY}`,
+      { key: 'bought', params: { name: player.name, property: tile.name, price: tile.price } },
       ...state.logs,
     ],
     turnPhase: 'END',
@@ -160,7 +160,7 @@ export const executeTrade = (
   state: GameState,
   p1Id: string,
   p2Id: string,
-  offer: any,
+  offer: import('../components/TradeModal').TradeOffer,
 ): GameState => {
   const newPlayers = state.players.map((p) => {
     if (p.id === p1Id) {

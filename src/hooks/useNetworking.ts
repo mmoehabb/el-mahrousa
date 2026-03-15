@@ -16,6 +16,8 @@ const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 export const useNetworking = () => {
   const { gameState, setGameState, isHost, setIsHost, myId, playerName } = useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
+  const [connectionError, setConnectionError] = useState<string | null>(null)
+  const [isConnecting, setIsConnecting] = useState(false)
   const connections = useRef<{ [id: string]: DataConnection }>({})
   const [lobbyId, setLobbyId] = useState<string>('')
 
@@ -28,6 +30,7 @@ export const useNetworking = () => {
   }, [])
 
   const handleAction = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (action: any, from: string) => {
       if (!isHost) return
 
@@ -36,12 +39,13 @@ export const useNetworking = () => {
         const currentPlayer = nextState.players[nextState.currentPlayerIndex]
 
         switch (action.type) {
-          case 'ROLL':
+          case 'ROLL': {
             if (currentPlayer.id !== from) return prev
             const [d1, d2] = rollDice()
             nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' }
             nextState.logs = [`${currentPlayer.name} rolled ${d1 + d2}`, ...nextState.logs]
             break
+          }
           case 'FINISH_ROLL':
             if (nextState.turnPhase !== 'ROLLING') return prev
             nextState = {
@@ -148,6 +152,7 @@ export const useNetworking = () => {
   )
 
   const sendAction = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (action: any) => {
       if (isHost) {
         handleAction(action, myId)
@@ -161,10 +166,50 @@ export const useNetworking = () => {
     [isHost, myId, handleAction, lobbyId],
   )
 
+  const peerRef = useRef<Peer | null>(null);
+
   useEffect(() => {
-    const newPeer = new Peer(myId)
+    // If we already have a peer and it's open, don't recreate it
+    // This helps mitigate StrictMode double-mounting destroying the connection
+    if (peerRef.current && !peerRef.current.destroyed) {
+      return;
+    }
+
+    // Connect to our local signaling server instead of the public PeerJS cloud.
+    // In production, host should be updated to point to the deployed server.
+    const isProd = import.meta.env.MODE === 'production';
+    const newPeer = new Peer(myId, {
+      host: isProd ? window.location.hostname : 'localhost',
+      port: isProd ? Number(window.location.port || (window.location.protocol === 'https:' ? 443 : 80)) : 9000,
+      path: '/myapp',
+      secure: window.location.protocol === 'https:'
+    });
+
+    peerRef.current = newPeer;
+
     newPeer.on('open', () => {
       setPeer(newPeer)
+      setConnectionError(null)
+    })
+
+    newPeer.on('disconnected', () => {
+      console.warn('PeerJS disconnected, attempting to reconnect...');
+      if (peerRef.current && !peerRef.current.destroyed && peerRef.current.disconnected) {
+        peerRef.current.reconnect();
+      }
+    });
+
+    newPeer.on('error', (err) => {
+      console.error('Peer connection error:', err)
+      if (err.type === 'peer-unavailable') {
+        setConnectionError('Lobby not found. Please check the ID and try again.')
+      } else if (err.type === 'network' || err.type === 'server-error') {
+        setConnectionError('Connection failed. Please check your internet and try again.')
+      } else if (err.type === 'unavailable-id') {
+        setConnectionError('This name is already in use. Please refresh and try again.')
+      } else {
+        setConnectionError('Connection error. Please try again.')
+      }
     })
 
     newPeer.on('connection', (conn) => {
@@ -172,13 +217,24 @@ export const useNetworking = () => {
         connections.current[conn.peer] = conn
       })
 
+      conn.on('error', (err) => {
+        console.error('Connection error:', err)
+        setConnectionError('Failed to connect to player. Please try again.')
+      })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       conn.on('data', (data: any) => {
         if (data.type === 'SYNC') {
-          setGameState(data.state)
-        } else if (data.type === 'ACTION' && isHost) {
-          handleAction(data.action, conn.peer)
+          // A host should not receive a SYNC. If it does, ignore or handle edge cases.
+          // But just in case, we leave it.
+          setGameState(data.state);
+        } else if (data.type === 'ACTION') {
+          // Both host and (technically) guests could receive ACTION, but usually guests send ACTION.
+          // The issue was `&& isHost`. In React `useEffect` closures, `isHost` might be stale
+          // if it wasn't carefully tracked.
+          handleAction(data.action, conn.peer);
         }
-      })
+      });
 
       conn.on('close', () => {
         delete connections.current[conn.peer]
@@ -189,8 +245,14 @@ export const useNetworking = () => {
     })
 
     return () => {
-      newPeer.destroy()
-    }
+      // In StrictMode development, we avoid immediately destroying the peer
+      // to prevent the "interrupted while loading" WebSocket error.
+      // We will only destroy it if myId changes.
+      if (import.meta.env.MODE !== 'development') {
+        newPeer.destroy();
+        peerRef.current = null;
+      }
+    };
   }, [isHost, myId, setGameState, handleAction])
 
   useEffect(() => {
@@ -222,25 +284,64 @@ export const useNetworking = () => {
 
   const joinLobby = useCallback(
     (id: string) => {
-      if (!peer) return
-      const conn = peer.connect(id)
+      if (!peer) {
+        setConnectionError('Not connected yet. Please wait and try again.')
+        return
+      }
+      setIsConnecting(true)
+      setConnectionError(null)
+      const conn = peer.connect(id, { reliable: true })
+
+      const timeout = setTimeout(() => {
+        setConnectionError('Connection timed out. Please try again.')
+        setIsConnecting(false)
+        conn.close()
+      }, 10000)
+
       conn.on('open', () => {
+        clearTimeout(timeout)
         connections.current[id] = conn
         setLobbyId(id)
         setIsHost(false)
-
+        setIsConnecting(false)
         // Send JOIN action to the host right after connecting
         conn.send({ type: 'ACTION', action: { type: 'JOIN', name: playerName } })
       })
 
+      conn.on('error', (err) => {
+        clearTimeout(timeout)
+        setIsConnecting(false)
+        console.error('Join connection error:', err)
+        setConnectionError('Failed to join lobby. Please check the ID and try again.')
+      })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       conn.on('data', (data: any) => {
         if (data.type === 'SYNC') {
-          setGameState(data.state)
+          // Ensure state is fully overwritten to match the host
+          setGameState(data.state);
         }
+      });
+
+      conn.on('close', () => {
+        clearTimeout(timeout)
+        setIsConnecting(false)
+        console.warn('Disconnected from host.');
+        delete connections.current[id];
+        // When the host disconnects, the guest should ideally return to the lobby/menu
+        setGameState((prev) => ({ ...prev, status: 'LOBBY' }));
       })
     },
     [peer, setGameState, setIsHost, playerName],
   )
 
-  return { createLobby, joinLobby, lobbyId, sendAction }
+  return {
+    createLobby,
+    joinLobby,
+    lobbyId,
+    sendAction,
+    connectionError,
+    setConnectionError,
+    isConnecting,
+  }
 }
