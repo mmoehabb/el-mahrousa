@@ -34,7 +34,7 @@ const Board: React.FC = () => {
   const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
 
   useEffect(() => {
-    let interval: number
+    let interval: ReturnType<typeof setInterval>
     if (isRolling) {
       interval = setInterval(() => {
         setRollingDice([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1])

@@ -375,7 +375,7 @@ function App() {
                   <button
                     onClick={handleRoll}
                     disabled={!isMyTurn}
-                    className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                    className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-[10px]"
                   >
                     <Dice5 /> {t('game.rollDiceBtn')}
                   </button>
@@ -394,7 +394,7 @@ function App() {
                             currentPlayer.balance <
                               (gameState.tiles[currentPlayer.position].price || 0)
                           }
-                          className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700"
+                          className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 text-[10px]"
                         >
                           {t('game.buyForBtn', {
                             price: gameState.tiles[currentPlayer.position].price,
@@ -404,7 +404,7 @@ function App() {
                     <button
                       onClick={handleEndTurn}
                       disabled={!isMyTurn}
-                      className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600"
+                      className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600 text-[10px]"
                     >
                       {t('game.skipEndTurnBtn')}
                     </button>
@@ -415,7 +415,7 @@ function App() {
                   <button
                     onClick={handleEndTurn}
                     disabled={!isMyTurn}
-                    className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold"
+                    className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold text-[10px]"
                   >
                     {t('game.endTurnBtn')}
                   </button>
@@ -423,14 +423,14 @@ function App() {
 
                 <button
                   onClick={() => setIsTradeOpen(true)}
-                  className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all"
+                  className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all text-[10px]"
                 >
                   <Handshake size={18} /> PROPOSE TRADE
                 </button>
 
                 <button
                   onClick={() => (window.location.href = '/')}
-                  className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4"
+                  className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4 text-[10px]"
                 >
                   {t('game.leaveGameBtn')}
                 </button>
@@ -454,7 +454,7 @@ function App() {
                 <form onSubmit={handleSendChat} className="flex gap-1">
                   <input
                     type="text"
-                    className="flex-1 border text-xs p-1 rounded"
+                    className="flex-1 min-w-0 border text-xs p-1 rounded"
                     placeholder={t('game.chatPlaceholder')}
                     value={chatMsg}
                     onChange={(e) => setChatMsg(e.target.value)}
