@@ -3,6 +3,19 @@
     "languageToggle": {
       "en": "English",
       "ar": "عربي"
+    },
+    "settings": {
+      "title": "Settings",
+      "close": "Close",
+      "general": "General",
+      "servers": "Servers",
+      "language": "Language",
+      "displayMode": "Display Mode",
+      "dark": "Dark",
+      "light": "Light",
+      "addIceCandidate": "Add ICE Candidate",
+      "add": "Add",
+      "iceCandidateUrl": "stun:stun.l.google.com:19302"
     }
   },
   "lobby": {

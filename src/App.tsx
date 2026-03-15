@@ -8,6 +8,8 @@ import { GAME_CONFIG } from './config/gameConfig'
 import TradeModal, { type TradeOffer } from './components/TradeModal'
 import LoginScreen from './components/LoginScreen'
 import { useTranslation } from 'react-i18next'
+import SettingsModal from './components/SettingsModal'
+import { Settings } from 'lucide-react'
 
 const MAX_CHAT_LENGTH = 200
 
@@ -17,10 +19,11 @@ const sanitizeMessage = (msg: string): string => {
 
 function App() {
   const { gameState, myId, playerName, isHost } = useGame()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking()
   const [joinId, setJoinId] = useState('')
   const [joinError, setJoinError] = useState('')
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [chatMsg, setChatMsg] = useState('')
   const [isTradeOpen, setIsTradeOpen] = useState(false)
   const isRollingRef = useRef(false)
@@ -119,22 +122,18 @@ function App() {
     return <LoginScreen />
   }
 
-  const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')
-  }
-
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       {gameState.status === 'LOBBY' ? (
         <>
           <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto">
             <button
-              onClick={toggleLanguage}
-              className="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg font-bold transition-colors"
+              onClick={() => setIsSettingsOpen(true)}
+              className="bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold transition-colors flex items-center justify-center shadow-md"
+              aria-label={t('common.settings.title')}
             >
-              {i18n.language === 'en'
-                ? t('common.languageToggle.ar')
-                : t('common.languageToggle.en')}
+              <Settings size={24} className="text-egyptian-blue" />
             </button>
           </div>
           <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
