@@ -28,6 +28,12 @@ export interface ChatMessage {
 
 export type GameLog = string | { key: string; params: Record<string, string | number> };
 
+export interface PrisonRecord {
+  turnsLeft: number
+}
+
+export type Prison = Record<string, PrisonRecord>
+
 export interface GameState {
   players: Player[]
   currentPlayerIndex: number
@@ -39,4 +45,5 @@ export interface GameState {
   logs: GameLog[]
   countdown?: number | null
   chatMessages: ChatMessage[]
+  prison: Prison
 }
