@@ -12,7 +12,7 @@ export interface Tile {
 }
 
 export interface Player {
-  id: string
+  id: PlayerId
   name: string
   position: number
   balance: number
@@ -26,7 +26,22 @@ export interface ChatMessage {
   message: string
 }
 
-export type GameLog = string | { key: string; params: Record<string, string | number> };
+export type GameLog = string | { key: string; params: Record<string, string | number> }
+
+export type PlayerId = string;
+
+export interface PrisonRecord {
+  turnsLeft: number
+}
+
+export type Prison = Record<PlayerId, PrisonRecord>
+
+export interface TradeOffer {
+  myCash: number
+  partnerCash: number
+  myProperties: number[]
+  partnerProperties: number[]
+}
 
 export interface GameState {
   players: Player[]
@@ -39,4 +54,5 @@ export interface GameState {
   logs: GameLog[]
   countdown?: number | null
   chatMessages: ChatMessage[]
+  prison: Prison
 }
