@@ -1,4 +1,4 @@
-import type { GameState, Player, Tile } from '../types/game.ts'
+import type { GameState, Player, Tile, TradeOffer } from '../types/game.ts'
 import { GAME_CONFIG } from '../config/gameConfig.ts'
 import { BOARD_DATA } from '../config/gameConfig.ts'
 
@@ -160,7 +160,7 @@ export const executeTrade = (
   state: GameState,
   p1Id: string,
   p2Id: string,
-  offer: import('../components/TradeModal').TradeOffer,
+  offer: TradeOffer,
 ): GameState => {
   const newPlayers = state.players.map((p) => {
     if (p.id === p1Id) {

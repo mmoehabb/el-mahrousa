@@ -28,6 +28,13 @@ export interface ChatMessage {
 
 export type GameLog = string | { key: string; params: Record<string, string | number> };
 
+export interface TradeOffer {
+  myCash: number
+  partnerCash: number
+  myProperties: number[]
+  partnerProperties: number[]
+}
+
 export interface GameState {
   players: Player[]
   currentPlayerIndex: number
