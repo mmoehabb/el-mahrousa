@@ -193,6 +193,35 @@ export const executeTrade = (
   p2Id: string,
   offer: TradeOffer,
 ): GameState => {
+  const p1 = state.players.find((p) => p.id === p1Id)
+  const p2 = state.players.find((p) => p.id === p2Id)
+
+  if (!p1 || !p2) {
+    return {
+      ...state,
+      logs: [`Trade failed: One or both players not found.`, ...state.logs],
+    }
+  }
+
+  // Validate cash
+  if (p1.balance < offer.myCash || p2.balance < offer.partnerCash) {
+    return {
+      ...state,
+      logs: [`Trade failed: Insufficient funds.`, ...state.logs],
+    }
+  }
+
+  // Validate properties
+  const p1OwnsAll = offer.myProperties.every((id) => p1.properties.includes(id))
+  const p2OwnsAll = offer.partnerProperties.every((id) => p2.properties.includes(id))
+
+  if (!p1OwnsAll || !p2OwnsAll) {
+    return {
+      ...state,
+      logs: [`Trade failed: Properties not owned.`, ...state.logs],
+    }
+  }
+
   const newPlayers = state.players.map((p) => {
     if (p.id === p1Id) {
       return {
@@ -218,6 +247,6 @@ export const executeTrade = (
   return {
     ...state,
     players: newPlayers,
-    logs: [`Trade executed between ${p1Id} and ${p2Id}`, ...state.logs],
+    logs: [`Trade executed between ${p1.name} and ${p2.name}`, ...state.logs],
   }
 }
