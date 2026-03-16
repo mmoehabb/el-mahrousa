@@ -1,7 +1,7 @@
 import { test, describe, mock } from 'node:test'
 import assert from 'node:assert'
 
-import { rollDice, createInitialState, applyLandingLogic, endTurn, executeTrade } from './gameLogic.ts'
+import { rollDice, createInitialState, applyLandingLogic, endTurn, executeTrade, buyProperty } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
 
 const createMockPlayer = (id: string, isBankrupt: boolean = false): Player => ({
@@ -407,4 +407,106 @@ describe('applyLandingLogic', () => {
   test.todo('prevents player from ending turn if they are in debt (must sell or bankrupt)')
   test.todo('strips all properties from a player when they declare bankruptcy')
   test.todo('makes properties available for purchase after bankrupt player is stripped of them')
+})
+
+describe('buyProperty', () => {
+  const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
+    id: 'p1',
+    name: 'Player 1',
+    position: 0,
+    balance: 1500,
+    properties: [],
+    isBankrupt: false,
+    color: 'red',
+    ...overrides,
+  })
+
+  const createMockTile = (overrides: Partial<import('../types/game.ts').Tile> = {}): import('../types/game.ts').Tile => ({
+    id: 1,
+    name: 'Property 1',
+    type: 'PROPERTY',
+    price: 100,
+    ...overrides,
+  })
+
+  const createMockState = (
+    players: Player[],
+    tiles: import('../types/game.ts').Tile[],
+    overrides: Partial<GameState> = {},
+  ): GameState => ({
+    players,
+    currentPlayerIndex: 0,
+    tiles,
+    status: 'PLAYING',
+    turnPhase: 'ACTION',
+    lastDice: [1, 1],
+    logs: [],
+    chatMessages: [],
+    prison: {},
+    ...overrides,
+  })
+
+  test('should successfully buy an unowned property', () => {
+    const player = createMockPlayer({ balance: 200 })
+    const tile = createMockTile({ id: 1, price: 100 })
+    const state = createMockState([player], [createMockTile({ id: 0, price: 0 }), tile])
+
+    const newState = buyProperty(state, 1)
+
+    assert.notStrictEqual(newState, state) // Should return a new state object
+    assert.strictEqual(newState.players[0].balance, 100) // 200 - 100
+    assert.deepStrictEqual(newState.players[0].properties, [1])
+    assert.strictEqual(newState.turnPhase, 'END')
+    assert.strictEqual(newState.logs.length, 1)
+
+    const log = newState.logs[0] as { key: string; params: Record<string, string | number> }
+    assert.strictEqual(log.key, 'bought')
+    assert.strictEqual(log.params.name, 'Player 1')
+    assert.strictEqual(log.params.property, 'Property 1')
+    assert.strictEqual(log.params.price, 100)
+  })
+
+  test('should not buy if player has insufficient funds', () => {
+    const player = createMockPlayer({ balance: 50 })
+    const tile = createMockTile({ id: 1, price: 100 })
+    const state = createMockState([player], [createMockTile({ id: 0, price: 0 }), tile])
+
+    const newState = buyProperty(state, 1)
+
+    assert.strictEqual(newState, state) // Should return the exact same state
+  })
+
+  test('should not buy if property is already owned by another player', () => {
+    const player1 = createMockPlayer({ id: 'p1', balance: 500 })
+    const player2 = createMockPlayer({ id: 'p2', balance: 500, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 100 })
+    const state = createMockState(
+      [player1, player2],
+      [createMockTile({ id: 0, price: 0 }), tile],
+    )
+
+    const newState = buyProperty(state, 1)
+
+    assert.strictEqual(newState, state) // Should return the exact same state
+  })
+
+  test('should not buy if property is already owned by the current player', () => {
+    const player = createMockPlayer({ balance: 500, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 100 })
+    const state = createMockState([player], [createMockTile({ id: 0, price: 0 }), tile])
+
+    const newState = buyProperty(state, 1)
+
+    assert.strictEqual(newState, state) // Should return the exact same state
+  })
+
+  test('should not buy if tile has no price (e.g., GO or Tax)', () => {
+    const player = createMockPlayer({ balance: 500 })
+    const tile = createMockTile({ id: 1, type: 'SPECIAL', price: undefined })
+    const state = createMockState([player], [createMockTile({ id: 0, price: 0 }), tile])
+
+    const newState = buyProperty(state, 1)
+
+    assert.strictEqual(newState, state) // Should return the exact same state
+  })
 })
