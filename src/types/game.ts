@@ -26,7 +26,7 @@ export interface ChatMessage {
   message: string
 }
 
-export type GameLog = string | { key: string; params: Record<string, string | number> };
+export type GameLog = string | { key: string; params: Record<string, string | number> }
 
 export type PlayerId = string;
 
