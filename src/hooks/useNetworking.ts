@@ -13,6 +13,13 @@ import {
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 
+const sanitizeName = (name: unknown, defaultName: string): string => {
+  if (typeof name !== 'string') return defaultName
+  const trimmed = name.trim()
+  if (!trimmed) return defaultName
+  return trimmed.slice(0, 15)
+}
+
 export const useNetworking = () => {
   const { gameState, setGameState, isHost, setIsHost, myId, playerName } = useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
@@ -88,7 +95,7 @@ export const useNetworking = () => {
             if (!prev.players.find((p) => p.id === from)) {
               const newPlayer: Player = {
                 id: from,
-                name: action.name || `Player ${prev.players.length + 1}`,
+                name: sanitizeName(action.name, `Player ${prev.players.length + 1}`),
                 balance: 1500,
                 position: 0,
                 properties: [],
@@ -234,7 +241,7 @@ export const useNetworking = () => {
       players: [
         {
           id: myId,
-          name: playerName || 'Host',
+          name: sanitizeName(playerName, 'Host'),
           balance: 1500,
           position: 0,
           properties: [],
