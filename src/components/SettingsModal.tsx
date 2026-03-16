@@ -118,7 +118,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                       <span
                         className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                          isDarkMode ? 'translate-x-9 rtl:-translate-x-9' : 'translate-x-1 rtl:-translate-x-1'
+                          isDarkMode
+                            ? 'translate-x-9 rtl:-translate-x-9'
+                            : 'translate-x-1 rtl:-translate-x-1'
                         }`}
                       />
                     </button>
