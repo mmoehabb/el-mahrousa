@@ -91,6 +91,7 @@ describe('executeTrade', () => {
     lastDice: [1, 1],
     logs: ['Initial state'],
     chatMessages: [],
+    prison: {},
   })
 
   test('should correctly exchange cash and properties between two players', () => {
