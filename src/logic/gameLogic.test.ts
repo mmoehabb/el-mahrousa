@@ -2,8 +2,7 @@ import { test, describe, mock } from 'node:test'
 import assert from 'node:assert'
 
 import { rollDice, createInitialState, applyLandingLogic, endTurn, executeTrade } from './gameLogic.ts'
-import type { GameState, Player } from '../types/game.ts'
-import type { TradeOffer } from '../components/TradeModal.tsx'
+import type { GameState, Player, TradeOffer } from '../types/game.ts'
 
 const createMockPlayer = (id: string, isBankrupt: boolean = false): Player => ({
   id,
