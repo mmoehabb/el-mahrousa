@@ -1,4 +1,4 @@
-import type { GameState, Player, Tile } from '../types/game.ts'
+import type { GameState, Player, Tile, TradeOffer } from '../types/game.ts'
 import { GAME_CONFIG } from '../config/gameConfig.ts'
 import { BOARD_DATA } from '../config/gameConfig.ts'
 
@@ -12,6 +12,7 @@ export const createInitialState = (): GameState => ({
   logs: ['started'],
   countdown: null,
   chatMessages: [],
+  prison: {},
 })
 
 export const rollDice = (): [number, number] => {
@@ -96,6 +97,10 @@ export const applyLandingLogic = (state: GameState): GameState => {
       position: 6,
     }
     newState.players = newPlayers
+    newState.prison = {
+      ...newState.prison,
+      [player.id]: { turnsLeft: 2 },
+    }
     newState.logs = [`${player.name} was sent to Prison!`, ...newState.logs]
     newState.turnPhase = 'END'
   }
@@ -144,13 +149,39 @@ export const buyProperty = (state: GameState, tileId: number): GameState => {
 export const endTurn = (state: GameState): GameState => {
   let nextIndex = (state.currentPlayerIndex + 1) % state.players.length
   let attempts = 0
-  while (state.players[nextIndex].isBankrupt && attempts < state.players.length) {
-    nextIndex = (nextIndex + 1) % state.players.length
-    attempts++
+
+  const newState = { ...state, prison: { ...state.prison } }
+
+  while (attempts < state.players.length) {
+    const nextPlayer = state.players[nextIndex]
+
+    if (nextPlayer.isBankrupt) {
+      nextIndex = (nextIndex + 1) % state.players.length
+      attempts++
+      continue
+    }
+
+    const prisonRecord = newState.prison[nextPlayer.id]
+    if (prisonRecord) {
+      if (prisonRecord.turnsLeft > 0) {
+        newState.prison[nextPlayer.id] = { turnsLeft: prisonRecord.turnsLeft - 1 }
+        newState.logs = [`${nextPlayer.name} is in Prison for ${prisonRecord.turnsLeft - 1} more turn(s).`, ...newState.logs]
+        nextIndex = (nextIndex + 1) % state.players.length
+        attempts++
+        continue
+      } else {
+        const newPrison = { ...newState.prison }
+        delete newPrison[nextPlayer.id]
+        newState.prison = newPrison
+        newState.logs = [`${nextPlayer.name} has been released from Prison!`, ...newState.logs]
+      }
+    }
+
+    break
   }
 
   return {
-    ...state,
+    ...newState,
     currentPlayerIndex: nextIndex,
     turnPhase: 'ROLL',
   }
@@ -160,7 +191,7 @@ export const executeTrade = (
   state: GameState,
   p1Id: string,
   p2Id: string,
-  offer: import('../components/TradeModal').TradeOffer,
+  offer: TradeOffer,
 ): GameState => {
   const newPlayers = state.players.map((p) => {
     if (p.id === p1Id) {
