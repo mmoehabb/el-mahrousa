@@ -36,6 +36,13 @@ export interface PrisonRecord {
 
 export type Prison = Record<PlayerId, PrisonRecord>
 
+export interface TradeOffer {
+  myCash: number
+  partnerCash: number
+  myProperties: number[]
+  partnerProperties: number[]
+}
+
 export interface GameState {
   players: Player[]
   currentPlayerIndex: number
