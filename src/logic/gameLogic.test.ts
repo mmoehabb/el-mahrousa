@@ -1,6 +1,29 @@
 import { test, describe, mock } from 'node:test'
 import assert from 'node:assert'
 import { rollDice, createInitialState, applyLandingLogic, endTurn } from './gameLogic.ts'
+import type { GameState, Player } from '../types/game.ts'
+
+const createMockPlayer = (id: string, isBankrupt: boolean = false): Player => ({
+  id,
+  name: `Player ${id}`,
+  position: 0,
+  balance: 1500,
+  properties: [],
+  isBankrupt,
+  color: '#000000',
+})
+
+const createMockState = (players: Player[], currentPlayerIndex: number): GameState => ({
+  players,
+  currentPlayerIndex,
+  tiles: [],
+  status: 'PLAYING',
+  turnPhase: 'END',
+  lastDice: [1, 1],
+  logs: [],
+  chatMessages: [],
+  prison: {},
+})
 
 describe('rollDice', () => {
   test('should return an array of two numbers', () => {
@@ -43,6 +66,60 @@ describe('rollDice', () => {
     } finally {
       randomMock.mock.restore()
     }
+  })
+})
+
+describe('endTurn', () => {
+  test('should transition to the next player', () => {
+    const state = createMockState(
+      [createMockPlayer('1'), createMockPlayer('2'), createMockPlayer('3')],
+      0,
+    )
+
+    const newState = endTurn(state)
+    assert.strictEqual(newState.currentPlayerIndex, 1)
+    assert.strictEqual(newState.turnPhase, 'ROLL')
+  })
+
+  test('should wrap around to the first player', () => {
+    const state = createMockState(
+      [createMockPlayer('1'), createMockPlayer('2'), createMockPlayer('3')],
+      2,
+    )
+
+    const newState = endTurn(state)
+    assert.strictEqual(newState.currentPlayerIndex, 0)
+    assert.strictEqual(newState.turnPhase, 'ROLL')
+  })
+
+  test('should skip a bankrupt player', () => {
+    const state = createMockState(
+      [createMockPlayer('1'), createMockPlayer('2', true), createMockPlayer('3')],
+      0,
+    )
+
+    const newState = endTurn(state)
+    assert.strictEqual(newState.currentPlayerIndex, 2)
+  })
+
+  test('should wrap around and skip a bankrupt player', () => {
+    const state = createMockState(
+      [createMockPlayer('1', true), createMockPlayer('2'), createMockPlayer('3')],
+      2,
+    )
+
+    const newState = endTurn(state)
+    assert.strictEqual(newState.currentPlayerIndex, 1)
+  })
+
+  test('should return to same player if all others are bankrupt', () => {
+    const state = createMockState(
+      [createMockPlayer('1'), createMockPlayer('2', true), createMockPlayer('3', true)],
+      0,
+    )
+
+    const newState = endTurn(state)
+    assert.strictEqual(newState.currentPlayerIndex, 0)
   })
 })
 
