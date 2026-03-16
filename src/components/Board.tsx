@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useGame } from '../context/GameContext'
+import type { Player } from '../types/game'
 import TileComponent from './Tile'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -51,6 +52,24 @@ const Board: React.FC = () => {
   const topRow = tiles.slice(12, 19) // 12 to 18
   const rightCol = tiles.slice(19, 24) // 19 to 23
 
+  const { playersByPosition, ownerByTile } = useMemo(() => {
+    const playersMap: Record<number, Player[]> = {}
+    const ownerMap: Record<number, Player> = {}
+
+    gameState.players.forEach((p) => {
+      if (!playersMap[p.position]) {
+        playersMap[p.position] = []
+      }
+      playersMap[p.position].push(p)
+
+      p.properties.forEach((propId) => {
+        ownerMap[propId] = p
+      })
+    })
+
+    return { playersByPosition: playersMap, ownerByTile: ownerMap }
+  }, [gameState.players])
+
   return (
     <div className="relative p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-4 border-egyptian-gold inline-block">
       <div className="grid grid-cols-7 grid-rows-7 gap-1">
@@ -61,7 +80,11 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: i + 1, gridRowStart: 1 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              tilePlayers={playersByPosition[tile.id] || []}
+              owner={ownerByTile[tile.id]}
+            />
           </div>
         ))}
 
@@ -72,7 +95,11 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: 1, gridRowStart: i + 2 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              tilePlayers={playersByPosition[tile.id] || []}
+              owner={ownerByTile[tile.id]}
+            />
           </div>
         ))}
 
@@ -83,7 +110,11 @@ const Board: React.FC = () => {
             className="col-start-7"
             style={{ gridColumnStart: 7, gridRowStart: i + 2 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              tilePlayers={playersByPosition[tile.id] || []}
+              owner={ownerByTile[tile.id]}
+            />
           </div>
         ))}
 
@@ -94,7 +125,11 @@ const Board: React.FC = () => {
             className="col-start-1"
             style={{ gridColumnStart: i + 1, gridRowStart: 7 }}
           >
-            <TileComponent tile={tile} players={gameState.players} />
+            <TileComponent
+              tile={tile}
+              tilePlayers={playersByPosition[tile.id] || []}
+              owner={ownerByTile[tile.id]}
+            />
           </div>
         ))}
 
