@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dice5, Send, Handshake } from 'lucide-react'
-import type { GameState } from '../types/game'
+import type { GameState, GameAction } from '../types/game'
 
 const MAX_CHAT_LENGTH = 200
 
@@ -16,7 +16,7 @@ interface GameControlsProps {
   handleBuy: () => void
   handleEndTurn: () => void
   setIsTradeOpen: (open: boolean) => void
-  sendAction: (action: { type: string; [key: string]: unknown }) => void
+  sendAction: (action: GameAction) => void
 }
 
 export default function GameControls({

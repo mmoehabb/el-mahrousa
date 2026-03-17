@@ -71,7 +71,11 @@
     "leaveGameBtn": "LEAVE GAME",
     "currency": "Cash ({{amount}} {{currency}})",
     "chatReady": "Chat is ready...",
-    "chatPlaceholder": "Type a message..."
+    "chatPlaceholder": "Type a message...",
+    "pleaseRotate": "Please Rotate Device",
+    "rotateInstruction": "Please rotate your device to play",
+    "infoLogs": "Info & Logs",
+    "controlsChat": "Controls & Chat"
   },
   "trade": {
     "title": "Trade Proposal",

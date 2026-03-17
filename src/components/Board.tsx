@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useGame } from '../context/GameContext'
-import type { Player } from '../types/game'
+import type { Player, GameAction } from '../types/game'
 import TileComponent from './Tile'
 import { useTranslation } from 'react-i18next'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { Dice5 } from 'lucide-react'
 
 const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
   value,
@@ -26,7 +27,13 @@ const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
   )
 }
 
-const Board: React.FC = () => {
+interface BoardProps {
+  handleRoll: () => void
+  isMyTurn: boolean
+  sendAction: (action: GameAction) => void
+}
+
+const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   const { t } = useTranslation()
   const { gameState } = useGame()
   const tiles = gameState.tiles
@@ -49,6 +56,24 @@ const Board: React.FC = () => {
   }, [isRolling])
 
   const effectiveDisplayDice = isRolling ? rollingDice : gameState.lastDice
+
+  const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+
+  // Extract the latest game log to show in the center
+  const latestLog = gameState.logs.length > 0 ? gameState.logs[0] : null
+  const renderLog = (log: typeof latestLog) => {
+    if (!log) return t('game.gameLogs')
+    if (typeof log === 'string') return log
+    if (log.key) {
+      const translatedParams = { ...log.params }
+      if (translatedParams.property) {
+        const propName = String(translatedParams.property)
+        translatedParams.property = t(`tiles.${propName.toLowerCase().replace(/ /g, '-')}`)
+      }
+      return t(`logs.${log.key}`, translatedParams) as string
+    }
+    return JSON.stringify(log)
+  }
 
   // Split tiles for the 4 sides of the 6x6 board
   const bottomRow = tiles.slice(0, 7).reverse() // 0 to 6
@@ -75,8 +100,8 @@ const Board: React.FC = () => {
   }, [gameState.players])
 
   return (
-    <div className="relative p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-4 border-egyptian-gold inline-block">
-      <div className="grid grid-cols-7 grid-rows-7 gap-1">
+    <div className="relative p-2 sm:p-4 md:p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold inline-block">
+      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1">
         {/* Top Row */}
         {topRow.map((tile, i) => (
           <div
@@ -138,51 +163,90 @@ const Board: React.FC = () => {
         ))}
 
         {/* Center */}
-        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/40 rounded-lg relative">
-          <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel">
-            EL-MAHROUSA
-          </h1>
-          <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel">
-            {t('lobby.titleAr')}
+        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
+          <div className="flex flex-col items-center">
+            <h1 className="text-[10px] sm:text-xl lg:text-3xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel text-center leading-tight mt-1">
+              EL-MAHROUSA
+            </h1>
+            <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel text-[8px] sm:text-sm lg:text-lg">
+              {t('lobby.titleAr')}
+            </div>
           </div>
 
-          <AnimatePresence>
-            {(gameState.turnPhase === 'ROLLING' || gameState.turnPhase === 'MOVING') && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                className="absolute bottom-10 flex gap-4 bg-white/50 p-4 rounded-2xl backdrop-blur-md border border-white/50 shadow-xl"
+          <div className="flex gap-2 sm:gap-4 bg-white/50 p-2 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md border border-white/50 shadow-xl scale-75 sm:scale-100">
+            <motion.div
+              animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
+              transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
+            >
+              <DiceFace
+                value={effectiveDisplayDice[0]}
+                aria-label={`First die showing ${effectiveDisplayDice[0]}`}
+              />
+            </motion.div>
+            <motion.div
+              animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}}
+              transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
+            >
+              <DiceFace
+                value={effectiveDisplayDice[1]}
+                aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
+              />
+            </motion.div>
+          </div>
+
+          <div className="w-full max-w-[200px] sm:max-w-xs space-y-1 sm:space-y-2">
+            {gameState.turnPhase === 'ROLL' && (
+              <button
+                onClick={handleRoll}
+                disabled={!isMyTurn}
+                className="w-full bg-egyptian-blue text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-black flex items-center justify-center gap-1 sm:gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-[10px] sm:text-sm shadow-md"
               >
-                <motion.div
-                  animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 0.5,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <DiceFace
-                    value={effectiveDisplayDice[0]}
-                    aria-label={`First die showing ${effectiveDisplayDice[0]}`}
-                  />
-                </motion.div>
-                <motion.div
-                  animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 0.5,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <DiceFace
-                    value={effectiveDisplayDice[1]}
-                    aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
-                  />
-                </motion.div>
-              </motion.div>
+                <Dice5 className="w-4 h-4 sm:w-6 sm:h-6" /> {t('game.rollDiceBtn')}
+              </button>
             )}
-          </AnimatePresence>
+
+            {gameState.turnPhase === 'ACTION' && (
+              <div className="space-y-1 sm:space-y-2">
+                {gameState.tiles[currentPlayer.position]?.price &&
+                  !gameState.players.some((p) => p.properties.includes(currentPlayer.position)) && (
+                    <button
+                      onClick={() => sendAction({ type: 'BUY' })}
+                      disabled={
+                        !isMyTurn ||
+                        currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
+                      }
+                      className="w-full bg-green-600 text-white py-1.5 sm:py-2 rounded md:rounded-lg font-bold hover:bg-green-700 text-[9px] sm:text-sm shadow-md"
+                    >
+                      {t('game.buyForBtn', {
+                        price: gameState.tiles[currentPlayer.position].price,
+                      })}
+                    </button>
+                  )}
+                <button
+                  onClick={() => sendAction({ type: 'END_TURN' })}
+                  disabled={!isMyTurn}
+                  className="w-full bg-slate-500 text-white py-1.5 sm:py-2 rounded md:rounded-lg font-bold hover:bg-slate-600 text-[9px] sm:text-sm shadow-md"
+                >
+                  {t('game.skipEndTurnBtn')}
+                </button>
+              </div>
+            )}
+
+            {gameState.turnPhase === 'END' && (
+              <button
+                onClick={() => sendAction({ type: 'END_TURN' })}
+                disabled={!isMyTurn}
+                className="w-full bg-egyptian-blue text-white py-1.5 sm:py-2 rounded md:rounded-lg font-bold text-[9px] sm:text-sm shadow-md"
+              >
+                {t('game.endTurnBtn')}
+              </button>
+            )}
+
+            {/* Game Logs placed right below actions */}
+            <div className="w-full mt-2 bg-white/80 p-1 sm:p-2 rounded border-l-2 sm:border-l-4 border-egyptian-gold text-center text-[7px] sm:text-xs text-slate-700 font-bold shadow-sm line-clamp-2 leading-tight">
+              {renderLog(latestLog)}
+            </div>
+          </div>
         </div>
       </div>
     </div>

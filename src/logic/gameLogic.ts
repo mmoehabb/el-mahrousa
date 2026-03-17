@@ -172,7 +172,10 @@ export const endTurn = (state: GameState): GameState => {
     if (prisonRecord) {
       if (prisonRecord.turnsLeft > 0) {
         newState.prison[nextPlayer.id] = { turnsLeft: prisonRecord.turnsLeft - 1 }
-        newState.logs = [`${nextPlayer.name} is in Prison for ${prisonRecord.turnsLeft - 1} more turn(s).`, ...newState.logs]
+        newState.logs = [
+          `${nextPlayer.name} is in Prison for ${prisonRecord.turnsLeft - 1} more turn(s).`,
+          ...newState.logs,
+        ]
         nextIndex = (nextIndex + 1) % state.players.length
         attempts++
         continue

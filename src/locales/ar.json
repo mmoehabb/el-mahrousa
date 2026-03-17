@@ -71,7 +71,11 @@
     "leaveGameBtn": "مغادرة اللعبة",
     "currency": "نقود ({{amount}} {{currency}})",
     "chatReady": "المحادثة جاهزة...",
-    "chatPlaceholder": "اكتب رسالة..."
+    "chatPlaceholder": "اكتب رسالة...",
+    "pleaseRotate": "يرجى تدوير الجهاز",
+    "rotateInstruction": "يرجى تدوير الجهاز للعب",
+    "infoLogs": "المعلومات والسجل",
+    "controlsChat": "التحكم والمحادثة"
   },
   "trade": {
     "title": "اقتراح مقايضة",
