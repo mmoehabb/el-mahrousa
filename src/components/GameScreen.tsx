@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, Info, Settings2, X } from 'lucide-react'
+import { Users, Info, Settings2, X, SmartphoneNfc } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import Board from './Board'
 import TradeModal from './TradeModal'
@@ -167,86 +167,95 @@ const GameScreen: React.FC<GameScreenProps> = ({
   )
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-7xl justify-center items-center lg:items-start relative">
-      {/* Mobile Top Nav/FABs */}
-      <div className="lg:hidden flex justify-between w-full max-w-full px-2">
-        <button
-          onClick={() => setShowMobileLeft(true)}
-          className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue z-20"
-        >
-          <Info size={24} />
-        </button>
-        <button
-          onClick={() => setShowMobileRight(true)}
-          className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red z-20"
-        >
-          <Settings2 size={24} />
-        </button>
+    <>
+      {/* Mobile Landscape Overlay - only active when on GameScreen */}
+      <div className="landscape-overlay">
+        <SmartphoneNfc size={64} className="landscape-overlay-icon mb-4" />
+        <h2 className="text-2xl font-bold mb-2 font-english-pixel">Please Rotate Device</h2>
+        <p className="font-arabic-pixel text-xl">يرجى تدوير الجهاز للعب</p>
       </div>
 
-      <TradeModal
-        isOpen={isTradeOpen}
-        onClose={() => setIsTradeOpen(false)}
-        players={gameState.players}
-        myId={myId}
-        allTiles={gameState.tiles}
-        onPropose={handleProposeTrade}
-      />
+      <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-7xl justify-center items-center lg:items-start relative">
+        {/* Mobile Top Nav/FABs */}
+        <div className="lg:hidden flex justify-between w-full max-w-full px-2">
+          <button
+            onClick={() => setShowMobileLeft(true)}
+            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue z-20"
+          >
+            <Info size={24} />
+          </button>
+          <button
+            onClick={() => setShowMobileRight(true)}
+            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red z-20"
+          >
+            <Settings2 size={24} />
+          </button>
+        </div>
 
-      {/* Desktop Left Panel */}
-      <div className="hidden lg:block">{playerInfoContent}</div>
+        <TradeModal
+          isOpen={isTradeOpen}
+          onClose={() => setIsTradeOpen(false)}
+          players={gameState.players}
+          myId={myId}
+          allTiles={gameState.tiles}
+          onPropose={handleProposeTrade}
+        />
 
-      {/* Center: Board - Scrollable wrapper for mobile */}
-      <div className="w-full max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 scale-90 sm:scale-100 origin-top">
-        <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
+        {/* Desktop Left Panel */}
+        <div className="hidden lg:block">{playerInfoContent}</div>
+
+        {/* Center: Board - Scrollable wrapper for mobile */}
+        <div className="w-full max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 scale-90 sm:scale-100 origin-top">
+          <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
+        </div>
+
+        {/* Desktop Right Panel */}
+        <div className="hidden lg:block">{controlsContent}</div>
+
+        {/* Mobile Modals */}
+        <AnimatePresence>
+          {showMobileLeft && (
+            <motion.div
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              className="fixed inset-0 z-50 flex bg-black/50"
+            >
+              <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
+                <button
+                  onClick={() => setShowMobileLeft(false)}
+                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1"
+                >
+                  <X size={20} />
+                </button>
+                <h2 className="text-xl font-bold mb-4 mt-2">Info & Logs</h2>
+                {playerInfoContent}
+              </div>
+            </motion.div>
+          )}
+
+          {showMobileRight && (
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              className="fixed inset-0 z-50 flex justify-end bg-black/50"
+            >
+              <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
+                <button
+                  onClick={() => setShowMobileRight(false)}
+                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1 z-50"
+                >
+                  <X size={20} />
+                </button>
+                <h2 className="text-xl font-bold mb-4 mt-2">Controls & Chat</h2>
+                {controlsContent}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-
-      {/* Desktop Right Panel */}
-      <div className="hidden lg:block">{controlsContent}</div>
-
-      {/* Mobile Modals */}
-      <AnimatePresence>
-        {showMobileLeft && (
-          <motion.div
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            className="fixed inset-0 z-50 flex bg-black/50"
-          >
-            <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
-              <button
-                onClick={() => setShowMobileLeft(false)}
-                className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1"
-              >
-                <X size={20} />
-              </button>
-              <h2 className="text-xl font-bold mb-4 mt-2">Info & Logs</h2>
-              {playerInfoContent}
-            </div>
-          </motion.div>
-        )}
-
-        {showMobileRight && (
-          <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 100 }}
-            className="fixed inset-0 z-50 flex justify-end bg-black/50"
-          >
-            <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
-              <button
-                onClick={() => setShowMobileRight(false)}
-                className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1 z-50"
-              >
-                <X size={20} />
-              </button>
-              <h2 className="text-xl font-bold mb-4 mt-2">Controls & Chat</h2>
-              {controlsContent}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </>
   )
 }
 

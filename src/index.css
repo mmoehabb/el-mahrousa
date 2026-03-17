@@ -138,8 +138,8 @@ body.font-arabic-pixel {
     }
   }
 
-  /* Hide app content on portrait mobile */
-  #root > *:not(.landscape-overlay) {
+  /* Hide GameScreen content on portrait mobile, allowing LoginScreen and Lobby to work normally */
+  .game-screen-container {
     display: none !important;
   }
 }
