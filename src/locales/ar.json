@@ -3,6 +3,19 @@
     "languageToggle": {
       "en": "English",
       "ar": "عربي"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "close": "إغلاق",
+      "general": "عام",
+      "servers": "الخوادم",
+      "language": "اللغة",
+      "displayMode": "وضع العرض",
+      "dark": "داكن",
+      "light": "فاتح",
+      "addIceCandidate": "إضافة خادم ICE",
+      "add": "إضافة",
+      "iceCandidateUrl": "stun:stun.l.google.com:19302"
     }
   },
   "lobby": {

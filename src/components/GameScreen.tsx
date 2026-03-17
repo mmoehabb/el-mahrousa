@@ -5,7 +5,7 @@ import { useNetworking } from '../hooks/useNetworking'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Dice5, Send, Users, Handshake, MessageSquare, Gamepad2, X } from 'lucide-react'
 import { GAME_CONFIG } from '../config/gameConfig'
-import TradeModal, { type TradeOffer } from './TradeModal'
+import TradeModal from './TradeModal'; import type { TradeOffer } from '../types/game'
 import { useTranslation } from 'react-i18next'
 
 const MAX_CHAT_LENGTH = 200
