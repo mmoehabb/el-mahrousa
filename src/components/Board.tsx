@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useGame } from '../context/GameContext'
-import type { Player } from '../types/game'
+import type { Player, GameAction } from '../types/game'
 import TileComponent from './Tile'
 import { useTranslation } from 'react-i18next'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { Dice5 } from 'lucide-react'
 
 const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
   value,
@@ -26,7 +27,13 @@ const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
   )
 }
 
-const Board: React.FC = () => {
+interface BoardProps {
+  handleRoll: () => void
+  isMyTurn: boolean
+  sendAction: (action: GameAction) => void
+}
+
+const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   const { t } = useTranslation()
   const { gameState } = useGame()
   const tiles = gameState.tiles
@@ -49,6 +56,24 @@ const Board: React.FC = () => {
   }, [isRolling])
 
   const effectiveDisplayDice = isRolling ? rollingDice : gameState.lastDice
+
+  const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+
+  // Extract the latest game log to show in the center
+  const latestLog = gameState.logs.length > 0 ? gameState.logs[gameState.logs.length - 1] : null
+  const renderLog = (log: typeof latestLog) => {
+    if (!log) return t('game.gameLogs')
+    if (typeof log === 'string') return log
+    if (log.key) {
+      const translatedParams = { ...log.params }
+      if (translatedParams.property) {
+        const propName = String(translatedParams.property)
+        translatedParams.property = t(`tiles.${propName.toLowerCase().replace(/ /g, '-')}`)
+      }
+      return t(`logs.${log.key}`, translatedParams) as string
+    }
+    return JSON.stringify(log)
+  }
 
   // Split tiles for the 4 sides of the 6x6 board
   const bottomRow = tiles.slice(0, 7).reverse() // 0 to 6
@@ -138,51 +163,91 @@ const Board: React.FC = () => {
         ))}
 
         {/* Center */}
-        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/40 rounded-lg relative">
-          <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel">
-            EL-MAHROUSA
-          </h1>
-          <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel">
-            {t('lobby.titleAr')}
+        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-4 space-y-4">
+
+          <div className="flex flex-col items-center">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel text-center">
+              EL-MAHROUSA
+            </h1>
+            <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel text-sm sm:text-base lg:text-lg">
+              {t('lobby.titleAr')}
+            </div>
           </div>
 
-          <AnimatePresence>
-            {(gameState.turnPhase === 'ROLLING' || gameState.turnPhase === 'MOVING') && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                className="absolute bottom-10 flex gap-4 bg-white/50 p-4 rounded-2xl backdrop-blur-md border border-white/50 shadow-xl"
+          <div className="flex gap-4 bg-white/50 p-4 rounded-2xl backdrop-blur-md border border-white/50 shadow-xl">
+            <motion.div
+              animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
+              transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
+            >
+              <DiceFace
+                value={effectiveDisplayDice[0]}
+                aria-label={`First die showing ${effectiveDisplayDice[0]}`}
+              />
+            </motion.div>
+            <motion.div
+              animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}}
+              transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
+            >
+              <DiceFace
+                value={effectiveDisplayDice[1]}
+                aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
+              />
+            </motion.div>
+          </div>
+
+          <div className="w-full max-w-xs space-y-2">
+            {gameState.turnPhase === 'ROLL' && (
+              <button
+                onClick={handleRoll}
+                disabled={!isMyTurn}
+                className="w-full bg-egyptian-blue text-white py-3 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-xs sm:text-sm shadow-md"
               >
-                <motion.div
-                  animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 0.5,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <DiceFace
-                    value={effectiveDisplayDice[0]}
-                    aria-label={`First die showing ${effectiveDisplayDice[0]}`}
-                  />
-                </motion.div>
-                <motion.div
-                  animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 0.5,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <DiceFace
-                    value={effectiveDisplayDice[1]}
-                    aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
-                  />
-                </motion.div>
-              </motion.div>
+                <Dice5 /> {t('game.rollDiceBtn')}
+              </button>
             )}
-          </AnimatePresence>
+
+            {gameState.turnPhase === 'ACTION' && (
+              <div className="space-y-2">
+                {gameState.tiles[currentPlayer.position]?.price &&
+                  !gameState.players.some((p) => p.properties.includes(currentPlayer.position)) && (
+                    <button
+                      onClick={() => sendAction({ type: 'BUY' })}
+                      disabled={
+                        !isMyTurn ||
+                        currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
+                      }
+                      className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 text-xs sm:text-sm shadow-md"
+                    >
+                      {t('game.buyForBtn', {
+                        price: gameState.tiles[currentPlayer.position].price,
+                      })}
+                    </button>
+                  )}
+                <button
+                  onClick={() => sendAction({ type: 'END_TURN' })}
+                  disabled={!isMyTurn}
+                  className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600 text-xs sm:text-sm shadow-md"
+                >
+                  {t('game.skipEndTurnBtn')}
+                </button>
+              </div>
+            )}
+
+            {gameState.turnPhase === 'END' && (
+              <button
+                onClick={() => sendAction({ type: 'END_TURN' })}
+                disabled={!isMyTurn}
+                className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold text-xs sm:text-sm shadow-md"
+              >
+                {t('game.endTurnBtn')}
+              </button>
+            )}
+          </div>
+
+          <div className="mt-auto w-full max-w-sm bg-white/80 p-2 rounded border-l-4 border-egyptian-gold text-center text-xs text-slate-700 font-bold shadow-sm">
+             {renderLog(latestLog)}
+          </div>
+
         </div>
       </div>
     </div>
