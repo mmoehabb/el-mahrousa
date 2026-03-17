@@ -21,27 +21,46 @@ describe('rollDice', () => {
     }
   })
 
-  test('should be deterministic with mocked Math.random', () => {
-    const randomMock = mock.method(Math, 'random')
+  test('should be deterministic with mocked crypto.getRandomValues', () => {
+    const originalGetRandomValues = crypto.getRandomValues
+
+    const cryptoMock = mock.method(crypto, 'getRandomValues')
 
     try {
-      // Mock Math.random to return 0 (should result in 1)
-      randomMock.mock.mockImplementation(() => 0)
+      // Mock crypto.getRandomValues to return 0 (should result in 1)
+      cryptoMock.mock.mockImplementation(<T extends ArrayBufferView | null>(array: T) => {
+        if (array && '0' in array) {
+          ;(array as unknown as Uint32Array)[0] = 0
+        }
+        return array
+      })
       assert.deepStrictEqual(rollDice(), [1, 1])
 
-      // Mock Math.random to return 0.999999 (should result in 6)
-      randomMock.mock.mockImplementation(() => 0.999999)
+      // Mock crypto.getRandomValues to return near max Uint32 (should result in 6)
+      cryptoMock.mock.mockImplementation(<T extends ArrayBufferView | null>(array: T) => {
+        if (array && '0' in array) {
+          ;(array as unknown as Uint32Array)[0] = 0xffffffff
+        }
+        return array
+      })
       assert.deepStrictEqual(rollDice(), [6, 6])
 
-      // Mock Math.random to return specific sequence
+      // Mock crypto.getRandomValues to return specific sequence
       let count = 0
-      randomMock.mock.mockImplementation(() => {
+      cryptoMock.mock.mockImplementation(<T extends ArrayBufferView | null>(array: T) => {
         count++
-        return count === 1 ? 0.1 : 0.8 // 0.1 -> 1, 0.8 -> 5
+        if (array && '0' in array) {
+          // 0.1 * (0xffffffff + 1) -> 1
+          // 0.8 * (0xffffffff + 1) -> 5
+          ;(array as unknown as Uint32Array)[0] =
+            count === 1 ? Math.floor(0.1 * (0xffffffff + 1)) : Math.floor(0.8 * (0xffffffff + 1))
+        }
+        return array
       })
       assert.deepStrictEqual(rollDice(), [1, 5])
     } finally {
-      randomMock.mock.restore()
+      cryptoMock.mock.restore()
+      crypto.getRandomValues = originalGetRandomValues
     }
   })
 })

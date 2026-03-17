@@ -37,7 +37,11 @@ const Board: React.FC = () => {
     let interval: ReturnType<typeof setInterval>
     if (isRolling) {
       interval = setInterval(() => {
-        setRollingDice([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1])
+        const array = new Uint32Array(2)
+        crypto.getRandomValues(array)
+        const d1 = Math.floor((array[0] / (0xffffffff + 1)) * 6) + 1
+        const d2 = Math.floor((array[1] / (0xffffffff + 1)) * 6) + 1
+        setRollingDice([d1, d2])
       }, 100)
     }
     return () => clearInterval(interval)
