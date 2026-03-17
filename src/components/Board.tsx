@@ -60,7 +60,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
 
   // Extract the latest game log to show in the center
-  const latestLog = gameState.logs.length > 0 ? gameState.logs[gameState.logs.length - 1] : null
+  const latestLog = gameState.logs.length > 0 ? gameState.logs[0] : null
   const renderLog = (log: typeof latestLog) => {
     if (!log) return t('game.gameLogs')
     if (typeof log === 'string') return log
