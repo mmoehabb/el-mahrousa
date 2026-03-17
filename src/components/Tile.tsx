@@ -31,7 +31,8 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner }) => {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-0.5 md:gap-1 justify-center mb-1 relative z-20 w-full px-1">
+      {/* Container for players, absolutely positioned near the center to avoid shifting layout */}
+      <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-0.5 md:gap-1 z-20 pointer-events-none p-1 pt-6">
         {tilePlayers.map((p) => (
           <motion.div
             key={p.id}
