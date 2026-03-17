@@ -164,7 +164,6 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
 
         {/* Center */}
         <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-4 space-y-4">
-
           <div className="flex flex-col items-center">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel text-center">
               EL-MAHROUSA
@@ -245,9 +244,8 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
           </div>
 
           <div className="mt-auto w-full max-w-sm bg-white/80 p-2 rounded border-l-4 border-egyptian-gold text-center text-xs text-slate-700 font-bold shadow-sm">
-             {renderLog(latestLog)}
+            {renderLog(latestLog)}
           </div>
-
         </div>
       </div>
     </div>

@@ -135,9 +135,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
               const translatedParams = { ...log.params }
               if (translatedParams.property) {
                 const propName = String(translatedParams.property)
-                translatedParams.property = t(
-                  `tiles.${propName.toLowerCase().replace(/ /g, '-')}`
-                )
+                translatedParams.property = t(`tiles.${propName.toLowerCase().replace(/ /g, '-')}`)
               }
               return (
                 <div key={i} className="border-b border-slate-100 pb-1">
@@ -196,9 +194,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       />
 
       {/* Desktop Left Panel */}
-      <div className="hidden lg:block">
-        {playerInfoContent}
-      </div>
+      <div className="hidden lg:block">{playerInfoContent}</div>
 
       {/* Center: Board - Scrollable wrapper for mobile */}
       <div className="w-full max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 scale-90 sm:scale-100 origin-top">
@@ -206,9 +202,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       </div>
 
       {/* Desktop Right Panel */}
-      <div className="hidden lg:block">
-        {controlsContent}
-      </div>
+      <div className="hidden lg:block">{controlsContent}</div>
 
       {/* Mobile Modals */}
       <AnimatePresence>

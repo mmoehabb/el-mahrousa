@@ -127,9 +127,15 @@ body.font-arabic-pixel {
   }
 
   @keyframes rotate-phone {
-    0% { transform: rotate(0deg); }
-    50% { transform: rotate(-90deg); }
-    100% { transform: rotate(-90deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(-90deg);
+    }
+    100% {
+      transform: rotate(-90deg);
+    }
   }
 
   /* Hide app content on portrait mobile */

@@ -1,7 +1,15 @@
 import { test, describe, mock } from 'node:test'
 import assert from 'node:assert'
 
-import { rollDice, moveOneStep, createInitialState, applyLandingLogic, endTurn, executeTrade, buyProperty } from './gameLogic.ts'
+import {
+  rollDice,
+  moveOneStep,
+  createInitialState,
+  applyLandingLogic,
+  endTurn,
+  executeTrade,
+  buyProperty,
+} from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
 import { GAME_CONFIG } from '../config/gameConfig.ts'
 
@@ -285,9 +293,33 @@ describe('endTurn prison logic', () => {
   const getBaseState = () => {
     const state = createInitialState()
     state.players = [
-      { id: 'p1', name: 'Player 1', position: 0, balance: 1500, properties: [], isBankrupt: false, color: '#f00' },
-      { id: 'p2', name: 'Player 2', position: 0, balance: 1500, properties: [], isBankrupt: false, color: '#0f0' },
-      { id: 'p3', name: 'Player 3', position: 0, balance: 1500, properties: [], isBankrupt: false, color: '#00f' },
+      {
+        id: 'p1',
+        name: 'Player 1',
+        position: 0,
+        balance: 1500,
+        properties: [],
+        isBankrupt: false,
+        color: '#f00',
+      },
+      {
+        id: 'p2',
+        name: 'Player 2',
+        position: 0,
+        balance: 1500,
+        properties: [],
+        isBankrupt: false,
+        color: '#0f0',
+      },
+      {
+        id: 'p3',
+        name: 'Player 3',
+        position: 0,
+        balance: 1500,
+        properties: [],
+        isBankrupt: false,
+        color: '#00f',
+      },
     ]
     state.currentPlayerIndex = 0
     return state
@@ -339,8 +371,24 @@ describe('applyLandingLogic', () => {
   const getBaseState = () => {
     const state = createInitialState()
     state.players = [
-      { id: 'p1', name: 'Player 1', position: 0, balance: 1500, properties: [], isBankrupt: false, color: '#f00' },
-      { id: 'p2', name: 'Player 2', position: 0, balance: 1500, properties: [], isBankrupt: false, color: '#0f0' },
+      {
+        id: 'p1',
+        name: 'Player 1',
+        position: 0,
+        balance: 1500,
+        properties: [],
+        isBankrupt: false,
+        color: '#f00',
+      },
+      {
+        id: 'p2',
+        name: 'Player 2',
+        position: 0,
+        balance: 1500,
+        properties: [],
+        isBankrupt: false,
+        color: '#0f0',
+      },
     ]
     state.currentPlayerIndex = 0
     return state
@@ -350,11 +398,11 @@ describe('applyLandingLogic', () => {
     const state = getBaseState()
 
     // Find a TAX tile in BOARD_DATA
-    const taxTileIndex = state.tiles.findIndex(t => t.type === 'TAX')
+    const taxTileIndex = state.tiles.findIndex((t) => t.type === 'TAX')
     assert.notStrictEqual(taxTileIndex, -1, 'Board must have at least one TAX tile')
 
     // Deep clone the tiles array to avoid polluting global state
-    state.tiles = state.tiles.map(t => ({ ...t }))
+    state.tiles = state.tiles.map((t) => ({ ...t }))
     const taxTile = state.tiles[taxTileIndex]
 
     // Explicitly set price to 0 to test fallback logic
@@ -372,7 +420,7 @@ describe('applyLandingLogic', () => {
   test('pays rent to owner when landing on owned PROPERTY', () => {
     const state = getBaseState()
 
-    const propIndex = state.tiles.findIndex(t => t.type === 'PROPERTY')
+    const propIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
     assert.notStrictEqual(propIndex, -1, 'Board must have at least one PROPERTY tile')
 
     const propTile = state.tiles[propIndex]
@@ -393,7 +441,7 @@ describe('applyLandingLogic', () => {
   test('does not pay rent if owner is bankrupt', () => {
     const state = getBaseState()
 
-    const propIndex = state.tiles.findIndex(t => t.type === 'PROPERTY')
+    const propIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
     const propTile = state.tiles[propIndex]
 
     // Player 2 owns it but is bankrupt
@@ -412,7 +460,7 @@ describe('applyLandingLogic', () => {
   test('sends player to Prison when landing on "Go To Prison" tile', () => {
     const state = getBaseState()
 
-    const prisonTileIndex = state.tiles.findIndex(t => t.name === 'Go To Prison')
+    const prisonTileIndex = state.tiles.findIndex((t) => t.name === 'Go To Prison')
     assert.notStrictEqual(prisonTileIndex, -1, 'Board must have "Go To Prison" tile')
 
     state.players[0].position = prisonTileIndex
@@ -441,7 +489,9 @@ describe('buyProperty', () => {
     ...overrides,
   })
 
-  const createMockTile = (overrides: Partial<import('../types/game.ts').Tile> = {}): import('../types/game.ts').Tile => ({
+  const createMockTile = (
+    overrides: Partial<import('../types/game.ts').Tile> = {},
+  ): import('../types/game.ts').Tile => ({
     id: 1,
     name: 'Property 1',
     type: 'PROPERTY',
@@ -500,10 +550,7 @@ describe('buyProperty', () => {
     const player1 = createMockPlayer({ id: 'p1', balance: 500 })
     const player2 = createMockPlayer({ id: 'p2', balance: 500, properties: [1] })
     const tile = createMockTile({ id: 1, price: 100 })
-    const state = createMockState(
-      [player1, player2],
-      [createMockTile({ id: 0, price: 0 }), tile],
-    )
+    const state = createMockState([player1, player2], [createMockTile({ id: 0, price: 0 }), tile])
 
     const newState = buyProperty(state, 1)
 
@@ -674,7 +721,11 @@ describe('moveOneStep', () => {
 
     assert.strictEqual(newState.players[0].position, 1, 'Position should increment by 1')
     assert.strictEqual(newState.players[0].balance, 1500, 'Balance should remain unchanged')
-    assert.strictEqual(newState.logs.length, initialState.logs.length, 'No new logs should be added')
+    assert.strictEqual(
+      newState.logs.length,
+      initialState.logs.length,
+      'No new logs should be added',
+    )
   })
 
   test('should wrap around and add GO_REWARD when passing GO', () => {
@@ -702,13 +753,17 @@ describe('moveOneStep', () => {
     assert.strictEqual(
       newState.players[0].balance,
       1500 + GAME_CONFIG.GO_REWARD,
-      'Balance should increase by GO_REWARD'
+      'Balance should increase by GO_REWARD',
     )
-    assert.strictEqual(newState.logs.length, initialState.logs.length + 1, 'A new log should be added')
+    assert.strictEqual(
+      newState.logs.length,
+      initialState.logs.length + 1,
+      'A new log should be added',
+    )
     assert.deepStrictEqual(
       newState.logs[0],
       { key: 'passedStart', params: { name: 'Player 1', amount: GAME_CONFIG.GO_REWARD } },
-      'Log should reflect passing GO'
+      'Log should reflect passing GO',
     )
   })
 
