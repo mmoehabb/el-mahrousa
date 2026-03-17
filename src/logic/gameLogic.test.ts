@@ -510,3 +510,125 @@ describe('buyProperty', () => {
     assert.strictEqual(newState, state) // Should return the exact same state
   })
 })
+
+describe('executeTrade', () => {
+  const createMockState = (): GameState => ({
+    players: [
+      {
+        id: 'p1',
+        name: 'Player 1',
+        position: 0,
+        balance: 1000,
+        properties: [1, 2],
+        isBankrupt: false,
+        color: '#ff0000',
+      },
+      {
+        id: 'p2',
+        name: 'Player 2',
+        position: 0,
+        balance: 1500,
+        properties: [3, 4],
+        isBankrupt: false,
+        color: '#0000ff',
+      },
+    ],
+    currentPlayerIndex: 0,
+    tiles: [],
+    status: 'PLAYING',
+    turnPhase: 'ACTION',
+    lastDice: [1, 1],
+    logs: [],
+    chatMessages: [],
+    prison: {},
+  })
+
+  test('should execute a valid trade', () => {
+    const state = createMockState()
+    const offer = {
+      myCash: 200,
+      partnerCash: 100,
+      myProperties: [1],
+      partnerProperties: [3],
+    }
+
+    const newState = executeTrade(state, 'p1', 'p2', offer)
+
+    const p1 = newState.players.find((p) => p.id === 'p1')!
+    const p2 = newState.players.find((p) => p.id === 'p2')!
+
+    assert.strictEqual(p1.balance, 1000 - 200 + 100)
+    assert.deepStrictEqual(p1.properties, [2, 3])
+
+    assert.strictEqual(p2.balance, 1500 - 100 + 200)
+    assert.deepStrictEqual(p2.properties, [4, 1])
+
+    assert.strictEqual(newState.logs[0], 'Trade executed between Player 1 and Player 2')
+  })
+
+  test('should fail if p1 has insufficient funds', () => {
+    const state = createMockState()
+    const offer = {
+      myCash: 2000, // p1 only has 1000
+      partnerCash: 0,
+      myProperties: [],
+      partnerProperties: [],
+    }
+
+    const newState = executeTrade(state, 'p1', 'p2', offer)
+
+    const p1 = newState.players.find((p) => p.id === 'p1')!
+    assert.strictEqual(p1.balance, 1000) // unchanged
+    assert.strictEqual(newState.logs[0], 'Trade failed: Insufficient funds.')
+  })
+
+  test('should fail if p2 has insufficient funds', () => {
+    const state = createMockState()
+    const offer = {
+      myCash: 0,
+      partnerCash: 2000, // p2 only has 1500
+      myProperties: [],
+      partnerProperties: [],
+    }
+
+    const newState = executeTrade(state, 'p1', 'p2', offer)
+
+    const p2 = newState.players.find((p) => p.id === 'p2')!
+    assert.strictEqual(p2.balance, 1500) // unchanged
+    assert.strictEqual(newState.logs[0], 'Trade failed: Insufficient funds.')
+  })
+
+  test('should fail if p1 offers unowned property', () => {
+    const state = createMockState()
+    const offer = {
+      myCash: 0,
+      partnerCash: 0,
+      myProperties: [5], // p1 does not own 5
+      partnerProperties: [],
+    }
+
+    const newState = executeTrade(state, 'p1', 'p2', offer)
+
+    const p1 = newState.players.find((p) => p.id === 'p1')!
+    assert.deepStrictEqual(p1.properties, [1, 2]) // unchanged
+    assert.strictEqual(newState.logs[0], 'Trade failed: Properties not owned.')
+  })
+
+  test('should fail if p2 offers unowned property', () => {
+    const state = createMockState()
+    const offer = {
+      myCash: 0,
+      partnerCash: 0,
+      myProperties: [],
+      partnerProperties: [1], // p2 does not own 1
+    }
+
+    const newState = executeTrade(state, 'p1', 'p2', offer)
+
+    const p2 = newState.players.find((p) => p.id === 'p2')!
+    assert.deepStrictEqual(p2.properties, [3, 4]) // unchanged
+    assert.strictEqual(newState.logs[0], 'Trade failed: Properties not owned.')
+  })
+})
+
+
