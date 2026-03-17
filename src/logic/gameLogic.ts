@@ -15,8 +15,15 @@ export const createInitialState = (): GameState => ({
   prison: {},
 })
 
+// Generates a float between 0 (inclusive) and 1 (exclusive) using crypto
+const secureRandom = (): number => {
+  const array = new Uint32Array(1)
+  crypto.getRandomValues(array)
+  return array[0] / (0xffffffff + 1)
+}
+
 export const rollDice = (): [number, number] => {
-  return [Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1]
+  return [Math.floor(secureRandom() * 6) + 1, Math.floor(secureRandom() * 6) + 1]
 }
 
 export const moveOneStep = (state: GameState): GameState => {

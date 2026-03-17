@@ -17,7 +17,7 @@ const GameContext = createContext<GameContextType | undefined>(undefined)
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [gameState, setGameState] = useState<GameState>(createInitialState())
   const [isHost, setIsHost] = useState(false)
-  const [myId] = useState(() => Math.random().toString(36).substring(7))
+  const [myId] = useState(() => crypto.randomUUID())
   const [playerName, setPlayerName] = useState(() => sessionStorage.getItem('playerName') || '')
 
   const handleSetPlayerName = (name: string) => {
