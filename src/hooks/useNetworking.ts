@@ -129,9 +129,12 @@ export const useNetworking = () => {
             }
             break
           case 'PLAYER_DISCONNECT': {
-            const disconnectedPlayer = nextState.players.find((p) => p.id === from)
-            if (disconnectedPlayer) {
-              nextState.players = nextState.players.filter((p) => p.id !== from)
+            const disconnectedPlayerIndex = nextState.players.findIndex((p) => p.id === from)
+            if (disconnectedPlayerIndex !== -1) {
+              const disconnectedPlayer = nextState.players[disconnectedPlayerIndex]
+              const newPlayers = [...nextState.players]
+              newPlayers.splice(disconnectedPlayerIndex, 1)
+              nextState.players = newPlayers
               nextState.logs = [`${disconnectedPlayer.name} left the game.`, ...nextState.logs]
 
               if (nextState.status === 'WAITING' && nextState.countdown !== null) {
