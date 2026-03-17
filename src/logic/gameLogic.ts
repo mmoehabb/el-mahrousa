@@ -162,13 +162,16 @@ export const executeTrade = (
   p2Id: string,
   offer: import('../components/TradeModal').TradeOffer,
 ): GameState => {
+  const myPropertiesSet = new Set(offer.myProperties)
+  const partnerPropertiesSet = new Set(offer.partnerProperties)
+
   const newPlayers = state.players.map((p) => {
     if (p.id === p1Id) {
       return {
         ...p,
         balance: p.balance - offer.myCash + offer.partnerCash,
         properties: p.properties
-          .filter((id: number) => !offer.myProperties.includes(id))
+          .filter((id: number) => !myPropertiesSet.has(id))
           .concat(offer.partnerProperties),
       }
     }
@@ -177,7 +180,7 @@ export const executeTrade = (
         ...p,
         balance: p.balance - offer.partnerCash + offer.myCash,
         properties: p.properties
-          .filter((id: number) => !offer.partnerProperties.includes(id))
+          .filter((id: number) => !partnerPropertiesSet.has(id))
           .concat(offer.myProperties),
       }
     }
