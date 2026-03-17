@@ -241,10 +241,11 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                 {t('game.endTurnBtn')}
               </button>
             )}
-          </div>
 
-          <div className="mt-auto mb-1 w-full max-w-[200px] sm:max-w-sm bg-white/80 p-1 sm:p-2 rounded border-l-2 sm:border-l-4 border-egyptian-gold text-center text-[7px] sm:text-xs text-slate-700 font-bold shadow-sm line-clamp-2 leading-tight">
-            {renderLog(latestLog)}
+            {/* Game Logs placed right below actions */}
+            <div className="w-full mt-2 bg-white/80 p-1 sm:p-2 rounded border-l-2 sm:border-l-4 border-egyptian-gold text-center text-[7px] sm:text-xs text-slate-700 font-bold shadow-sm line-clamp-2 leading-tight">
+              {renderLog(latestLog)}
+            </div>
           </div>
         </div>
       </div>

@@ -171,22 +171,24 @@ const GameScreen: React.FC<GameScreenProps> = ({
       {/* Mobile Landscape Overlay - only active when on GameScreen */}
       <div className="landscape-overlay">
         <SmartphoneNfc size={64} className="landscape-overlay-icon mb-4" />
-        <h2 className="text-2xl font-bold mb-2 font-english-pixel">Please Rotate Device</h2>
-        <p className="font-arabic-pixel text-xl">يرجى تدوير الجهاز للعب</p>
+        <h2 className="text-2xl font-bold mb-2 font-english-pixel">{t('game.pleaseRotate')}</h2>
+        <p className="font-arabic-pixel text-xl">{t('game.rotateInstruction')}</p>
       </div>
 
       <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-7xl justify-center items-center lg:items-start relative">
-        {/* Mobile Top Nav/FABs */}
-        <div className="lg:hidden flex justify-between w-full max-w-full px-2">
+        {/* Mobile Sticky Nav/FABs */}
+        <div className="lg:hidden fixed top-4 left-4 right-4 flex justify-between z-30 pointer-events-none">
           <button
             onClick={() => setShowMobileLeft(true)}
-            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue z-20"
+            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue pointer-events-auto"
+            aria-label={t('game.infoLogs')}
           >
             <Info size={24} />
           </button>
           <button
             onClick={() => setShowMobileRight(true)}
-            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red z-20"
+            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red pointer-events-auto"
+            aria-label={t('game.controlsChat')}
           >
             <Settings2 size={24} />
           </button>
@@ -228,7 +230,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 >
                   <X size={20} />
                 </button>
-                <h2 className="text-xl font-bold mb-4 mt-2">Info & Logs</h2>
+                <h2 className="text-xl font-bold mb-4 mt-2">{t('game.infoLogs')}</h2>
                 {playerInfoContent}
               </div>
             </motion.div>
@@ -248,7 +250,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 >
                   <X size={20} />
                 </button>
-                <h2 className="text-xl font-bold mb-4 mt-2">Controls & Chat</h2>
+                <h2 className="text-xl font-bold mb-4 mt-2">{t('game.controlsChat')}</h2>
                 {controlsContent}
               </div>
             </motion.div>
