@@ -152,7 +152,7 @@ describe('executeTrade', () => {
     assert.deepStrictEqual(newP2.properties, [1])
 
     // Logs should be updated
-    assert.strictEqual(newState.logs[0], 'Trade executed between p1 and p2')
+    assert.strictEqual(newState.logs[0], 'Trade executed between Player p1 and Player p2')
     assert.strictEqual(newState.logs[1], 'Initial state')
   })
 
