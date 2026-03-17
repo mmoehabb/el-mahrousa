@@ -1,8 +1,9 @@
 import { test, describe, mock } from 'node:test'
 import assert from 'node:assert'
 
-import { rollDice, createInitialState, applyLandingLogic, endTurn, executeTrade, buyProperty } from './gameLogic.ts'
+import { rollDice, moveOneStep, createInitialState, applyLandingLogic, endTurn, executeTrade, buyProperty } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
+import { GAME_CONFIG } from '../config/gameConfig.ts'
 
 const createMockPlayer = (id: string, isBankrupt: boolean = false): Player => ({
   id,
@@ -631,4 +632,96 @@ describe('executeTrade', () => {
   })
 })
 
+describe('moveOneStep', () => {
+  test('should move player position by 1 without changing balance for normal tile', () => {
+    const initialState = createInitialState()
+    const stateWithPlayer = {
+      ...initialState,
+      players: [
+        {
+          id: 'player1',
+          name: 'Player 1',
+          position: 0,
+          balance: 1500,
+          properties: [],
+          isBankrupt: false,
+          color: '#ff0000',
+        },
+      ],
+      currentPlayerIndex: 0,
+    }
 
+    const newState = moveOneStep(stateWithPlayer)
+
+    assert.strictEqual(newState.players[0].position, 1, 'Position should increment by 1')
+    assert.strictEqual(newState.players[0].balance, 1500, 'Balance should remain unchanged')
+    assert.strictEqual(newState.logs.length, initialState.logs.length, 'No new logs should be added')
+  })
+
+  test('should wrap around and add GO_REWARD when passing GO', () => {
+    const initialState = createInitialState()
+    const lastTileIndex = initialState.tiles.length - 1
+    const stateWithPlayer = {
+      ...initialState,
+      players: [
+        {
+          id: 'player1',
+          name: 'Player 1',
+          position: lastTileIndex,
+          balance: 1500,
+          properties: [],
+          isBankrupt: false,
+          color: '#ff0000',
+        },
+      ],
+      currentPlayerIndex: 0,
+    }
+
+    const newState = moveOneStep(stateWithPlayer)
+
+    assert.strictEqual(newState.players[0].position, 0, 'Position should wrap around to 0')
+    assert.strictEqual(
+      newState.players[0].balance,
+      1500 + GAME_CONFIG.GO_REWARD,
+      'Balance should increase by GO_REWARD'
+    )
+    assert.strictEqual(newState.logs.length, initialState.logs.length + 1, 'A new log should be added')
+    assert.deepStrictEqual(
+      newState.logs[0],
+      { key: 'passedStart', params: { name: 'Player 1', amount: GAME_CONFIG.GO_REWARD } },
+      'Log should reflect passing GO'
+    )
+  })
+
+  test('should not mutate original state', () => {
+    const initialState = createInitialState()
+    const stateWithPlayer = {
+      ...initialState,
+      players: [
+        {
+          id: 'player1',
+          name: 'Player 1',
+          position: 0,
+          balance: 1500,
+          properties: [],
+          isBankrupt: false,
+          color: '#ff0000',
+        },
+      ],
+      currentPlayerIndex: 0,
+    }
+
+    // Freeze original state to ensure no mutation
+    Object.freeze(stateWithPlayer)
+    Object.freeze(stateWithPlayer.players)
+    Object.freeze(stateWithPlayer.players[0])
+
+    // We expect no TypeError to be thrown from mutation
+    const newState = moveOneStep(stateWithPlayer)
+
+    assert.strictEqual(newState.players[0].position, 1)
+    assert.strictEqual(stateWithPlayer.players[0].position, 0)
+    assert.notStrictEqual(newState, stateWithPlayer)
+    assert.notStrictEqual(newState.players, stateWithPlayer.players)
+  })
+})
