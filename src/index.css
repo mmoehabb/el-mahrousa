@@ -90,6 +90,27 @@ body.font-arabic-pixel {
     40px 70px;
 }
 
+@media (orientation: portrait) and (max-width: 768px) {
+  .game-screen-wrapper {
+    /*
+     * Force landscape mode for mobile devices in portrait.
+     * We rotate the entire wrapper by 90 degrees and switch width/height.
+     */
+    transform: rotate(90deg);
+    transform-origin: center center;
+    width: 100dvh;
+    height: 100dvw;
+    position: absolute;
+    top: calc((100dvh - 100dvw) / 2);
+    left: calc((100dvw - 100dvh) / 2);
+  }
+
+  .game-screen-content {
+    width: 100dvh;
+    height: 100dvw;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

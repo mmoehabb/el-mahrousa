@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useGame } from '../context/GameContext'
 import TileComponent from './Tile'
 import { useTranslation } from 'react-i18next'
-import { motion, AnimatePresence } from 'framer-motion'
-
 const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
   value,
   'aria-label': ariaLabel,
@@ -29,21 +27,6 @@ const Board: React.FC = () => {
   const { t } = useTranslation()
   const { gameState } = useGame()
   const tiles = gameState.tiles
-
-  const isRolling = gameState.turnPhase === 'ROLLING'
-  const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
-
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval>
-    if (isRolling) {
-      interval = setInterval(() => {
-        setRollingDice([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1])
-      }, 100)
-    }
-    return () => clearInterval(interval)
-  }, [isRolling])
-
-  const effectiveDisplayDice = isRolling ? rollingDice : gameState.lastDice
 
   // Split tiles for the 4 sides of the 6x6 board
   const bottomRow = tiles.slice(0, 7).reverse() // 0 to 6
@@ -99,55 +82,18 @@ const Board: React.FC = () => {
         ))}
 
         {/* Center */}
-        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/40 rounded-lg relative">
-          <h1 className="text-4xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel">
+        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-2 border-2 border-egyptian-gold/40 rounded-lg relative overflow-hidden">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel text-center px-4">
             EL-MAHROUSA
           </h1>
-          <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel">
+          <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel text-xl sm:text-2xl mt-2 text-center">
             {t('lobby.titleAr')}
           </div>
-
-          <AnimatePresence>
-            {(gameState.turnPhase === 'ROLLING' || gameState.turnPhase === 'MOVING') && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                className="absolute bottom-10 flex gap-4 bg-white/50 p-4 rounded-2xl backdrop-blur-md border border-white/50 shadow-xl"
-              >
-                <motion.div
-                  animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 0.5,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <DiceFace
-                    value={effectiveDisplayDice[0]}
-                    aria-label={`First die showing ${effectiveDisplayDice[0]}`}
-                  />
-                </motion.div>
-                <motion.div
-                  animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 0.5,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <DiceFace
-                    value={effectiveDisplayDice[1]}
-                    aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
-                  />
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </div>
   )
 }
 
+export { DiceFace }
 export default Board
