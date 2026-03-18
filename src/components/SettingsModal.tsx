@@ -29,20 +29,28 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex bg-white text-slate-800">
+    <div className="fixed inset-0 z-50 flex flex-col md:flex-row bg-white text-slate-800">
       {/* Sidebar Navigation */}
-      <div className="w-64 border-e border-slate-200 bg-slate-50 flex flex-col">
-        <div className="p-6 border-b border-slate-200">
-          <h2 className="text-2xl font-bold text-egyptian-blue uppercase tracking-widest flex items-center gap-2">
+      <div className="w-full md:w-64 border-b md:border-b-0 md:border-e border-slate-200 bg-slate-50 flex flex-col">
+        <div className="p-4 md:p-6 border-b border-slate-200 flex justify-between items-center md:block">
+          <h2 className="text-xl md:text-2xl font-bold text-egyptian-blue uppercase tracking-widest flex items-center gap-2">
             <Settings size={24} />
             {t('common.settings.title')}
           </h2>
+          {/* Close button inside header on mobile only */}
+          <button
+            onClick={onClose}
+            className="md:hidden p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-full transition-colors"
+            aria-label={t('common.settings.close')}
+          >
+            <X size={24} />
+          </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-none md:flex-1 p-2 md:p-4 flex flex-row md:flex-col gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('general')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-colors ${
+            className={`flex-1 md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
               activeTab === 'general'
                 ? 'bg-egyptian-blue text-white'
                 : 'text-slate-600 hover:bg-slate-200'
@@ -54,7 +62,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           <button
             onClick={() => setActiveTab('servers')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-colors ${
+            className={`flex-1 md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
               activeTab === 'servers'
                 ? 'bg-egyptian-blue text-white'
                 : 'text-slate-600 hover:bg-slate-200'
@@ -67,9 +75,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header with Close Button */}
-        <div className="flex justify-end p-4">
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Header with Close Button (desktop only) */}
+        <div className="hidden md:flex justify-end p-4">
           <button
             onClick={onClose}
             className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
@@ -80,12 +88,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 p-8 overflow-y-auto">
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto">
           <div className="max-w-2xl mx-auto">
             {activeTab === 'general' && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                  <h3 className="text-xl font-bold text-egyptian-blue mb-4">
+              <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <section className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue mb-4">
                     {t('common.settings.language')}
                   </h3>
                   <div className="flex flex-col gap-2">
@@ -100,8 +108,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   </div>
                 </section>
 
-                <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                  <h3 className="text-xl font-bold text-egyptian-blue mb-4">
+                <section className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue mb-4">
                     {t('common.settings.displayMode')}
                   </h3>
                   <div className="flex items-center gap-4">
@@ -130,12 +138,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             )}
 
             {activeTab === 'servers' && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                  <h3 className="text-xl font-bold text-egyptian-blue mb-4">
+              <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <section className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue mb-4">
                     {t('common.settings.addIceCandidate')}
                   </h3>
-                  <form onSubmit={handleAddIceCandidate} className="flex gap-4">
+                  <form onSubmit={handleAddIceCandidate} className="flex flex-col md:flex-row gap-3 md:gap-4">
                     <input
                       type="text"
                       value={iceUrl}
@@ -146,7 +154,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <button
                       type="submit"
                       disabled={!iceUrl.trim()}
-                      className="px-6 py-3 bg-egyptian-blue text-white font-bold rounded-lg hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full md:w-auto px-6 py-3 bg-egyptian-blue text-white font-bold rounded-lg hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {t('common.settings.add')}
                     </button>
