@@ -143,7 +143,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <h3 className="text-lg md:text-xl font-bold text-egyptian-blue mb-4">
                     {t('common.settings.addIceCandidate')}
                   </h3>
-                  <form onSubmit={handleAddIceCandidate} className="flex flex-col md:flex-row gap-3 md:gap-4">
+                  <form
+                    onSubmit={handleAddIceCandidate}
+                    className="flex flex-col md:flex-row gap-3 md:gap-4"
+                  >
                     <input
                       type="text"
                       value={iceUrl}
