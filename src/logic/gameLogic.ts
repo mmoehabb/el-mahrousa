@@ -190,10 +190,14 @@ export const endTurn = (state: GameState): GameState => {
     break
   }
 
+  const nextPlayerId = newState.players[nextIndex].id
+  const isStillInPrison =
+    newState.prison[nextPlayerId] && newState.prison[nextPlayerId].turnsLeft > 0
+
   return {
     ...newState,
     currentPlayerIndex: nextIndex,
-    turnPhase: 'ROLL',
+    turnPhase: isStillInPrison ? 'END' : 'ROLL',
   }
 }
 
