@@ -71,7 +71,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
   const playerInfoContent = (
     <div className="w-64 space-y-4">
-      <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue rtl:border-r-4 rtl:border-l-0">
+      <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue rtl:border-r-4 rtl:border-l-0">
         <h3 className="font-bold flex items-center gap-2 mb-2">
           <Users size={18} /> {t('game.players')}
         </h3>
@@ -102,15 +102,15 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         {lobbyId && (
           <div className="space-y-2 mt-4">
-            <div className="p-3 bg-slate-100 rounded border border-dashed border-slate-400 text-center">
-              <span className="text-xs text-slate-500 uppercase block">
+            <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded border border-dashed border-slate-400 dark:border-slate-600 text-center">
+              <span className="text-xs text-slate-500 dark:text-slate-400 uppercase block">
                 {t('game.shareIdLabel')}
               </span>
               <span className="font-mono font-bold select-all">{lobbyId}</span>
             </div>
             <button
               onClick={handleShareLink}
-              className="w-full bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors relative"
+              className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors relative"
             >
               {showCopied ? t('game.copiedBtn') : t('game.shareLinkBtn')}
             </button>
@@ -118,7 +118,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         )}
       </div>
 
-      <div className="bg-white/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold rtl:border-r-4 rtl:border-l-0">
+      <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold rtl:border-r-4 rtl:border-l-0">
         <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
           {t('game.gameLogs')}
         </h3>
@@ -126,7 +126,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
           {gameState.logs.map((log, i) => {
             if (typeof log === 'string') {
               return (
-                <div key={i} className="border-b border-slate-100 pb-1">
+                <div key={i} className="border-b border-slate-100 dark:border-slate-800 pb-1">
                   {log}
                 </div>
               )
@@ -138,13 +138,13 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 translatedParams.property = t(`tiles.${propName.toLowerCase().replace(/ /g, '-')}`)
               }
               return (
-                <div key={i} className="border-b border-slate-100 pb-1">
+                <div key={i} className="border-b border-slate-100 dark:border-slate-800 pb-1">
                   {t(`logs.${log.key}`, translatedParams) as string}
                 </div>
               )
             }
             return (
-              <div key={i} className="border-b border-slate-100 pb-1">
+              <div key={i} className="border-b border-slate-100 dark:border-slate-800 pb-1">
                 {JSON.stringify(log)}
               </div>
             )
@@ -180,14 +180,14 @@ const GameScreen: React.FC<GameScreenProps> = ({
         <div className="lg:hidden fixed top-4 left-4 right-4 flex justify-between z-30 pointer-events-none">
           <button
             onClick={() => setShowMobileLeft(true)}
-            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue pointer-events-auto"
+            className="bg-white/90 dark:bg-slate-900/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue pointer-events-auto"
             aria-label={t('game.infoLogs')}
           >
             <Info size={24} />
           </button>
           <button
             onClick={() => setShowMobileRight(true)}
-            className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red pointer-events-auto"
+            className="bg-white/90 dark:bg-slate-900/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red pointer-events-auto"
             aria-label={t('game.controlsChat')}
           >
             <Settings2 size={24} />
@@ -223,10 +223,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
               exit={{ opacity: 0, x: -100 }}
               className="fixed inset-0 z-50 flex bg-black/50"
             >
-              <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
+              <div className="bg-sand dark:bg-slate-900 p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
                 <button
                   onClick={() => setShowMobileLeft(false)}
-                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1"
+                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white dark:bg-slate-800 dark:text-white rounded-full p-1"
                 >
                   <X size={20} />
                 </button>
@@ -243,10 +243,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
               exit={{ opacity: 0, x: 100 }}
               className="fixed inset-0 z-50 flex justify-end bg-black/50"
             >
-              <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
+              <div className="bg-sand dark:bg-slate-900 p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
                 <button
                   onClick={() => setShowMobileRight(false)}
-                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1 z-50"
+                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white dark:bg-slate-800 dark:text-white rounded-full p-1 z-50"
                 >
                   <X size={20} />
                 </button>

@@ -12,8 +12,24 @@ type Tab = 'general' | 'servers'
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('general')
-  const [isDarkMode, setIsDarkMode] = useState(false) // UI state only for now
+  const [isDarkMode, setIsDarkMode] = useState(() =>
+    document.documentElement.classList.contains('dark'),
+  )
   const [iceUrl, setIceUrl] = useState('')
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => {
+      const next = !prev
+      if (next) {
+        document.documentElement.classList.add('dark')
+        localStorage.setItem('theme', 'dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+        localStorage.setItem('theme', 'light')
+      }
+      return next
+    })
+  }
 
   if (!isOpen) return null
 
@@ -29,18 +45,18 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col md:flex-row bg-white text-slate-800">
+    <div className="fixed inset-0 z-50 flex flex-col md:flex-row bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
       {/* Sidebar Navigation */}
-      <div className="w-full md:w-64 border-b md:border-b-0 md:border-e border-slate-200 bg-slate-50 flex flex-col">
-        <div className="p-4 md:p-6 border-b border-slate-200 flex justify-between items-center md:block">
-          <h2 className="text-xl md:text-2xl font-bold text-egyptian-blue uppercase tracking-widest flex items-center gap-2">
+      <div className="w-full md:w-64 border-b md:border-b-0 md:border-e border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex flex-col">
+        <div className="p-4 md:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center md:block">
+          <h2 className="text-xl md:text-2xl font-bold text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest flex items-center gap-2">
             <Settings size={24} />
             {t('common.settings.title')}
           </h2>
           {/* Close button inside header on mobile only */}
           <button
             onClick={onClose}
-            className="md:hidden p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-full transition-colors"
+            className="md:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
             aria-label={t('common.settings.close')}
           >
             <X size={24} />
@@ -52,8 +68,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             onClick={() => setActiveTab('general')}
             className={`flex-1 md:flex-none md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
               activeTab === 'general'
-                ? 'bg-egyptian-blue text-white'
-                : 'text-slate-600 hover:bg-slate-200'
+                ? 'bg-egyptian-blue text-white dark:bg-egyptian-gold dark:text-slate-900'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             <Settings size={20} />
@@ -64,8 +80,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             onClick={() => setActiveTab('servers')}
             className={`flex-1 md:flex-none md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
               activeTab === 'servers'
-                ? 'bg-egyptian-blue text-white'
-                : 'text-slate-600 hover:bg-slate-200'
+                ? 'bg-egyptian-blue text-white dark:bg-egyptian-gold dark:text-slate-900'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             <Server size={20} />
@@ -80,7 +96,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         <div className="hidden md:flex justify-end p-4">
           <button
             onClick={onClose}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
+            className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
             aria-label={t('common.settings.close')}
           >
             <X size={24} />
@@ -92,15 +108,15 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           <div className="max-w-2xl mx-auto">
             {activeTab === 'general' && (
               <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <section className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue mb-4">
+                <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
                     {t('common.settings.language')}
                   </h3>
                   <div className="flex flex-col gap-2">
                     <select
                       value={i18n.language}
                       onChange={handleLanguageChange}
-                      className="w-full md:w-64 p-3 border border-slate-300 rounded-lg bg-white text-slate-800 font-bold focus:ring-2 focus:ring-egyptian-blue focus:border-transparent outline-none"
+                      className="w-full md:w-64 p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold focus:ring-2 focus:ring-egyptian-blue dark:focus:ring-egyptian-gold focus:border-transparent outline-none"
                     >
                       <option value="en">{t('common.languageToggle.en')}</option>
                       <option value="ar">{t('common.languageToggle.ar')}</option>
@@ -108,18 +124,20 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   </div>
                 </section>
 
-                <section className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue mb-4">
+                <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
                     {t('common.settings.displayMode')}
                   </h3>
                   <div className="flex items-center gap-4">
-                    <span className="font-bold text-slate-600">
+                    <span className="font-bold text-slate-600 dark:text-slate-400">
                       {isDarkMode ? t('common.settings.dark') : t('common.settings.light')}
                     </span>
                     <button
-                      onClick={() => setIsDarkMode(!isDarkMode)}
+                      onClick={toggleDarkMode}
                       className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
-                        isDarkMode ? 'bg-egyptian-blue' : 'bg-slate-300'
+                        isDarkMode
+                          ? 'bg-egyptian-blue dark:bg-egyptian-gold'
+                          : 'bg-slate-300 dark:bg-slate-600'
                       }`}
                       role="switch"
                       aria-checked={isDarkMode}
@@ -139,8 +157,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
             {activeTab === 'servers' && (
               <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <section className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue mb-4">
+                <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
                     {t('common.settings.addIceCandidate')}
                   </h3>
                   <form
@@ -152,12 +170,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       value={iceUrl}
                       onChange={(e) => setIceUrl(e.target.value)}
                       placeholder={t('common.settings.iceCandidateUrl')}
-                      className="flex-1 p-3 border border-slate-300 rounded-lg bg-white text-slate-800 font-mono focus:ring-2 focus:ring-egyptian-blue focus:border-transparent outline-none"
+                      className="flex-1 p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-mono focus:ring-2 focus:ring-egyptian-blue dark:focus:ring-egyptian-gold focus:border-transparent outline-none"
                     />
                     <button
                       type="submit"
                       disabled={!iceUrl.trim()}
-                      className="w-full md:w-auto px-6 py-3 bg-egyptian-blue text-white font-bold rounded-lg hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full md:w-auto px-6 py-3 bg-egyptian-blue dark:bg-egyptian-gold text-white dark:text-slate-900 font-bold rounded-lg hover:bg-blue-800 dark:hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {t('common.settings.add')}
                     </button>
