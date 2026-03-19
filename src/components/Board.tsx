@@ -14,7 +14,7 @@ const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
   const dots = Array(value).fill(0)
   return (
     <div
-      className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-lg border-2 border-slate-200 dark:border-slate-700 flex flex-wrap justify-center items-center p-1 gap-1"
+      className="w-12 h-12 bg-white rounded-xl shadow-lg border-2 border-slate-200 flex flex-wrap justify-center items-center p-1 gap-1"
       role="img"
       aria-label={ariaLabel || `Dice showing ${value}`}
     >
