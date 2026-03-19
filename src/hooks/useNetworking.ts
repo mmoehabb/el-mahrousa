@@ -9,6 +9,7 @@ import {
   buyProperty,
   endTurn,
   executeTrade,
+  handleBankrupt,
 } from '../logic/gameLogic'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
@@ -151,6 +152,46 @@ export const useNetworking = () => {
                   nextState.currentPlayerIndex = 0
                 }
               }
+            }
+            break
+          }
+          case 'BANKRUPT': {
+            const bankruptPlayer = nextState.players.find((p) => p.id === from)
+            if (!bankruptPlayer || bankruptPlayer.isBankrupt) return prev
+
+            nextState = handleBankrupt(nextState, from)
+            nextState.logs = [`${bankruptPlayer.name} has declared bankruptcy.`, ...nextState.logs]
+
+            if (nextState.players[nextState.currentPlayerIndex].id === from) {
+              nextState = endTurn(nextState)
+            }
+
+            const activePlayers = nextState.players.filter((p) => !p.isBankrupt)
+            if (activePlayers.length <= 1) {
+              nextState.status = 'FINISHED'
+              const winnerName = activePlayers.length === 1 ? activePlayers[0].name : bankruptPlayer.name
+              nextState.logs = [`${winnerName} has won the game!`, ...nextState.logs]
+            }
+            break
+          }
+          case 'REMATCH': {
+            if (from !== lobby.hostId) return prev
+            nextState = {
+              ...nextState,
+              status: 'WAITING',
+              currentPlayerIndex: 0,
+              turnPhase: 'ROLL',
+              lastDice: [1, 1],
+              countdown: null,
+              prison: {},
+              logs: ['Rematch initiated! Waiting to start...'],
+              players: nextState.players.map((p) => ({
+                ...p,
+                balance: 1500,
+                position: 0,
+                properties: [],
+                isBankrupt: false,
+              })),
             }
             break
           }

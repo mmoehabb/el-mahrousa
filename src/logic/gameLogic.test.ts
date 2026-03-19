@@ -9,6 +9,7 @@ import {
   endTurn,
   executeTrade,
   buyProperty,
+  handleBankrupt,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
 import { GAME_CONFIG } from '../config/gameConfig.ts'
@@ -797,5 +798,39 @@ describe('moveOneStep', () => {
     assert.strictEqual(stateWithPlayer.players[0].position, 0)
     assert.notStrictEqual(newState, stateWithPlayer)
     assert.notStrictEqual(newState.players, stateWithPlayer.players)
+  })
+})
+
+describe('handleBankrupt', () => {
+  test('strips all properties from a player and sets balance to 0 when they declare bankruptcy', () => {
+    const initialState = createInitialState('test-lobby')
+    const player1: Player = {
+      id: 'p1',
+      name: 'Player 1',
+      position: 0,
+      balance: 100,
+      properties: [1, 3],
+      isBankrupt: false,
+    }
+    const player2: Player = {
+      id: 'p2',
+      name: 'Player 2',
+      position: 0,
+      balance: 1500,
+      properties: [],
+      isBankrupt: false,
+    }
+    initialState.players = [player1, player2]
+    initialState.currentPlayerIndex = 0
+
+    const nextState = handleBankrupt(initialState, 'p1')
+
+    assert.strictEqual(nextState.players[0].isBankrupt, true)
+    assert.strictEqual(nextState.players[0].balance, 0)
+    assert.deepStrictEqual(nextState.players[0].properties, [])
+
+    // Test that the properties are unowned
+    assert.strictEqual(nextState.players.some(p => p.properties.includes(1)), false)
+    assert.strictEqual(nextState.players.some(p => p.properties.includes(3)), false)
   })
 })

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dice5, Send, Handshake } from 'lucide-react'
+import { Dice5, Send, Handshake, Flag } from 'lucide-react'
 import type { GameState, GameAction } from '../types/game'
+import { useGame } from '../context/GameContext'
 
 const MAX_CHAT_LENGTH = 200
 
@@ -29,9 +30,11 @@ export default function GameControls({
   sendAction,
 }: GameControlsProps) {
   const { t } = useTranslation()
+  const { myId } = useGame()
   const [chatMsg, setChatMsg] = useState('')
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+  const me = gameState.players.find(p => p.id === myId)
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +52,21 @@ export default function GameControls({
           <div className="font-bold text-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
+          {me && !me.isBankrupt && (
+            <button
+              onClick={() => {
+                if (window.confirm(t('game.confirmBankrupt'))) {
+                  sendAction({ type: 'BANKRUPT' })
+                }
+              }}
+              className="absolute -top-12 right-0 rtl:left-0 rtl:right-auto bg-red-600 text-white p-1.5 rounded shadow-md hover:bg-red-700 transition-colors flex items-center gap-1 text-[10px] font-bold z-10"
+              title={t('game.declareBankrupt')}
+            >
+              <Flag size={12} /> {t('game.bankruptBtn')}
+            </button>
+          )}
+
           {gameState.turnPhase === 'ROLL' && (
             <button
               onClick={handleRoll}
