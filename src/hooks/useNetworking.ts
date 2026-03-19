@@ -201,7 +201,7 @@ export const useNetworking = () => {
         return nextState
       })
     },
-    [isHost, setGameState],
+    [isHost, setGameState, lobbyId],
   )
 
   const sendAction = useCallback(
