@@ -7,6 +7,9 @@ import {
   moveOneStep,
   applyLandingLogic,
   buyProperty,
+  buyHouse,
+  sellHouse,
+  sellProperty,
   endTurn,
   executeTrade,
 } from '../logic/gameLogic'
@@ -73,6 +76,18 @@ export const useNetworking = () => {
           case 'BUY':
             if (currentPlayer.id !== from) return prev
             nextState = buyProperty(nextState, currentPlayer.position)
+            break
+          case 'BUY_HOUSE':
+            if (currentPlayer.id !== from) return prev
+            nextState = buyHouse(nextState, action.tileId)
+            break
+          case 'SELL_HOUSE':
+            if (currentPlayer.id !== from) return prev
+            nextState = sellHouse(nextState, action.tileId)
+            break
+          case 'SELL_PROPERTY':
+            if (currentPlayer.id !== from) return prev
+            nextState = sellProperty(nextState, action.tileId)
             break
           case 'END_TURN':
             if (currentPlayer.id !== from) return prev
