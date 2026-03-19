@@ -9,13 +9,27 @@ import { useTranslation } from 'react-i18next'
 import SettingsModal from './components/SettingsModal'
 import { Settings } from 'lucide-react'
 import GameScreen from './components/GameScreen'
+import useSound from 'use-sound'
 
 function App() {
-  const { gameState, myId, playerName, isHost } = useGame()
+  const { gameState, myId, playerName, isHost, isBgmEnabled } = useGame()
+  const [playBgm, { stop: stopBgm }] = useSound('/sounds/bgm.mp3', {
+    loop: true,
+    volume: 0.3,
+  })
   const { t } = useTranslation()
   const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [showCopied, setShowCopied] = useState(false)
+
+  useEffect(() => {
+    if (isBgmEnabled) {
+      playBgm()
+    } else {
+      stopBgm()
+    }
+    return () => stopBgm()
+  }, [isBgmEnabled, playBgm, stopBgm])
 
   useEffect(() => {
     if (playerName && gameState.status === 'LOBBY') {

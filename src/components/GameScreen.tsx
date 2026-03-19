@@ -8,6 +8,7 @@ import GameControls from './GameControls'
 import type { TradeOffer, GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useGameSounds } from '../hooks/useGameSounds'
 
 interface GameScreenProps {
   lobbyId: string | null
@@ -26,9 +27,44 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const { gameState, myId } = useGame()
   const [isTradeOpen, setIsTradeOpen] = useState(false)
   const isRollingRef = useRef(false)
+  const sounds = useGameSounds()
+  const prevPhaseRef = useRef(gameState.turnPhase)
+  const prevLogsLengthRef = useRef(gameState.logs.length)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const isMyTurn = currentPlayer?.id === myId
+
+  useEffect(() => {
+    // Phase change sounds
+    if (prevPhaseRef.current !== gameState.turnPhase) {
+      if (gameState.turnPhase === 'ROLLING') {
+        sounds.playRoll()
+      } else if (gameState.turnPhase === 'MOVING') {
+        // play Move sounds progressively in the setTimeout logic below instead
+      }
+      prevPhaseRef.current = gameState.turnPhase
+    }
+
+    // Log-based sounds
+    if (gameState.logs.length > prevLogsLengthRef.current) {
+      const newLogs = gameState.logs.slice(0, gameState.logs.length - prevLogsLengthRef.current)
+
+      newLogs.forEach((log) => {
+        if (typeof log === 'string') {
+          if (log.includes('paid') && log.includes('tax')) sounds.playRent()
+          if (log.includes('Prison')) sounds.playJail()
+          if (log.includes('bankrupt')) sounds.playBankrupt()
+          if (log.includes('won')) sounds.playWin()
+        } else if (log.key) {
+          if (log.key === 'passedStart') sounds.playGo()
+          if (log.key === 'paidRent') sounds.playRent()
+          if (log.key === 'bought') sounds.playBuy()
+        }
+      })
+
+      prevLogsLengthRef.current = gameState.logs.length
+    }
+  }, [gameState.turnPhase, gameState.logs, sounds])
 
   // Handle auto-advance for dice roll and movement animations
   useEffect(() => {
@@ -43,13 +79,15 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
     if (gameState.turnPhase === 'MOVING') {
       const timer = setTimeout(() => {
+        sounds.playMove()
         sendAction({ type: 'MOVE_STEP' })
       }, 300) // 300ms per step hop
       return () => clearTimeout(timer)
     }
-  }, [gameState.turnPhase, gameState.stepsLeft, isMyTurn, sendAction, gameState.status])
+  }, [gameState.turnPhase, gameState.stepsLeft, isMyTurn, sendAction, gameState.status, sounds])
 
   const handleRoll = () => {
+    sounds.playClick()
     if (isRollingRef.current) return
     isRollingRef.current = true
     sendAction({ type: 'ROLL' })
@@ -58,8 +96,14 @@ const GameScreen: React.FC<GameScreenProps> = ({
     }, 2000)
   }
 
-  const handleBuy = () => sendAction({ type: 'BUY' })
-  const handleEndTurn = () => sendAction({ type: 'END_TURN' })
+  const handleBuy = () => {
+    sounds.playClick()
+    sendAction({ type: 'BUY' })
+  }
+  const handleEndTurn = () => {
+    sounds.playClick()
+    sendAction({ type: 'END_TURN' })
+  }
 
   const [showMobileLeft, setShowMobileLeft] = useState(false)
   const [showMobileRight, setShowMobileRight] = useState(false)
@@ -179,14 +223,20 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {/* Mobile Sticky Nav/FABs */}
         <div className="lg:hidden fixed top-4 left-4 right-4 flex justify-between z-30 pointer-events-none">
           <button
-            onClick={() => setShowMobileLeft(true)}
+            onClick={() => {
+              sounds.playClick()
+              setShowMobileLeft(true)
+            }}
             className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue pointer-events-auto"
             aria-label={t('game.infoLogs')}
           >
             <Info size={24} />
           </button>
           <button
-            onClick={() => setShowMobileRight(true)}
+            onClick={() => {
+              sounds.playClick()
+              setShowMobileRight(true)
+            }}
             className="bg-white/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red pointer-events-auto"
             aria-label={t('game.controlsChat')}
           >
@@ -225,7 +275,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
             >
               <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
                 <button
-                  onClick={() => setShowMobileLeft(false)}
+                  onClick={() => {
+                    sounds.playClick()
+                    setShowMobileLeft(false)
+                  }}
                   className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1"
                 >
                   <X size={20} />
@@ -245,7 +298,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
             >
               <div className="bg-sand p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
                 <button
-                  onClick={() => setShowMobileRight(false)}
+                  onClick={() => {
+                    sounds.playClick()
+                    setShowMobileRight(false)
+                  }}
                   className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white rounded-full p-1 z-50"
                 >
                   <X size={20} />

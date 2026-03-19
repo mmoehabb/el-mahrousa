@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Settings, Server } from 'lucide-react'
+import { X, Settings, Server, Volume2, Music } from 'lucide-react'
+import { useGame } from '../context/GameContext'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ type Tab = 'general' | 'servers'
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { t, i18n } = useTranslation()
+  const { isSfxEnabled, setIsSfxEnabled, isBgmEnabled, setIsBgmEnabled } = useGame()
   const [activeTab, setActiveTab] = useState<Tab>('general')
   const [isDarkMode, setIsDarkMode] = useState(false) // UI state only for now
   const [iceUrl, setIceUrl] = useState('')
@@ -124,6 +126,55 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         }`}
                       />
                     </button>
+                  </div>
+                </section>
+
+                <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                  <h3 className="text-xl font-bold text-egyptian-blue mb-4">Audio</h3>
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="font-bold text-slate-600 flex items-center gap-2">
+                        <Volume2 size={20} /> Sound Effects
+                      </span>
+                      <button
+                        onClick={() => setIsSfxEnabled(!isSfxEnabled)}
+                        className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
+                          isSfxEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
+                        }`}
+                        role="switch"
+                        aria-checked={isSfxEnabled}
+                      >
+                        <span
+                          className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                            isSfxEnabled
+                              ? 'translate-x-9 rtl:-translate-x-9'
+                              : 'translate-x-1 rtl:-translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="font-bold text-slate-600 flex items-center gap-2">
+                        <Music size={20} /> Background Music
+                      </span>
+                      <button
+                        onClick={() => setIsBgmEnabled(!isBgmEnabled)}
+                        className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
+                          isBgmEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
+                        }`}
+                        role="switch"
+                        aria-checked={isBgmEnabled}
+                      >
+                        <span
+                          className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                            isBgmEnabled
+                              ? 'translate-x-9 rtl:-translate-x-9'
+                              : 'translate-x-1 rtl:-translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </section>
               </div>
