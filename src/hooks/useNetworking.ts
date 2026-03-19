@@ -53,7 +53,7 @@ export const useNetworking = () => {
             if (currentPlayer.id !== from) return prev
             const [d1, d2] = rollDice()
             nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' }
-            nextState.logs = [`${currentPlayer.name} rolled ${d1 + d2}`, ...nextState.logs]
+            // Dice roll log removed per requirements
             break
           }
           case 'FINISH_ROLL':
