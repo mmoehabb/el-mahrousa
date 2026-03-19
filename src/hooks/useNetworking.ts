@@ -7,8 +7,12 @@ import {
   moveOneStep,
   applyLandingLogic,
   buyProperty,
+  buyHouse,
+  sellHouse,
+  sellProperty,
   endTurn,
   executeTrade,
+  handleBankrupt,
 } from '../logic/gameLogic'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
@@ -50,7 +54,7 @@ export const useNetworking = () => {
             if (currentPlayer.id !== from) return prev
             const [d1, d2] = rollDice()
             nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' }
-            nextState.logs = [`${currentPlayer.name} rolled ${d1 + d2}`, ...nextState.logs]
+            // Dice roll log removed per requirements
             break
           }
           case 'FINISH_ROLL':
@@ -73,6 +77,18 @@ export const useNetworking = () => {
           case 'BUY':
             if (currentPlayer.id !== from) return prev
             nextState = buyProperty(nextState, currentPlayer.position)
+            break
+          case 'BUY_HOUSE':
+            if (currentPlayer.id !== from) return prev
+            nextState = buyHouse(nextState, action.tileId)
+            break
+          case 'SELL_HOUSE':
+            if (currentPlayer.id !== from) return prev
+            nextState = sellHouse(nextState, action.tileId)
+            break
+          case 'SELL_PROPERTY':
+            if (currentPlayer.id !== from) return prev
+            nextState = sellProperty(nextState, action.tileId)
             break
           case 'END_TURN':
             if (currentPlayer.id !== from) return prev
@@ -154,11 +170,53 @@ export const useNetworking = () => {
             }
             break
           }
+          case 'BANKRUPT': {
+            const bankruptPlayer = nextState.players.find((p) => p.id === from)
+            if (!bankruptPlayer || bankruptPlayer.isBankrupt) return prev
+
+            nextState = handleBankrupt(nextState, from)
+            nextState.logs = [`${bankruptPlayer.name} has declared bankruptcy.`, ...nextState.logs]
+
+            if (nextState.players[nextState.currentPlayerIndex].id === from) {
+              nextState = endTurn(nextState)
+            }
+
+            const activePlayers = nextState.players.filter((p) => !p.isBankrupt)
+            if (activePlayers.length <= 1) {
+              nextState.status = 'FINISHED'
+              const winnerName =
+                activePlayers.length === 1 ? activePlayers[0].name : bankruptPlayer.name
+              nextState.logs = [`${winnerName} has won the game!`, ...nextState.logs]
+            }
+            break
+          }
+          case 'REMATCH': {
+            // Only accept REMATCH if it's from the lobby host (whose ID is the lobbyId)
+            if (from !== lobbyId) return prev
+            nextState = {
+              ...nextState,
+              status: 'WAITING',
+              currentPlayerIndex: 0,
+              turnPhase: 'ROLL',
+              lastDice: [1, 1],
+              countdown: null,
+              prison: {},
+              logs: ['Rematch initiated! Waiting to start...'],
+              players: nextState.players.map((p) => ({
+                ...p,
+                balance: 1500,
+                position: 0,
+                properties: [],
+                isBankrupt: false,
+              })),
+            }
+            break
+          }
         }
         return nextState
       })
     },
-    [isHost, setGameState],
+    [isHost, setGameState, lobbyId],
   )
 
   const sendAction = useCallback(

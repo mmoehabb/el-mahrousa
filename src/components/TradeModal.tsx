@@ -95,7 +95,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
     >
       <div
         ref={modalRef}
-        className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         <div className="bg-egyptian-blue text-white p-4 flex justify-between items-center">
           <h2 id="trade-modal-title" className="font-bold uppercase">
@@ -111,18 +111,24 @@ const TradeModal: React.FC<TradeModalProps> = ({
           <div className="flex-1 space-y-4">
             <h3 className="font-bold border-b pb-1 text-sm">{t('trade.yourOffer')}</h3>
             <div className="space-y-2">
-              <label className="text-xs text-slate-500 block">{GAME_CONFIG.CURRENCY}</label>
+              <label className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 block">
+                {GAME_CONFIG.CURRENCY}
+              </label>
               <input
                 type="number"
-                className="w-full border border-slate-200 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
                 value={offer.myCash}
                 onChange={(e) => setOffer({ ...offer, myCash: parseInt(e.target.value) || 0 })}
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-slate-500 block">{t('trade.properties')}</label>
+              <label className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 block">
+                {t('trade.properties')}
+              </label>
               {me.properties.length === 0 ? (
-                <p className="text-xs text-slate-400 italic">{t('trade.noProperties')}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 italic">
+                  {t('trade.noProperties')}
+                </p>
               ) : (
                 me.properties.map((pid) => (
                   <div key={pid} className="flex items-center space-x-2">
@@ -165,10 +171,12 @@ const TradeModal: React.FC<TradeModalProps> = ({
             {partner && (
               <>
                 <div className="space-y-2">
-                  <label className="text-xs text-slate-500 block">{GAME_CONFIG.CURRENCY}</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 block">
+                    {GAME_CONFIG.CURRENCY}
+                  </label>
                   <input
                     type="number"
-                    className="w-full border border-slate-200 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
+                    className="w-full border border-slate-200 dark:border-slate-700 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
                     value={offer.partnerCash}
                     onChange={(e) =>
                       setOffer({ ...offer, partnerCash: parseInt(e.target.value) || 0 })
@@ -176,9 +184,13 @@ const TradeModal: React.FC<TradeModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-500 block">{t('trade.properties')}</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 block">
+                    {t('trade.properties')}
+                  </label>
                   {partner.properties.length === 0 ? (
-                    <p className="text-xs text-slate-400 italic">{t('trade.noProperties')}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 italic">
+                      {t('trade.noProperties')}
+                    </p>
                   ) : (
                     partner.properties.map((pid) => (
                       <div key={pid} className="flex items-center space-x-2">
@@ -204,10 +216,10 @@ const TradeModal: React.FC<TradeModalProps> = ({
           </div>
         </div>
 
-        <div className="p-4 bg-slate-50 border-t flex justify-end gap-2">
+        <div className="p-4 bg-slate-50 dark:bg-slate-800 border-t flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-bold text-slate-600 border border-slate-200 rounded hover:border-egyptian-blue active:scale-95"
+            className="px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded hover:border-egyptian-blue active:scale-95"
           >
             {t('trade.cancel')}
           </button>

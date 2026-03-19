@@ -22,15 +22,15 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
   }
 
   return (
-    <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
-      <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue uppercase tracking-widest">
+    <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
+      <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest">
         {t('lobby.title')}
       </h1>
 
       <div className="space-y-4">
         <button
           onClick={createLobby}
-          className="w-full bg-egyptian-gold text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors"
+          className="w-full bg-egyptian-gold text-white dark:text-slate-900 py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors"
         >
           {t('lobby.createNewLobby')}
         </button>
@@ -45,11 +45,15 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
                 setJoinId(e.target.value)
                 setJoinError('')
               }}
-              className={`w-full border p-2 rounded-lg ${joinError ? 'border-red-500' : ''}`}
+              className={`w-full border p-2 rounded-lg bg-white dark:bg-slate-800 dark:text-white dark:border-slate-700 ${joinError ? 'border-red-500 dark:border-red-400' : ''}`}
               aria-describedby={joinError ? 'join-error' : undefined}
             />
             {joinError && (
-              <p id="join-error" className="text-red-500 text-xs mt-1" role="alert">
+              <p
+                id="join-error"
+                className="text-red-500 dark:text-red-400 text-xs mt-1"
+                role="alert"
+              >
                 {joinError}
               </p>
             )}

@@ -9,6 +9,7 @@ export interface Tile {
   rent?: number[] // [base, 1h, 2h, 3h, 4h, hotel]
   housePrice?: number
   color?: string
+  houses?: number // Number of houses on the property (0-5)
 }
 
 export interface Player {
@@ -48,6 +49,9 @@ export type GameAction =
   | { type: 'FINISH_ROLL' }
   | { type: 'MOVE_STEP' }
   | { type: 'BUY' }
+  | { type: 'BUY_HOUSE'; tileId: number }
+  | { type: 'SELL_HOUSE'; tileId: number }
+  | { type: 'SELL_PROPERTY'; tileId: number }
   | { type: 'END_TURN' }
   | { type: 'CHAT'; message: string }
   | { type: 'PROPOSE_TRADE'; partnerId: string; offer: TradeOffer }
@@ -56,6 +60,8 @@ export type GameAction =
   | { type: 'TICK_COUNTDOWN' }
   | { type: 'CANCEL_COUNTDOWN' }
   | { type: 'PLAYER_DISCONNECT' }
+  | { type: 'BANKRUPT' }
+  | { type: 'REMATCH' }
 
 export interface GameState {
   players: Player[]

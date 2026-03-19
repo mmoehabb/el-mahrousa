@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useGame } from '../context/GameContext'
-import type { Player, GameAction } from '../types/game'
+import type { Player, GameAction, Tile } from '../types/game'
 import TileComponent from './Tile'
+import PropertyModal from './PropertyModal'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Dice5 } from 'lucide-react'
@@ -35,8 +36,10 @@ interface BoardProps {
 
 const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   const { t } = useTranslation()
-  const { gameState } = useGame()
+  const { gameState, myId } = useGame()
   const tiles = gameState.tiles
+
+  const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
 
   const isRolling = gameState.turnPhase === 'ROLLING'
   const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
@@ -59,9 +62,9 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
 
-  // Extract the latest game log to show in the center
-  const latestLog = gameState.logs.length > 0 ? gameState.logs[0] : null
-  const renderLog = (log: typeof latestLog) => {
+  // Extract the latest up to 7 game logs to show in the center
+  const recentLogs = gameState.logs.slice(0, 7)
+  const renderLog = (log: (typeof gameState.logs)[0]) => {
     if (!log) return t('game.gameLogs')
     if (typeof log === 'string') return log
     if (log.key) {
@@ -99,8 +102,23 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
     return { playersByPosition: playersMap, ownerByTile: ownerMap }
   }, [gameState.players])
 
+  const handleTileClick = (tile: Tile) => {
+    setSelectedTile(tile)
+  }
+
   return (
     <div className="relative p-2 sm:p-4 md:p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold inline-block">
+      <PropertyModal
+        isOpen={!!selectedTile}
+        onClose={() => setSelectedTile(null)}
+        tile={selectedTile}
+        owner={selectedTile ? ownerByTile[selectedTile.id] : undefined}
+        isMyTurn={isMyTurn}
+        myId={myId}
+        myBalance={gameState.players.find((p) => p.id === myId)?.balance || 0}
+        turnPhase={gameState.turnPhase}
+        sendAction={sendAction}
+      />
       <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1">
         {/* Top Row */}
         {topRow.map((tile, i) => (
@@ -113,6 +131,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}
@@ -128,6 +147,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}
@@ -143,6 +163,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}
@@ -158,12 +179,13 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}
 
         {/* Center */}
-        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
+        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
           <div className="flex flex-col items-center">
             <h1 className="text-[10px] sm:text-xl lg:text-3xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel text-center leading-tight mt-1">
               EL-MAHROUSA
@@ -173,7 +195,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
             </div>
           </div>
 
-          <div className="flex gap-2 sm:gap-4 bg-white/50 p-2 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md border border-white/50 shadow-xl scale-75 sm:scale-100">
+          <div className="flex gap-2 sm:gap-4 bg-white/50 dark:bg-slate-800/80 p-2 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-75 sm:scale-100">
             <motion.div
               animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
               transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
@@ -243,8 +265,30 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
             )}
 
             {/* Game Logs placed right below actions */}
-            <div className="w-full mt-2 bg-white/80 p-1 sm:p-2 rounded border-l-2 sm:border-l-4 border-egyptian-gold text-center text-[7px] sm:text-xs text-slate-700 font-bold shadow-sm line-clamp-2 leading-tight">
-              {renderLog(latestLog)}
+            <div className="w-full mt-2 p-1 sm:p-2 text-start font-bold flex flex-col items-start overflow-y-auto max-h-24 sm:max-h-32 hide-scrollbar">
+              {recentLogs.length > 0 ? (
+                recentLogs.map((log, i) => {
+                  const scale = 1 - (i / 6) * 0.35 // 100% to 65%
+                  const opacity = 1 - (i / 6) * 0.5 // 100% to 50%
+                  return (
+                    <div
+                      key={i}
+                      className="text-[8px] sm:text-[10px] text-slate-700 dark:text-slate-200 leading-tight w-full origin-top-left rtl:origin-top-right"
+                      style={{
+                        transform: `scale(${scale})`,
+                        opacity: opacity,
+                        marginBottom: i === recentLogs.length - 1 ? 0 : '0.25rem',
+                      }}
+                    >
+                      {renderLog(log)}
+                    </div>
+                  )
+                })
+              ) : (
+                <div className="text-[8px] sm:text-[10px] text-slate-700 dark:text-slate-200 leading-tight w-full">
+                  {t('game.gameLogs')}
+                </div>
+              )}
             </div>
           </div>
         </div>

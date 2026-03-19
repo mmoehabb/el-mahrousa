@@ -36,11 +36,11 @@ const LoginScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold">
-        <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue uppercase tracking-widest font-english-pixel">
+      <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold">
+        <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest font-english-pixel">
           {t('login.title')}
         </h1>
-        <p className="text-center text-slate-500 mb-6">{t('login.subtitle')}</p>
+        <p className="text-center text-slate-500 dark:text-slate-400 mb-6">{t('login.subtitle')}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -49,10 +49,10 @@ const LoginScreen: React.FC = () => {
               value={name}
               onChange={handleChange}
               placeholder={t('login.namePlaceholder')}
-              className={`w-full border border-2 p-3 rounded-lg outline-none transition-colors ${
+              className={`w-full border border-2 p-3 rounded-lg outline-none transition-colors bg-white dark:bg-slate-800 dark:text-white ${
                 error
-                  ? 'border-red-500 focus:border-red-600'
-                  : 'border-slate-200 focus:border-egyptian-blue'
+                  ? 'border-red-500 focus:border-red-600 dark:border-red-400 dark:focus:border-red-500'
+                  : 'border-slate-200 focus:border-egyptian-blue dark:border-slate-700 dark:focus:border-egyptian-gold'
               }`}
               autoFocus
               required
@@ -60,11 +60,15 @@ const LoginScreen: React.FC = () => {
               aria-describedby={error ? 'name-error' : undefined}
             />
             {error && (
-              <p id="name-error" className="text-red-500 text-xs mt-1" role="alert">
+              <p
+                id="name-error"
+                className="text-red-500 dark:text-red-400 text-xs mt-1"
+                role="alert"
+              >
                 {error}
               </p>
             )}
-            <p className="text-slate-400 text-xs mt-1">
+            <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
               {t('login.charCount', { current: name.length, max: MAX_NAME_LENGTH })}
             </p>
           </div>

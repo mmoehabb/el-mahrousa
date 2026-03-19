@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dice5, Send, Handshake } from 'lucide-react'
+import { Dice5, Send, Handshake, Flag } from 'lucide-react'
 import type { GameState, GameAction } from '../types/game'
 import { useGameSounds } from '../hooks/useGameSounds'
+import { useGame } from '../context/GameContext'
+import ConfirmDialog from './ConfirmDialog'
 
 const MAX_CHAT_LENGTH = 200
 
@@ -30,10 +32,13 @@ export default function GameControls({
   sendAction,
 }: GameControlsProps) {
   const { t } = useTranslation()
+  const { myId } = useGame()
   const [chatMsg, setChatMsg] = useState('')
   const sounds = useGameSounds()
+  const [isBankruptDialogOpen, setIsBankruptDialogOpen] = useState(false)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+  const me = gameState.players.find((p) => p.id === myId)
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,13 +50,15 @@ export default function GameControls({
 
   return (
     <div className="w-64 space-y-4">
-      <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
+      <div className="bg-white/90 dark:bg-slate-900/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
         <div className="mb-4">
-          <span className="text-xs text-slate-500 uppercase">{t('game.currentTurnLabel')}</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase">
+            {t('game.currentTurnLabel')}
+          </span>
           <div className="font-bold text-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
           {gameState.turnPhase === 'ROLL' && (
             <button
               onClick={handleRoll}
@@ -118,14 +125,31 @@ export default function GameControls({
           >
             {t('game.leaveGameBtn')}
           </button>
+
+          {me && !me.isBankrupt && (
+            <button
+              onClick={() => setIsBankruptDialogOpen(true)}
+              className="w-full border-2 border-red-600 text-red-600 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all mt-4 flex items-center justify-center gap-2 text-[10px]"
+              title={t('game.declareBankrupt')}
+            >
+              <Flag size={14} /> {t('game.bankruptBtn')}
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 rtl:border-l-4 rtl:border-r-0">
+      <ConfirmDialog
+        isOpen={isBankruptDialogOpen}
+        message={t('game.confirmBankrupt')}
+        onConfirm={() => sendAction({ type: 'BANKRUPT' })}
+        onCancel={() => setIsBankruptDialogOpen(false)}
+      />
+
+      <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 dark:border-slate-600 rtl:border-l-4 rtl:border-r-0">
         <div className="h-40 flex flex-col">
           <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2 pr-1 rtl:pr-0 rtl:pl-1">
             {gameState.chatMessages.length === 0 ? (
-              <div className="text-slate-400 italic">{t('game.chatReady')}</div>
+              <div className="text-slate-400 dark:text-slate-500 italic">{t('game.chatReady')}</div>
             ) : (
               gameState.chatMessages.map((msg, i) => (
                 <div key={i} className="mb-1">
@@ -149,7 +173,10 @@ export default function GameControls({
               value={chatMsg}
               onChange={(e) => setChatMsg(e.target.value)}
             />
-            <button type="submit" className="p-1 bg-slate-200 rounded rtl:rotate-180">
+            <button
+              type="submit"
+              className="p-1 bg-slate-200 dark:bg-slate-700 rounded rtl:rotate-180"
+            >
               <Send size={14} />
             </button>
           </form>
