@@ -243,7 +243,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
             )}
 
             {/* Game Logs placed right below actions */}
-            <div className="w-full mt-2 bg-white/80 p-1 sm:p-2 rounded border-l-2 sm:border-l-4 border-egyptian-gold text-center font-bold shadow-sm flex flex-col items-center overflow-y-auto max-h-24 sm:max-h-32 hide-scrollbar">
+            <div className="w-full mt-2 p-1 sm:p-2 text-center font-bold flex flex-col items-center overflow-y-auto max-h-24 sm:max-h-32 hide-scrollbar">
               {recentLogs.length > 0 ? (
                 recentLogs.map((log, i) => {
                   const scale = 1 - (i / 6) * 0.35 // 100% to 65%
