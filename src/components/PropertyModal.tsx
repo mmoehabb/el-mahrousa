@@ -72,12 +72,12 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
-          className="bg-sand w-full max-w-sm rounded-xl shadow-2xl overflow-hidden"
+          className="bg-sand dark:bg-slate-800 w-full max-w-sm rounded-xl shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div
-            className="p-4 text-center relative border-b-4 border-slate-800"
+            className="p-4 text-center relative border-b-4 border-slate-800 dark:border-slate-900"
             style={{ backgroundColor: tile.color || '#fff', color: tile.color ? '#fff' : '#000' }}
           >
             <button
@@ -86,16 +86,16 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             >
               <X size={20} className="text-white" />
             </button>
-            <h2 className="text-xl font-black uppercase tracking-wider drop-shadow-md">
+            <h2 className="text-xl font-black uppercase tracking-wider drop-shadow-md text-white">
               {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
             </h2>
           </div>
 
-          <div className="p-6 bg-white/90">
+          <div className="p-6 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200">
             {/* Ownership info */}
             <div className="mb-4 text-center">
               {owner ? (
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-300">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: owner.color }} />
                   <span className="font-bold text-sm">
                     {t('game.ownedBy', { name: owner.name })}
@@ -103,7 +103,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                   </span>
                 </div>
               ) : (
-                <div className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-800 border border-green-300 font-bold text-sm">
+                <div className="inline-block px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-800 font-bold text-sm">
                   {t('game.unowned')}
                 </div>
               )}
@@ -112,7 +112,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             {/* Rent Table */}
             {tile.type === 'PROPERTY' && tile.rent && (
               <div className="space-y-2 mb-6">
-                <div className="flex justify-between font-bold border-b border-slate-200 pb-1">
+                <div className="flex justify-between font-bold border-b border-slate-200 dark:border-slate-700 pb-1">
                   <span>{t('game.rentLevel')}</span>
                   <span>{t('game.amount')}</span>
                 </div>
@@ -120,7 +120,9 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                   <div
                     key={idx}
                     className={`flex justify-between text-sm py-1 px-2 rounded ${
-                      currentHouses === idx ? 'bg-egyptian-gold/20 font-bold' : 'text-slate-600'
+                      currentHouses === idx
+                        ? 'bg-egyptian-gold/20 font-bold'
+                        : 'text-slate-600 dark:text-slate-400'
                     }`}
                   >
                     <span className="flex items-center gap-1">
@@ -129,7 +131,9 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                         : idx === maxHouses
                           ? t('game.hotelRent')
                           : `${idx} ${t('game.houses')}`}
-                      {currentHouses === idx && <Home size={14} className="text-egyptian-blue" />}
+                      {currentHouses === idx && (
+                        <Home size={14} className="text-egyptian-blue dark:text-egyptian-gold" />
+                      )}
                     </span>
                     <span>
                       {amount} {GAME_CONFIG.CURRENCY}
@@ -142,16 +146,20 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             {/* Price Info */}
             <div className="grid grid-cols-2 gap-4 mb-6 text-sm text-center">
               {tile.price && (
-                <div className="bg-slate-50 p-2 rounded border border-slate-200">
-                  <div className="text-slate-500">{t('game.propertyPrice')}</div>
+                <div className="bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700">
+                  <div className="text-slate-500 dark:text-slate-400">
+                    {t('game.propertyPrice')}
+                  </div>
                   <div className="font-bold">
                     {tile.price} {GAME_CONFIG.CURRENCY}
                   </div>
                 </div>
               )}
               {tile.housePrice && (
-                <div className="bg-slate-50 p-2 rounded border border-slate-200">
-                  <div className="text-slate-500">{t('game.houseBasePrice')}</div>
+                <div className="bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700">
+                  <div className="text-slate-500 dark:text-slate-400">
+                    {t('game.houseBasePrice')}
+                  </div>
                   <div className="font-bold">
                     {tile.housePrice} {GAME_CONFIG.CURRENCY}
                   </div>
@@ -161,7 +169,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
 
             {/* Actions */}
             {canAct && tile.type === 'PROPERTY' && (
-              <div className="space-y-2 pt-4 border-t border-slate-200">
+              <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button
                   onClick={handleBuyHouse}
                   disabled={currentHouses >= maxHouses || myBalance < buyCost}

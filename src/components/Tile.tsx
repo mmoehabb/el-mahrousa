@@ -17,12 +17,12 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
 
   return (
     <div
-      className={`board-tile bg-white/80 backdrop-blur-sm border border-slate-200 ${onClick ? 'cursor-pointer hover:bg-white transition-colors' : ''}`}
+      className={`board-tile bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 ${onClick ? 'cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition-colors' : ''}`}
       onClick={onClick}
     >
       {tile.color && (
         <div
-          className="absolute top-0 left-0 right-0 h-4 border-b border-slate-400"
+          className="absolute top-0 left-0 right-0 h-4 border-b border-slate-400 dark:border-slate-600"
           style={{ backgroundColor: tile.color }}
         />
       )}
@@ -31,7 +31,7 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
       </div>
 
       {tile.price && (
-        <div className="text-[6px] sm:text-[7px] md:text-[8px] text-slate-600 font-english-pixel mt-auto mb-0.5 md:mb-1">
+        <div className="text-[6px] sm:text-[7px] md:text-[8px] text-slate-600 dark:text-slate-300 font-english-pixel mt-auto mb-0.5 md:mb-1">
           {tile.price} {GAME_CONFIG.CURRENCY}
         </div>
       )}
@@ -39,7 +39,7 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
       {/* Houses Container */}
       {tile.houses ? (
         <div className="absolute top-0.5 right-0.5 flex gap-0.5 z-30">
-          <div className="bg-white/80 rounded px-0.5 flex items-center shadow-sm text-egyptian-blue">
+          <div className="bg-white/80 dark:bg-slate-800/80 rounded px-0.5 flex items-center shadow-sm text-egyptian-blue dark:text-egyptian-gold">
             <Home className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4" />
             <span className="text-[8px] sm:text-[10px] md:text-xs font-bold font-english-pixel ml-0.5">
               {tile.houses}

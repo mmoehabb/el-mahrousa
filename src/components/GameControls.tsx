@@ -48,9 +48,11 @@ export default function GameControls({
 
   return (
     <div className="w-64 space-y-4">
-      <div className="bg-white/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
+      <div className="bg-white/90 dark:bg-slate-900/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
         <div className="mb-4">
-          <span className="text-xs text-slate-500 uppercase">{t('game.currentTurnLabel')}</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase">
+            {t('game.currentTurnLabel')}
+          </span>
           <div className="font-bold text-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
         </div>
 
@@ -135,11 +137,11 @@ export default function GameControls({
         onCancel={() => setIsBankruptDialogOpen(false)}
       />
 
-      <div className="bg-white/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 rtl:border-l-4 rtl:border-r-0">
+      <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 dark:border-slate-600 rtl:border-l-4 rtl:border-r-0">
         <div className="h-40 flex flex-col">
           <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2 pr-1 rtl:pr-0 rtl:pl-1">
             {gameState.chatMessages.length === 0 ? (
-              <div className="text-slate-400 italic">{t('game.chatReady')}</div>
+              <div className="text-slate-400 dark:text-slate-500 italic">{t('game.chatReady')}</div>
             ) : (
               gameState.chatMessages.map((msg, i) => (
                 <div key={i} className="mb-1">
@@ -157,7 +159,10 @@ export default function GameControls({
               value={chatMsg}
               onChange={(e) => setChatMsg(e.target.value)}
             />
-            <button type="submit" className="p-1 bg-slate-200 rounded rtl:rotate-180">
+            <button
+              type="submit"
+              className="p-1 bg-slate-200 dark:bg-slate-700 rounded rtl:rotate-180"
+            >
               <Send size={14} />
             </button>
           </form>
