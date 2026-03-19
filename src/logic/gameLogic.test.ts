@@ -473,9 +473,65 @@ describe('applyLandingLogic', () => {
     assert.strictEqual(newState.turnPhase, 'END')
   })
 
-  test.todo('prevents player from ending turn if they are in debt (must sell or bankrupt)')
-  test.todo('strips all properties from a player when they declare bankruptcy')
-  test.todo('makes properties available for purchase after bankrupt player is stripped of them')
+  test('prevents player from ending turn if they are in debt (must sell or bankrupt)', () => {
+    const state = getBaseState()
+    state.turnPhase = 'ACTION' // Mocking what it might be before
+
+    // Player 1 has 10 balance
+    state.players[0].balance = 10
+
+    // Tax tile
+    const taxTileIndex = state.tiles.findIndex((t) => t.type === 'TAX')
+
+    // Deep clone the tiles array to avoid polluting global state
+    state.tiles = state.tiles.map((t) => ({ ...t }))
+    state.tiles[taxTileIndex].price = 200 // More than balance
+    // In case logic looks at tax:
+    state.tiles[taxTileIndex].tax = 200
+    state.players[0].position = taxTileIndex
+
+    const newState = applyLandingLogic(state)
+
+    // Player lost money, but their turn phase didn't transition to END
+    assert.strictEqual(newState.players[0].balance, -190)
+    assert.strictEqual(newState.turnPhase, 'ACTION')
+  })
+
+  test('strips all properties from a player when they declare bankruptcy', () => {
+    const state = getBaseState()
+    state.players[0].properties = [1, 2]
+
+    const newState = handleBankrupt(state, 'p1')
+
+    assert.strictEqual(newState.players[0].isBankrupt, true)
+    assert.strictEqual(newState.players[0].balance, 0)
+    assert.deepStrictEqual(newState.players[0].properties, [])
+  })
+
+  test('makes properties available for purchase after bankrupt player is stripped of them', () => {
+    let state = getBaseState()
+    const propTileIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
+
+    // Deep clone tiles to safely mutate state for the test
+    state.tiles = state.tiles.map((t) => ({ ...t }))
+    const propTile = state.tiles[propTileIndex]
+
+    // Player 1 buys it originally
+    state.players[0].properties = [propTile.id]
+
+    // Player 1 goes bankrupt
+    state = handleBankrupt(state, 'p1')
+
+    // Now it's Player 2's turn
+    state.currentPlayerIndex = 1
+    state.players[1].position = propTileIndex
+
+    // Player 2 attempts to buy the same property
+    state = buyProperty(state, propTile.id)
+
+    // Verify Player 2 now owns the property
+    assert.ok(state.players[1].properties.includes(propTile.id))
+  })
 })
 
 describe('buyProperty', () => {

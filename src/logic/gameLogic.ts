@@ -72,7 +72,9 @@ export const applyLandingLogic = (state: GameState): GameState => {
       `${player.name} paid ${taxAmount} ${GAME_CONFIG.CURRENCY} in tax`,
       ...newState.logs,
     ]
-    newState.turnPhase = 'END'
+    if (newPlayers[state.currentPlayerIndex].balance >= 0) {
+      newState.turnPhase = 'END'
+    }
   } else if (tile.type === 'PROPERTY' || tile.type === 'AIRPORT' || tile.type === 'UTILITY') {
     const owner = state.players.find((p) => p.properties.includes(tile.id))
     if (owner && owner.id !== player.id && !owner.isBankrupt) {
@@ -95,7 +97,9 @@ export const applyLandingLogic = (state: GameState): GameState => {
         { key: 'paidRent', params: { name: player.name, amount: rent, owner: owner.name } },
         ...newState.logs,
       ]
-      newState.turnPhase = 'END'
+      if (newPlayers[state.currentPlayerIndex].balance >= 0) {
+        newState.turnPhase = 'END'
+      }
     }
   } else if (tile.name === 'Go To Prison') {
     const newPlayers = [...state.players]
