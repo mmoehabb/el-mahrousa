@@ -117,7 +117,9 @@ export const applyLandingLogic = (state: GameState): GameState => {
 
 const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): number => {
   if (tile.type === 'PROPERTY') {
-    return tile.rent ? tile.rent[0] : 0
+    if (!tile.rent) return 0
+    const houses = tile.houses || 0
+    return tile.rent[houses] || tile.rent[0]
   }
   if (tile.type === 'AIRPORT') {
     const airportCount = allTiles.filter(
@@ -126,6 +128,107 @@ const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): number => {
     return 25 * Math.pow(2, airportCount - 1)
   }
   return 25
+}
+
+export const buyHouse = (state: GameState, tileId: number): GameState => {
+  if (state.turnPhase !== 'ROLL') return state
+  const player = state.players[state.currentPlayerIndex]
+  const tile = state.tiles[tileId]
+
+  if (!player.properties.includes(tileId) || !tile.housePrice || !tile.rent) return state
+
+  const currentHouses = tile.houses || 0
+  if (currentHouses >= tile.rent.length - 1) return state // Max houses reached
+
+  const cost = tile.housePrice * Math.pow(2, currentHouses)
+  if (player.balance < cost) return state
+
+  const newPlayers = [...state.players]
+  newPlayers[state.currentPlayerIndex] = {
+    ...player,
+    balance: player.balance - cost,
+  }
+
+  const newTiles = [...state.tiles]
+  newTiles[tileId] = {
+    ...tile,
+    houses: currentHouses + 1,
+  }
+
+  return {
+    ...state,
+    players: newPlayers,
+    tiles: newTiles,
+    logs: [
+      { key: 'boughtHouse', params: { name: player.name, property: tile.name, price: cost } },
+      ...state.logs,
+    ],
+  }
+}
+
+export const sellHouse = (state: GameState, tileId: number): GameState => {
+  if (state.turnPhase !== 'ROLL') return state
+  const player = state.players[state.currentPlayerIndex]
+  const tile = state.tiles[tileId]
+
+  if (!player.properties.includes(tileId) || !tile.housePrice) return state
+
+  const currentHouses = tile.houses || 0
+  if (currentHouses === 0) return state
+
+  // Refund is half of what they paid for the current house level
+  const refund = (tile.housePrice * Math.pow(2, currentHouses - 1)) / 2
+
+  const newPlayers = [...state.players]
+  newPlayers[state.currentPlayerIndex] = {
+    ...player,
+    balance: player.balance + refund,
+  }
+
+  const newTiles = [...state.tiles]
+  newTiles[tileId] = {
+    ...tile,
+    houses: currentHouses - 1,
+  }
+
+  return {
+    ...state,
+    players: newPlayers,
+    tiles: newTiles,
+    logs: [
+      { key: 'soldHouse', params: { name: player.name, property: tile.name, price: refund } },
+      ...state.logs,
+    ],
+  }
+}
+
+export const sellProperty = (state: GameState, tileId: number): GameState => {
+  if (state.turnPhase !== 'ROLL') return state
+  const player = state.players[state.currentPlayerIndex]
+  const tile = state.tiles[tileId]
+
+  if (!player.properties.includes(tileId) || !tile.price) return state
+
+  const currentHouses = tile.houses || 0
+  if (currentHouses > 0) return state // Must sell houses first
+
+  const refund = tile.price / 2
+
+  const newPlayers = [...state.players]
+  newPlayers[state.currentPlayerIndex] = {
+    ...player,
+    balance: player.balance + refund,
+    properties: player.properties.filter((id) => id !== tileId),
+  }
+
+  return {
+    ...state,
+    players: newPlayers,
+    logs: [
+      { key: 'soldProperty', params: { name: player.name, property: tile.name, price: refund } },
+      ...state.logs,
+    ],
+  }
 }
 
 export const buyProperty = (state: GameState, tileId: number): GameState => {

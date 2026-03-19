@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useGame } from '../context/GameContext'
-import type { Player, GameAction } from '../types/game'
+import type { Player, GameAction, Tile } from '../types/game'
 import TileComponent from './Tile'
+import PropertyModal from './PropertyModal'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Dice5 } from 'lucide-react'
@@ -35,8 +36,10 @@ interface BoardProps {
 
 const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   const { t } = useTranslation()
-  const { gameState } = useGame()
+  const { gameState, myId } = useGame()
   const tiles = gameState.tiles
+
+  const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
 
   const isRolling = gameState.turnPhase === 'ROLLING'
   const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
@@ -99,8 +102,23 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
     return { playersByPosition: playersMap, ownerByTile: ownerMap }
   }, [gameState.players])
 
+  const handleTileClick = (tile: Tile) => {
+    setSelectedTile(tile)
+  }
+
   return (
     <div className="relative p-2 sm:p-4 md:p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold inline-block">
+      <PropertyModal
+        isOpen={!!selectedTile}
+        onClose={() => setSelectedTile(null)}
+        tile={selectedTile}
+        owner={selectedTile ? ownerByTile[selectedTile.id] : undefined}
+        isMyTurn={isMyTurn}
+        myId={myId}
+        myBalance={gameState.players.find((p) => p.id === myId)?.balance || 0}
+        turnPhase={gameState.turnPhase}
+        sendAction={sendAction}
+      />
       <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1">
         {/* Top Row */}
         {topRow.map((tile, i) => (
@@ -113,6 +131,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}
@@ -128,6 +147,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}
@@ -143,6 +163,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}
@@ -158,6 +179,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
+              onClick={() => handleTileClick(tile)}
             />
           </div>
         ))}

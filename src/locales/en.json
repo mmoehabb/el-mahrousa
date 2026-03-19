@@ -75,7 +75,20 @@
     "pleaseRotate": "Please Rotate Device",
     "rotateInstruction": "Please rotate your device to play",
     "infoLogs": "Info & Logs",
-    "controlsChat": "Controls & Chat"
+    "controlsChat": "Controls & Chat",
+    "ownedBy": "Owned by {{name}}",
+    "unowned": "Unowned",
+    "rentLevel": "Rent Level",
+    "amount": "Amount",
+    "baseRent": "Base Rent",
+    "hotelRent": "Hotel (Max)",
+    "houses": "Houses",
+    "propertyPrice": "Property Price",
+    "houseBasePrice": "House Base Price",
+    "buyHouseBtn": "BUY HOUSE",
+    "sellHouseBtn": "SELL HOUSE",
+    "sellPropertyBtn": "SELL PROPERTY",
+    "mustSellHousesFirst": "Must sell all houses first to sell property"
   },
   "trade": {
     "title": "Trade Proposal",
@@ -103,7 +116,10 @@
     "passedStart": "{{name}} passed Start and collected {{amount}}",
     "tradeProposed": "{{name}} proposed a trade to {{partner}}",
     "tradeAccepted": "{{name}} accepted trade from {{partner}}",
-    "tradeRejected": "{{name}} rejected trade from {{partner}}"
+    "tradeRejected": "{{name}} rejected trade from {{partner}}",
+    "boughtHouse": "{{name}} bought a house on {{property}} for {{price}}",
+    "soldHouse": "{{name}} sold a house on {{property}} for {{price}}",
+    "soldProperty": "{{name}} sold {{property}} for {{price}}"
   },
   "tiles": {
     "go": "GO",
