@@ -830,7 +830,13 @@ describe('handleBankrupt', () => {
     assert.deepStrictEqual(nextState.players[0].properties, [])
 
     // Test that the properties are unowned
-    assert.strictEqual(nextState.players.some(p => p.properties.includes(1)), false)
-    assert.strictEqual(nextState.players.some(p => p.properties.includes(3)), false)
+    assert.strictEqual(
+      nextState.players.some((p) => p.properties.includes(1)),
+      false,
+    )
+    assert.strictEqual(
+      nextState.players.some((p) => p.properties.includes(3)),
+      false,
+    )
   })
 })

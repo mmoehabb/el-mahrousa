@@ -169,7 +169,8 @@ export const useNetworking = () => {
             const activePlayers = nextState.players.filter((p) => !p.isBankrupt)
             if (activePlayers.length <= 1) {
               nextState.status = 'FINISHED'
-              const winnerName = activePlayers.length === 1 ? activePlayers[0].name : bankruptPlayer.name
+              const winnerName =
+                activePlayers.length === 1 ? activePlayers[0].name : bankruptPlayer.name
               nextState.logs = [`${winnerName} has won the game!`, ...nextState.logs]
             }
             break

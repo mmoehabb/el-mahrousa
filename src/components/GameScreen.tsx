@@ -217,7 +217,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
-          winner={gameState.players.find(p => !p.isBankrupt)}
+          winner={gameState.players.find((p) => !p.isBankrupt)}
           isHost={isHost}
           onRematch={() => sendAction({ type: 'REMATCH' })}
         />

@@ -57,7 +57,7 @@ const WinnerModal: React.FC<WinnerModalProps> = ({ isOpen, winner, isHost, onRem
             )}
 
             <button
-              onClick={() => window.location.href = '/'}
+              onClick={() => (window.location.href = '/')}
               className="w-full bg-slate-200 text-slate-800 py-3 rounded-lg font-bold hover:bg-slate-300 transition-colors"
             >
               {t('game.leaveGameBtn')}

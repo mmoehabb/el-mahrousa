@@ -34,7 +34,7 @@ export default function GameControls({
   const [chatMsg, setChatMsg] = useState('')
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
-  const me = gameState.players.find(p => p.id === myId)
+  const me = gameState.players.find((p) => p.id === myId)
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault()
