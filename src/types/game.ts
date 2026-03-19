@@ -60,6 +60,8 @@ export type GameAction =
   | { type: 'TICK_COUNTDOWN' }
   | { type: 'CANCEL_COUNTDOWN' }
   | { type: 'PLAYER_DISCONNECT' }
+  | { type: 'BANKRUPT' }
+  | { type: 'REMATCH' }
 
 export interface GameState {
   players: Player[]

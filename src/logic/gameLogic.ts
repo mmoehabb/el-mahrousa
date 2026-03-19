@@ -304,6 +304,17 @@ export const endTurn = (state: GameState): GameState => {
   }
 }
 
+export const handleBankrupt = (state: GameState, playerId: string): GameState => {
+  const newPlayers = state.players.map((p) => {
+    if (p.id === playerId) {
+      return { ...p, isBankrupt: true, balance: 0, properties: [] }
+    }
+    return p
+  })
+
+  return { ...state, players: newPlayers }
+}
+
 export const executeTrade = (
   state: GameState,
   p1Id: string,

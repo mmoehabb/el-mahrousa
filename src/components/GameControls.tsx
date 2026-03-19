@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dice5, Send, Handshake } from 'lucide-react'
+import { Dice5, Send, Handshake, Flag } from 'lucide-react'
 import type { GameState, GameAction } from '../types/game'
+import { useGame } from '../context/GameContext'
+import ConfirmDialog from './ConfirmDialog'
 
 const MAX_CHAT_LENGTH = 200
 
@@ -29,9 +31,12 @@ export default function GameControls({
   sendAction,
 }: GameControlsProps) {
   const { t } = useTranslation()
+  const { myId } = useGame()
   const [chatMsg, setChatMsg] = useState('')
+  const [isBankruptDialogOpen, setIsBankruptDialogOpen] = useState(false)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+  const me = gameState.players.find((p) => p.id === myId)
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,7 +56,7 @@ export default function GameControls({
           <div className="font-bold text-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
           {gameState.turnPhase === 'ROLL' && (
             <button
               onClick={handleRoll}
@@ -112,8 +117,25 @@ export default function GameControls({
           >
             {t('game.leaveGameBtn')}
           </button>
+
+          {me && !me.isBankrupt && (
+            <button
+              onClick={() => setIsBankruptDialogOpen(true)}
+              className="w-full border-2 border-red-600 text-red-600 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all mt-4 flex items-center justify-center gap-2 text-[10px]"
+              title={t('game.declareBankrupt')}
+            >
+              <Flag size={14} /> {t('game.bankruptBtn')}
+            </button>
+          )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isBankruptDialogOpen}
+        message={t('game.confirmBankrupt')}
+        onConfirm={() => sendAction({ type: 'BANKRUPT' })}
+        onCancel={() => setIsBankruptDialogOpen(false)}
+      />
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 dark:border-slate-600 rtl:border-l-4 rtl:border-r-0">
         <div className="h-40 flex flex-col">

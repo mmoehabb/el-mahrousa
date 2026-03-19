@@ -5,6 +5,7 @@ import { useGame } from '../context/GameContext'
 import Board from './Board'
 import TradeModal from './TradeModal'
 import GameControls from './GameControls'
+import WinnerModal from './WinnerModal'
 import type { TradeOffer, GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -23,7 +24,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   handleShareLink,
 }) => {
   const { t } = useTranslation()
-  const { gameState, myId } = useGame()
+  const { gameState, myId, isHost } = useGame()
   const [isTradeOpen, setIsTradeOpen] = useState(false)
   const isRollingRef = useRef(false)
 
@@ -82,19 +83,19 @@ const GameScreen: React.FC<GameScreenProps> = ({
               key={p.id}
               className={`flex justify-between items-center p-2 rounded min-w-0 ${
                 i === gameState.currentPlayerIndex ? 'bg-egyptian-gold/20' : ''
-              }`}
+              } ${p.isBankrupt ? 'opacity-50 grayscale' : ''}`}
             >
               <span className="flex items-center gap-2 min-w-0">
                 <div
                   className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: p.color }}
+                  style={{ backgroundColor: p.isBankrupt ? '#94a3b8' : p.color }}
                 />
-                <span className="truncate" title={p.name}>
+                <span className={`truncate ${p.isBankrupt ? 'line-through' : ''}`} title={p.name}>
                   {p.name} {p.id === myId ? t('waiting.you') : ''}
                 </span>
               </span>
               <span className="font-bold text-xs shrink-0">
-                {p.balance} {GAME_CONFIG.CURRENCY}
+                {p.isBankrupt ? t('game.bankruptLabel') : `${p.balance} ${GAME_CONFIG.CURRENCY}`}
               </span>
             </div>
           ))}
@@ -213,6 +214,13 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* Desktop Right Panel */}
         <div className="hidden lg:block">{controlsContent}</div>
+
+        <WinnerModal
+          isOpen={gameState.status === 'FINISHED'}
+          winner={gameState.players.find((p) => !p.isBankrupt)}
+          isHost={isHost}
+          onRematch={() => sendAction({ type: 'REMATCH' })}
+        />
 
         {/* Mobile Modals */}
         <AnimatePresence>
