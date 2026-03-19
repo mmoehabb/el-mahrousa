@@ -47,10 +47,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </button>
         </div>
 
-        <nav className="flex-none md:flex-1 p-2 md:p-4 flex flex-row md:flex-col gap-2 overflow-x-auto">
+        <nav className="flex-none md:flex-1 p-2 md:p-4 flex flex-row md:flex-col gap-2 md:gap-0 md:space-y-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('general')}
-            className={`flex-1 md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
+            className={`flex-1 md:flex-none md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
               activeTab === 'general'
                 ? 'bg-egyptian-blue text-white'
                 : 'text-slate-600 hover:bg-slate-200'
@@ -62,7 +62,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           <button
             onClick={() => setActiveTab('servers')}
-            className={`flex-1 md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
+            className={`flex-1 md:flex-none md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
               activeTab === 'servers'
                 ? 'bg-egyptian-blue text-white'
                 : 'text-slate-600 hover:bg-slate-200'
@@ -75,7 +75,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col">
         {/* Header with Close Button (desktop only) */}
         <div className="hidden md:flex justify-end p-4">
           <button
