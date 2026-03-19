@@ -41,7 +41,9 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
         <div className="absolute top-0.5 right-0.5 flex gap-0.5 z-30">
           <div className="bg-white/80 rounded px-0.5 flex items-center shadow-sm text-egyptian-blue">
             <Home className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4" />
-            <span className="text-[8px] sm:text-[10px] md:text-xs font-bold font-english-pixel ml-0.5">{tile.houses}</span>
+            <span className="text-[8px] sm:text-[10px] md:text-xs font-bold font-english-pixel ml-0.5">
+              {tile.houses}
+            </span>
           </div>
         </div>
       ) : null}

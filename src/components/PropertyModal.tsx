@@ -36,9 +36,10 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
   const maxHouses = tile.rent ? tile.rent.length - 1 : 0
 
   const buyCost = tile.housePrice ? tile.housePrice * Math.pow(2, currentHouses) : 0
-  const sellHouseRefund = tile.housePrice && currentHouses > 0
-    ? (tile.housePrice * Math.pow(2, currentHouses - 1)) / 2
-    : 0
+  const sellHouseRefund =
+    tile.housePrice && currentHouses > 0
+      ? (tile.housePrice * Math.pow(2, currentHouses - 1)) / 2
+      : 0
   const sellPropertyRefund = tile.price ? tile.price / 2 : 0
 
   const handleBuyHouse = () => {
@@ -93,10 +94,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             <div className="mb-4 text-center">
               {owner ? (
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-300">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: owner.color }}
-                  />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: owner.color }} />
                   <span className="font-bold text-sm">
                     {t('game.ownedBy', { name: owner.name })}
                     {isOwner ? ` (${t('waiting.you')})` : ''}
@@ -127,8 +125,8 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                       {idx === 0
                         ? t('game.baseRent')
                         : idx === maxHouses
-                        ? t('game.hotelRent')
-                        : `${idx} ${t('game.houses')}`}
+                          ? t('game.hotelRent')
+                          : `${idx} ${t('game.houses')}`}
                       {currentHouses === idx && <Home size={14} className="text-egyptian-blue" />}
                     </span>
                     <span>
