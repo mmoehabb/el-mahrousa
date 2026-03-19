@@ -243,7 +243,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
             )}
 
             {/* Game Logs placed right below actions */}
-            <div className="w-full mt-2 p-1 sm:p-2 text-center font-bold flex flex-col items-center overflow-y-auto max-h-24 sm:max-h-32 hide-scrollbar">
+            <div className="w-full mt-2 p-1 sm:p-2 text-start font-bold flex flex-col items-start overflow-y-auto max-h-24 sm:max-h-32 hide-scrollbar">
               {recentLogs.length > 0 ? (
                 recentLogs.map((log, i) => {
                   const scale = 1 - (i / 6) * 0.35 // 100% to 65%
@@ -251,11 +251,10 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                   return (
                     <div
                       key={i}
-                      className="text-[9px] sm:text-sm text-slate-700 leading-tight w-full"
+                      className="text-[8px] sm:text-[10px] text-slate-700 leading-tight w-full origin-top-left rtl:origin-top-right"
                       style={{
                         transform: `scale(${scale})`,
                         opacity: opacity,
-                        transformOrigin: 'top center',
                         marginBottom: i === recentLogs.length - 1 ? 0 : '0.25rem',
                       }}
                     >
@@ -264,7 +263,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                   )
                 })
               ) : (
-                <div className="text-[9px] sm:text-sm text-slate-700 leading-tight w-full">
+                <div className="text-[8px] sm:text-[10px] text-slate-700 leading-tight w-full">
                   {t('game.gameLogs')}
                 </div>
               )}
