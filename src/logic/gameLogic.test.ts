@@ -487,7 +487,7 @@ describe('applyLandingLogic', () => {
     state.tiles = state.tiles.map((t) => ({ ...t }))
     state.tiles[taxTileIndex].price = 200 // More than balance
     // In case logic looks at tax:
-    state.tiles[taxTileIndex].tax = 200
+
     state.players[0].position = taxTileIndex
 
     const newState = applyLandingLogic(state)
