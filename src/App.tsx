@@ -13,7 +13,7 @@ import useSound from 'use-sound'
 
 function App() {
   const { gameState, myId, playerName, isHost, isBgmEnabled } = useGame()
-  const [playBgm, { stop: stopBgm }] = useSound('/sounds/bgm.mp3', {
+  const [playBgm, { stop: stopBgm }] = useSound('/el-mahrousa/sounds/bgm.mp3', {
     loop: true,
     volume: 0.3,
   })
