@@ -59,9 +59,9 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
 
-  // Extract the latest game log to show in the center
-  const latestLog = gameState.logs.length > 0 ? gameState.logs[0] : null
-  const renderLog = (log: typeof latestLog) => {
+  // Extract the latest up to 7 game logs to show in the center
+  const recentLogs = gameState.logs.slice(0, 7)
+  const renderLog = (log: (typeof gameState.logs)[0]) => {
     if (!log) return t('game.gameLogs')
     if (typeof log === 'string') return log
     if (log.key) {
@@ -243,8 +243,31 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
             )}
 
             {/* Game Logs placed right below actions */}
-            <div className="w-full mt-2 bg-white/80 p-1 sm:p-2 rounded border-l-2 sm:border-l-4 border-egyptian-gold text-center text-[7px] sm:text-xs text-slate-700 font-bold shadow-sm line-clamp-2 leading-tight">
-              {renderLog(latestLog)}
+            <div className="w-full mt-2 bg-white/80 p-1 sm:p-2 rounded border-l-2 sm:border-l-4 border-egyptian-gold text-center font-bold shadow-sm flex flex-col items-center overflow-y-auto max-h-24 sm:max-h-32 hide-scrollbar">
+              {recentLogs.length > 0 ? (
+                recentLogs.map((log, i) => {
+                  const scale = 1 - (i / 6) * 0.35 // 100% to 65%
+                  const opacity = 1 - (i / 6) * 0.5 // 100% to 50%
+                  return (
+                    <div
+                      key={i}
+                      className="text-[9px] sm:text-sm text-slate-700 leading-tight w-full"
+                      style={{
+                        transform: `scale(${scale})`,
+                        opacity: opacity,
+                        transformOrigin: 'top center',
+                        marginBottom: i === recentLogs.length - 1 ? 0 : '0.25rem',
+                      }}
+                    >
+                      {renderLog(log)}
+                    </div>
+                  )
+                })
+              ) : (
+                <div className="text-[9px] sm:text-sm text-slate-700 leading-tight w-full">
+                  {t('game.gameLogs')}
+                </div>
+              )}
             </div>
           </div>
         </div>
