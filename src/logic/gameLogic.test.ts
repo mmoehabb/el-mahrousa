@@ -803,10 +803,11 @@ describe('moveOneStep', () => {
 
 describe('handleBankrupt', () => {
   test('strips all properties from a player and sets balance to 0 when they declare bankruptcy', () => {
-    const initialState = createInitialState('test-lobby')
+    const initialState = createInitialState()
     const player1: Player = {
       id: 'p1',
       name: 'Player 1',
+      color: 'red',
       position: 0,
       balance: 100,
       properties: [1, 3],
@@ -815,6 +816,7 @@ describe('handleBankrupt', () => {
     const player2: Player = {
       id: 'p2',
       name: 'Player 2',
+      color: 'blue',
       position: 0,
       balance: 1500,
       properties: [],

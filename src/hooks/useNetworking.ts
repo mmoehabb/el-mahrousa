@@ -176,7 +176,8 @@ export const useNetworking = () => {
             break
           }
           case 'REMATCH': {
-            if (from !== lobby.hostId) return prev
+            // Only accept REMATCH if it's from the lobby host (whose ID is the lobbyId)
+            if (from !== lobbyId) return prev
             nextState = {
               ...nextState,
               status: 'WAITING',
