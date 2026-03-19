@@ -12,6 +12,7 @@ interface PropertyModalProps {
   owner?: Player
   isMyTurn: boolean
   myId: string
+  myBalance: number
   turnPhase: string
   sendAction: (action: GameAction) => void
 }
@@ -23,6 +24,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
   owner,
   isMyTurn,
   myId,
+  myBalance,
   turnPhase,
   sendAction,
 }) => {
@@ -162,8 +164,8 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
               <div className="space-y-2 pt-4 border-t border-slate-200">
                 <button
                   onClick={handleBuyHouse}
-                  disabled={currentHouses >= maxHouses}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4"
+                  disabled={currentHouses >= maxHouses || myBalance < buyCost}
+                  className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
                 >
                   <span>{t('game.buyHouseBtn')}</span>
                   {currentHouses < maxHouses && (
@@ -176,7 +178,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 <button
                   onClick={handleSellHouse}
                   disabled={currentHouses === 0}
-                  className="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4"
+                  className="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
                 >
                   <span>{t('game.sellHouseBtn')}</span>
                   {currentHouses > 0 && (
@@ -189,7 +191,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 <button
                   onClick={handleSellProperty}
                   disabled={currentHouses > 0}
-                  className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4"
+                  className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
                 >
                   <span>{t('game.sellPropertyBtn')}</span>
                   {currentHouses === 0 && (

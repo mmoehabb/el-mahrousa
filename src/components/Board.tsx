@@ -115,6 +115,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         owner={selectedTile ? ownerByTile[selectedTile.id] : undefined}
         isMyTurn={isMyTurn}
         myId={myId}
+        myBalance={gameState.players.find((p) => p.id === myId)?.balance || 0}
         turnPhase={gameState.turnPhase}
         sendAction={sendAction}
       />
