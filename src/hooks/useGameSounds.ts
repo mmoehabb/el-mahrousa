@@ -3,8 +3,8 @@ import useSound from 'use-sound'
 import { useGame } from '../context/GameContext'
 
 export const useGameSounds = () => {
-  const { isSfxEnabled } = useGame()
-  const volume = 0.5
+  const { isSfxEnabled, sfxVolume } = useGame()
+  const volume = sfxVolume
 
   const [playRoll] = useSound('/el-mahrousa/sounds/roll.mp3', { volume })
   const [playMove] = useSound('/el-mahrousa/sounds/move.mp3', { volume })
@@ -14,7 +14,7 @@ export const useGameSounds = () => {
   const [playGo] = useSound('/el-mahrousa/sounds/go.mp3', { volume })
   const [playWin] = useSound('/el-mahrousa/sounds/win.mp3', { volume })
   const [playBankrupt] = useSound('/el-mahrousa/sounds/bankrupt.mp3', { volume })
-  const [playClick] = useSound('/el-mahrousa/sounds/click.mp3', { volume: 0.2 })
+  const [playClick] = useSound('/el-mahrousa/sounds/click.mp3', { volume: volume * 0.4 })
 
   return useMemo(() => {
     const playSound = (soundFn: () => void) => {

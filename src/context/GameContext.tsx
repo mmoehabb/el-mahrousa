@@ -14,6 +14,10 @@ interface GameContextType {
   setIsSfxEnabled: (enabled: boolean) => void
   isBgmEnabled: boolean
   setIsBgmEnabled: (enabled: boolean) => void
+  sfxVolume: number
+  setSfxVolume: (volume: number) => void
+  bgmVolume: number
+  setBgmVolume: (volume: number) => void
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -33,6 +37,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const stored = localStorage.getItem('isBgmEnabled')
     return stored ? JSON.parse(stored) : true
   })
+  const [sfxVolume, setSfxVolumeState] = useState(() => {
+    const stored = localStorage.getItem('sfxVolume')
+    return stored ? JSON.parse(stored) : 0.5
+  })
+  const [bgmVolume, setBgmVolumeState] = useState(() => {
+    const stored = localStorage.getItem('bgmVolume')
+    return stored ? JSON.parse(stored) : 0.3
+  })
 
   const handleSetPlayerName = (name: string) => {
     setPlayerName(name)
@@ -49,6 +61,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('isBgmEnabled', JSON.stringify(enabled))
   }
 
+  const handleSetSfxVolume = (volume: number) => {
+    setSfxVolumeState(volume)
+    localStorage.setItem('sfxVolume', JSON.stringify(volume))
+  }
+
+  const handleSetBgmVolume = (volume: number) => {
+    setBgmVolumeState(volume)
+    localStorage.setItem('bgmVolume', JSON.stringify(volume))
+  }
+
   return (
     <GameContext.Provider
       value={{
@@ -63,6 +85,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsSfxEnabled: handleSetSfxEnabled,
         isBgmEnabled,
         setIsBgmEnabled: handleSetBgmEnabled,
+        sfxVolume,
+        setSfxVolume: handleSetSfxVolume,
+        bgmVolume,
+        setBgmVolume: handleSetBgmVolume,
       }}
     >
       {children}

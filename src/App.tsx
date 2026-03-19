@@ -12,10 +12,10 @@ import GameScreen from './components/GameScreen'
 import useSound from 'use-sound'
 
 function App() {
-  const { gameState, myId, playerName, isHost, isBgmEnabled } = useGame()
+  const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume } = useGame()
   const [playBgm, { stop: stopBgm }] = useSound('/el-mahrousa/sounds/bgm.mp3', {
     loop: true,
-    volume: 0.3,
+    volume: bgmVolume,
   })
   const { t } = useTranslation()
   const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking()

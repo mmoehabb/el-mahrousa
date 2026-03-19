@@ -12,7 +12,16 @@ type Tab = 'general' | 'servers'
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { t, i18n } = useTranslation()
-  const { isSfxEnabled, setIsSfxEnabled, isBgmEnabled, setIsBgmEnabled } = useGame()
+  const {
+    isSfxEnabled,
+    setIsSfxEnabled,
+    isBgmEnabled,
+    setIsBgmEnabled,
+    sfxVolume,
+    setSfxVolume,
+    bgmVolume,
+    setBgmVolume,
+  } = useGame()
   const [activeTab, setActiveTab] = useState<Tab>('general')
   const [isDarkMode, setIsDarkMode] = useState(false) // UI state only for now
   const [iceUrl, setIceUrl] = useState('')
@@ -132,48 +141,82 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                   <h3 className="text-xl font-bold text-egyptian-blue mb-4">Audio</h3>
                   <div className="flex flex-col gap-6">
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="font-bold text-slate-600 flex items-center gap-2">
-                        <Volume2 size={20} /> Sound Effects
-                      </span>
-                      <button
-                        onClick={() => setIsSfxEnabled(!isSfxEnabled)}
-                        className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
-                          isSfxEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
-                        }`}
-                        role="switch"
-                        aria-checked={isSfxEnabled}
-                      >
-                        <span
-                          className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                            isSfxEnabled
-                              ? 'translate-x-9 rtl:-translate-x-9'
-                              : 'translate-x-1 rtl:-translate-x-1'
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="font-bold text-slate-600 flex items-center gap-2">
+                          <Volume2 size={20} /> Sound Effects
+                        </span>
+                        <button
+                          onClick={() => setIsSfxEnabled(!isSfxEnabled)}
+                          className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
+                            isSfxEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
                           }`}
+                          role="switch"
+                          aria-checked={isSfxEnabled}
+                        >
+                          <span
+                            className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                              isSfxEnabled
+                                ? 'translate-x-9 rtl:-translate-x-9'
+                                : 'translate-x-1 rtl:-translate-x-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-4 pl-7 rtl:pl-0 rtl:pr-7">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={sfxVolume}
+                          onChange={(e) => setSfxVolume(parseFloat(e.target.value))}
+                          disabled={!isSfxEnabled}
+                          className="w-full accent-egyptian-blue disabled:opacity-50"
                         />
-                      </button>
+                        <span className="text-sm text-slate-500 w-12 text-right">
+                          {Math.round(sfxVolume * 100)}%
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="font-bold text-slate-600 flex items-center gap-2">
-                        <Music size={20} /> Background Music
-                      </span>
-                      <button
-                        onClick={() => setIsBgmEnabled(!isBgmEnabled)}
-                        className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
-                          isBgmEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
-                        }`}
-                        role="switch"
-                        aria-checked={isBgmEnabled}
-                      >
-                        <span
-                          className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                            isBgmEnabled
-                              ? 'translate-x-9 rtl:-translate-x-9'
-                              : 'translate-x-1 rtl:-translate-x-1'
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="font-bold text-slate-600 flex items-center gap-2">
+                          <Music size={20} /> Background Music
+                        </span>
+                        <button
+                          onClick={() => setIsBgmEnabled(!isBgmEnabled)}
+                          className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
+                            isBgmEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
                           }`}
+                          role="switch"
+                          aria-checked={isBgmEnabled}
+                        >
+                          <span
+                            className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                              isBgmEnabled
+                                ? 'translate-x-9 rtl:-translate-x-9'
+                                : 'translate-x-1 rtl:-translate-x-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-4 pl-7 rtl:pl-0 rtl:pr-7">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={bgmVolume}
+                          onChange={(e) => setBgmVolume(parseFloat(e.target.value))}
+                          disabled={!isBgmEnabled}
+                          className="w-full accent-egyptian-blue disabled:opacity-50"
                         />
-                      </button>
+                        <span className="text-sm text-slate-500 w-12 text-right">
+                          {Math.round(bgmVolume * 100)}%
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </section>
