@@ -267,7 +267,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         <p className="font-arabic-pixel text-xl">{t('game.rotateInstruction')}</p>
       </div>
 
-      <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-7xl justify-center items-center lg:items-start relative">
+      <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-full lg:max-w-none px-0 lg:px-4 justify-center items-center lg:items-start relative">
         {/* Mobile Sticky Nav/FABs */}
         <div className="lg:hidden fixed top-4 left-4 right-4 flex justify-between z-30 pointer-events-none">
           <button
@@ -303,10 +303,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
         />
 
         {/* Desktop Left Panel */}
-        <div className="hidden lg:block">{playerInfoContent}</div>
+        <div className="hidden lg:block shrink-0">{playerInfoContent}</div>
 
         {/* Center: Board - Scrollable wrapper for mobile */}
-        <div className="w-full max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 scale-90 sm:scale-100 origin-top">
+        <div className="w-full lg:flex-1 max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 scale-90 sm:scale-100 origin-top">
           <TransformWrapper
             initialScale={1}
             minScale={0.5}
@@ -323,7 +323,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         </div>
 
         {/* Desktop Right Panel */}
-        <div className="hidden lg:block">{controlsContent}</div>
+        <div className="hidden lg:block shrink-0">{controlsContent}</div>
 
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
