@@ -225,7 +225,7 @@ const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): number => {
     const airportCount = allTiles.filter(
       (t) => t.type === 'AIRPORT' && owner.properties.includes(t.id),
     ).length
-    return 25 * Math.pow(2, airportCount - 1)
+    return airportCount * 40
   }
   return 25
 }
