@@ -306,6 +306,14 @@ export const useNetworking = () => {
     [isHost, myId, handleAction, lobbyId],
   )
 
+  const handleActionRef = useRef(handleAction)
+  const isHostRef = useRef(isHost)
+
+  useEffect(() => {
+    handleActionRef.current = handleAction
+    isHostRef.current = isHost
+  }, [handleAction, isHost])
+
   useEffect(() => {
     const newPeer = new Peer(myId)
     newPeer.on('open', () => {
@@ -340,15 +348,15 @@ export const useNetworking = () => {
       conn.on('data', (data: any) => {
         if (data.type === 'SYNC') {
           setGameState(data.state)
-        } else if (data.type === 'ACTION' && isHost) {
-          handleAction(data.action, conn.peer)
+        } else if (data.type === 'ACTION' && isHostRef.current) {
+          handleActionRef.current(data.action, conn.peer)
         }
       })
 
       conn.on('close', () => {
         delete connections.current[conn.peer]
-        if (isHost) {
-          handleAction({ type: 'PLAYER_DISCONNECT' }, conn.peer)
+        if (isHostRef.current) {
+          handleActionRef.current({ type: 'PLAYER_DISCONNECT' }, conn.peer)
         }
       })
     })
@@ -356,7 +364,7 @@ export const useNetworking = () => {
     return () => {
       newPeer.destroy()
     }
-  }, [isHost, myId, setGameState, handleAction])
+  }, [myId, setGameState])
 
   useEffect(() => {
     if (isHost) {
