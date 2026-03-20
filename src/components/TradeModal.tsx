@@ -291,7 +291,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center text-2xl mx-4 rotate-90 sm:rotate-0">↔</div>
+                <div className="flex items-center justify-center text-2xl mx-4 rotate-90 sm:rotate-0">
+                  ↔
+                </div>
 
                 {/* Partner side */}
                 <div className="flex-1 space-y-4">
