@@ -11,7 +11,10 @@ import {
   sellHouse,
   sellProperty,
   endTurn,
-  executeTrade,
+  proposeTrade,
+  acceptTrade,
+  rejectTrade,
+  cancelTrade,
   handleBankrupt,
 } from '../logic/gameLogic'
 
@@ -105,7 +108,16 @@ export const useNetworking = () => {
             }
             break
           case 'PROPOSE_TRADE':
-            nextState = executeTrade(nextState, from, action.partnerId, action.offer)
+            nextState = proposeTrade(nextState, from, action.partnerId, action.offer)
+            break
+          case 'ACCEPT_TRADE':
+            nextState = acceptTrade(nextState, action.tradeId)
+            break
+          case 'REJECT_TRADE':
+            nextState = rejectTrade(nextState, action.tradeId)
+            break
+          case 'CANCEL_TRADE':
+            nextState = cancelTrade(nextState, action.tradeId)
             break
           case 'JOIN':
             if (!prev.players.find((p) => p.id === from)) {

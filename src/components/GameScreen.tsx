@@ -7,7 +7,7 @@ import TradeModal from './TradeModal'
 import GameControls from './GameControls'
 import WinnerModal from './WinnerModal'
 import InformationDialog from './InformationDialog'
-import type { TradeOffer, GameAction } from '../types/game'
+import type { GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
@@ -124,11 +124,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
   const [showMobileLeft, setShowMobileLeft] = useState(false)
   const [showMobileRight, setShowMobileRight] = useState(false)
-
-  const handleProposeTrade = (partnerId: string, offer: TradeOffer) => {
-    sendAction({ type: 'PROPOSE_TRADE', partnerId, offer })
-    setIsTradeOpen(false)
-  }
 
   const playerInfoContent = (
     <div className="w-64 space-y-4">
@@ -267,7 +262,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
           players={gameState.players}
           myId={myId}
           allTiles={gameState.tiles}
-          onPropose={handleProposeTrade}
+          trades={gameState.trades || []}
+          sendAction={sendAction}
         />
 
         {/* Desktop Left Panel */}

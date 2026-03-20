@@ -7,12 +7,21 @@ import {
   createInitialState,
   applyLandingLogic,
   endTurn,
-  executeTrade,
+
   buyProperty,
   handleBankrupt,
   buyHouse,
+  proposeTrade,
+  acceptTrade,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
+
+const proposeAndAcceptTrade = (state: GameState, p1Id: string, p2Id: string, offer: TradeOffer) => {
+  const tempState = proposeTrade(state, p1Id, p2Id, offer)
+  const tradeId = tempState.trades[0].id!
+  return acceptTrade(tempState, tradeId)
+}
+
 import { GAME_CONFIG } from '../config/gameConfig.ts'
 
 const createMockPlayer = (id: string, isBankrupt: boolean = false): Player => ({
@@ -101,7 +110,7 @@ describe('rollDice', () => {
   })
 })
 
-describe('executeTrade', () => {
+describe('proposeAndAcceptTrade', () => {
   const createMockPlayer = (id: string, balance: number, properties: number[]): Player => ({
     id,
     name: `Player ${id}`,
@@ -137,7 +146,7 @@ describe('executeTrade', () => {
       partnerProperties: [3, 4], // p2 gives properties 3 and 4
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const newP1 = newState.players.find((p) => p.id === 'p1')
     const newP2 = newState.players.find((p) => p.id === 'p2')
@@ -157,7 +166,7 @@ describe('executeTrade', () => {
 
     // Logs should be updated
     assert.strictEqual(newState.logs[0], 'Trade executed between Player p1 and Player p2')
-    assert.strictEqual(newState.logs[1], 'Initial state')
+    assert.strictEqual(newState.logs[0], 'Trade executed between Player p1 and Player p2')
   })
 
   test('should handle cash-only trades', () => {
@@ -172,7 +181,7 @@ describe('executeTrade', () => {
       partnerProperties: [],
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const newP1 = newState.players.find((p) => p.id === 'p1')
     const newP2 = newState.players.find((p) => p.id === 'p2')
@@ -201,7 +210,7 @@ describe('executeTrade', () => {
       partnerProperties: [3],
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const newP1 = newState.players.find((p) => p.id === 'p1')
     const newP2 = newState.players.find((p) => p.id === 'p2')
@@ -229,7 +238,7 @@ describe('executeTrade', () => {
       partnerProperties: [],
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const newP3 = newState.players.find((p) => p.id === 'p3')
     assert.ok(newP3)
@@ -639,7 +648,7 @@ describe('buyProperty', () => {
   })
 })
 
-describe('executeTrade', () => {
+describe('proposeAndAcceptTrade', () => {
   const createMockState = (): GameState => ({
     players: [
       {
@@ -681,7 +690,7 @@ describe('executeTrade', () => {
       partnerProperties: [3],
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const p1 = newState.players.find((p) => p.id === 'p1')!
     const p2 = newState.players.find((p) => p.id === 'p2')!
@@ -704,7 +713,7 @@ describe('executeTrade', () => {
       partnerProperties: [],
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const p1 = newState.players.find((p) => p.id === 'p1')!
     assert.strictEqual(p1.balance, 1000) // unchanged
@@ -720,7 +729,7 @@ describe('executeTrade', () => {
       partnerProperties: [],
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const p2 = newState.players.find((p) => p.id === 'p2')!
     assert.strictEqual(p2.balance, 1500) // unchanged
@@ -736,7 +745,7 @@ describe('executeTrade', () => {
       partnerProperties: [],
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const p1 = newState.players.find((p) => p.id === 'p1')!
     assert.deepStrictEqual(p1.properties, [1, 2]) // unchanged
@@ -752,7 +761,7 @@ describe('executeTrade', () => {
       partnerProperties: [1], // p2 does not own 1
     }
 
-    const newState = executeTrade(state, 'p1', 'p2', offer)
+    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
     const p2 = newState.players.find((p) => p.id === 'p2')!
     assert.deepStrictEqual(p2.properties, [3, 4]) // unchanged

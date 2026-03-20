@@ -37,7 +37,13 @@ export interface PrisonRecord {
 
 export type Prison = Record<PlayerId, PrisonRecord>
 
+export type TradeStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED'
+
 export interface TradeOffer {
+  id?: string // will be generated when added to state
+  fromId?: string
+  toId?: string
+  status?: TradeStatus
   myCash: number
   partnerCash: number
   myProperties: number[]
@@ -55,6 +61,9 @@ export type GameAction =
   | { type: 'END_TURN' }
   | { type: 'CHAT'; message: string }
   | { type: 'PROPOSE_TRADE'; partnerId: string; offer: TradeOffer }
+  | { type: 'ACCEPT_TRADE'; tradeId: string }
+  | { type: 'REJECT_TRADE'; tradeId: string }
+  | { type: 'CANCEL_TRADE'; tradeId: string }
   | { type: 'JOIN'; name: string }
   | { type: 'START_COUNTDOWN' }
   | { type: 'TICK_COUNTDOWN' }
@@ -84,4 +93,5 @@ export interface GameState {
   chatMessages: ChatMessage[]
   prison: Prison
   activeEvent: ActiveEvent | null
+  trades: TradeOffer[]
 }

@@ -14,6 +14,7 @@ export const createInitialState = (): GameState => ({
   chatMessages: [],
   prison: {},
   activeEvent: null,
+  trades: [],
 })
 
 // Generates a float between 0 (inclusive) and 1 (exclusive) using crypto
@@ -422,14 +423,37 @@ export const handleBankrupt = (state: GameState, playerId: string): GameState =>
   return { ...state, players: newPlayers }
 }
 
-export const executeTrade = (
+export const proposeTrade = (
   state: GameState,
-  p1Id: string,
-  p2Id: string,
+  fromId: string,
+  toId: string,
   offer: TradeOffer,
 ): GameState => {
-  const p1 = state.players.find((p) => p.id === p1Id)
-  const p2 = state.players.find((p) => p.id === p2Id)
+  const newTrade: TradeOffer = {
+    ...offer,
+    id: crypto.randomUUID(),
+    fromId,
+    toId,
+    status: 'PENDING',
+  }
+  return {
+    ...state,
+    trades: [newTrade, ...(state.trades || [])],
+    logs: [`A new trade has been proposed.`, ...state.logs],
+  }
+}
+
+export const acceptTrade = (state: GameState, tradeId: string): GameState => {
+  const trade = state.trades.find((t) => t.id === tradeId)
+  if (!trade || trade.status !== 'PENDING') {
+    return {
+      ...state,
+      logs: [`Trade failed: Trade not found or not pending.`, ...state.logs],
+    }
+  }
+
+  const p1 = state.players.find((p) => p.id === trade.fromId)
+  const p2 = state.players.find((p) => p.id === trade.toId)
 
   if (!p1 || !p2) {
     return {
@@ -439,7 +463,7 @@ export const executeTrade = (
   }
 
   // Validate cash
-  if (p1.balance < offer.myCash || p2.balance < offer.partnerCash) {
+  if (p1.balance < trade.myCash || p2.balance < trade.partnerCash) {
     return {
       ...state,
       logs: [`Trade failed: Insufficient funds.`, ...state.logs],
@@ -447,8 +471,8 @@ export const executeTrade = (
   }
 
   // Validate properties
-  const p1OwnsAll = offer.myProperties.every((id) => p1.properties.includes(id))
-  const p2OwnsAll = offer.partnerProperties.every((id) => p2.properties.includes(id))
+  const p1OwnsAll = trade.myProperties.every((id) => p1.properties.includes(id))
+  const p2OwnsAll = trade.partnerProperties.every((id) => p2.properties.includes(id))
 
   if (!p1OwnsAll || !p2OwnsAll) {
     return {
@@ -458,30 +482,67 @@ export const executeTrade = (
   }
 
   const newPlayers = state.players.map((p) => {
-    if (p.id === p1Id) {
+    if (p.id === trade.fromId) {
       return {
         ...p,
-        balance: p.balance - offer.myCash + offer.partnerCash,
+        balance: p.balance - trade.myCash + trade.partnerCash,
         properties: p.properties
-          .filter((id: number) => !offer.myProperties.includes(id))
-          .concat(offer.partnerProperties),
+          .filter((id: number) => !trade.myProperties.includes(id))
+          .concat(trade.partnerProperties),
       }
     }
-    if (p.id === p2Id) {
+    if (p.id === trade.toId) {
       return {
         ...p,
-        balance: p.balance - offer.partnerCash + offer.myCash,
+        balance: p.balance - trade.partnerCash + trade.myCash,
         properties: p.properties
-          .filter((id: number) => !offer.partnerProperties.includes(id))
-          .concat(offer.myProperties),
+          .filter((id: number) => !trade.partnerProperties.includes(id))
+          .concat(trade.myProperties),
       }
     }
     return p
   })
 
+  const newTrades = state.trades.map((t) =>
+    t.id === tradeId ? { ...t, status: 'ACCEPTED' as const } : t,
+  )
+
   return {
     ...state,
     players: newPlayers,
+    trades: newTrades,
     logs: [`Trade executed between ${p1.name} and ${p2.name}`, ...state.logs],
+  }
+}
+
+export const rejectTrade = (state: GameState, tradeId: string): GameState => {
+  const trade = state.trades.find((t) => t.id === tradeId)
+  if (!trade || trade.status !== 'PENDING') {
+    return state
+  }
+
+  const newTrades = state.trades.map((t) =>
+    t.id === tradeId ? { ...t, status: 'REJECTED' as const } : t,
+  )
+
+  return {
+    ...state,
+    trades: newTrades,
+    logs: [`A trade offer was rejected.`, ...state.logs],
+  }
+}
+
+export const cancelTrade = (state: GameState, tradeId: string): GameState => {
+  const trade = state.trades.find((t) => t.id === tradeId)
+  if (!trade || trade.status !== 'PENDING') {
+    return state
+  }
+
+  const newTrades = state.trades.filter((t) => t.id !== tradeId)
+
+  return {
+    ...state,
+    trades: newTrades,
+    logs: [`A trade offer was canceled.`, ...state.logs],
   }
 }
