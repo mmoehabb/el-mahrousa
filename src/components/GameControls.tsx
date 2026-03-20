@@ -49,6 +49,10 @@ export default function GameControls({
     setChatMsg('')
   }
 
+  const myPendingTrades = (gameState.trades || []).filter(
+    (trade) => (trade.fromId === myId || trade.toId === myId) && trade.status === 'PENDING',
+  )
+
   return (
     <div className="w-64 space-y-4">
       <div className="bg-white/90 dark:bg-slate-900/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
@@ -110,16 +114,6 @@ export default function GameControls({
           <button
             onClick={() => {
               sounds.playClick()
-              setIsTradeOpen(true)
-            }}
-            className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all text-[10px]"
-          >
-            <Handshake size={18} /> PROPOSE TRADE
-          </button>
-
-          <button
-            onClick={() => {
-              sounds.playClick()
               setIsLeaveDialogOpen(true)
             }}
             className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4 text-[10px]"
@@ -152,6 +146,90 @@ export default function GameControls({
         onConfirm={() => (window.location.href = import.meta.env.BASE_URL || '/')}
         onCancel={() => setIsLeaveDialogOpen(false)}
       />
+
+      <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-egyptian-gold rtl:border-l-4 rtl:border-r-0">
+        <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
+          <Handshake size={18} /> TRADES
+        </h3>
+
+        <button
+          onClick={() => {
+            sounds.playClick()
+            setIsTradeOpen(true)
+          }}
+          className="w-full bg-egyptian-gold text-white py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-yellow-600 transition-all text-[10px] mb-3"
+        >
+          PROPOSE TRADE
+        </button>
+
+        {myPendingTrades.length > 0 && (
+          <div className="space-y-2 mb-3">
+            {myPendingTrades.slice(0, 3).map((trade) => {
+              const isSender = trade.fromId === myId
+              const otherId = isSender ? trade.toId : trade.fromId
+              const otherPlayer = gameState.players.find((p) => p.id === otherId)
+              const otherName = otherPlayer ? otherPlayer.name : 'Unknown'
+
+              return (
+                <div
+                  key={trade.id}
+                  className="bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700 text-xs flex flex-col gap-2"
+                >
+                  <div>
+                    <span className="font-bold">{isSender ? 'To: ' : 'From: '}</span>
+                    {otherName}
+                  </div>
+
+                  <div className="flex justify-between gap-1 mt-1">
+                    {isSender ? (
+                      <button
+                        onClick={() => {
+                          sounds.playClick()
+                          sendAction({ type: 'CANCEL_TRADE', tradeId: trade.id! })
+                        }}
+                        className="flex-1 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 text-slate-800 dark:text-white py-1 rounded text-[10px] font-bold"
+                      >
+                        Cancel
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            sounds.playClick()
+                            sendAction({ type: 'ACCEPT_TRADE', tradeId: trade.id! })
+                          }}
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1 rounded text-[10px] font-bold"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => {
+                            sounds.playClick()
+                            sendAction({ type: 'REJECT_TRADE', tradeId: trade.id! })
+                          }}
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white py-1 rounded text-[10px] font-bold"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        <button
+          onClick={() => {
+            sounds.playClick()
+            setIsTradeOpen(true)
+          }}
+          className="w-full text-center text-egyptian-gold hover:underline text-xs"
+        >
+          View All Trades
+        </button>
+      </div>
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 dark:border-slate-600 rtl:border-l-4 rtl:border-r-0">
         <div className="h-40 flex flex-col">
