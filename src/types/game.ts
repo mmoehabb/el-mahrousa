@@ -15,6 +15,7 @@ export interface Tile {
 export interface Player {
   id: PlayerId
   name: string
+  avatar: string
   position: number
   balance: number
   properties: number[] // IDs of tiles
@@ -67,7 +68,7 @@ export type GameAction =
   | { type: 'ACCEPT_TRADE'; tradeId: string }
   | { type: 'REJECT_TRADE'; tradeId: string }
   | { type: 'CANCEL_TRADE'; tradeId: string }
-  | { type: 'JOIN'; name: string }
+  | { type: 'JOIN'; name: string; avatar: string }
   | { type: 'START_COUNTDOWN' }
   | { type: 'TICK_COUNTDOWN' }
   | { type: 'CANCEL_COUNTDOWN' }
