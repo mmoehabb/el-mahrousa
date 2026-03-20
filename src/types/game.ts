@@ -20,6 +20,9 @@ export interface Player {
   properties: number[] // IDs of tiles
   isBankrupt: boolean
   color: string
+  isMuted?: boolean
+  isSpeaking?: boolean
+  hasJoinedVoice?: boolean
 }
 
 export interface ChatMessage {
@@ -73,6 +76,8 @@ export type GameAction =
   | { type: 'REMATCH' }
   | { type: 'CLEAR_EVENT' }
   | { type: 'KICK_PLAYER'; playerId: string }
+  | { type: 'TOGGLE_MUTE'; isMuted: boolean }
+  | { type: 'JOIN_VOICE' }
 
 export interface ActiveEvent {
   title: string

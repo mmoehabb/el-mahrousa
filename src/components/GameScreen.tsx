@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, Info, Settings2, X, SmartphoneNfc, UserMinus } from 'lucide-react'
+import { Users, Info, Settings2, X, SmartphoneNfc, UserMinus, Mic, MicOff } from 'lucide-react'
 import { useGame } from '../context/GameContext'
+import Toast from './Toast'
 import Board from './Board'
 import TradeModal from './TradeModal'
 import GameControls from './GameControls'
@@ -18,6 +19,11 @@ interface GameScreenProps {
   sendAction: (action: GameAction) => void
   showCopied: boolean
   handleShareLink: () => void
+  toggleVoiceChat?: () => void
+  isMuted?: boolean
+  voiceError?: string | null
+  setVoiceError?: (err: string | null) => void
+  hasJoinedVoice?: boolean
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({
@@ -25,6 +31,11 @@ const GameScreen: React.FC<GameScreenProps> = ({
   sendAction,
   showCopied,
   handleShareLink,
+  toggleVoiceChat,
+  isMuted,
+  voiceError,
+  setVoiceError,
+  hasJoinedVoice,
 }) => {
   const { t } = useTranslation()
   const { gameState, myId, isHost } = useGame()
@@ -151,6 +162,15 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 </span>
               </span>
               <div className="flex items-center gap-2">
+                {!p.isBankrupt && p.id !== myId && p.hasJoinedVoice && (
+                  <div className="text-slate-400">
+                    {p.isMuted === false ? (
+                      <Mic size={14} className="text-green-500" />
+                    ) : (
+                      <MicOff size={14} />
+                    )}
+                  </div>
+                )}
                 <span className="font-bold text-xs shrink-0">
                   {p.isBankrupt ? t('game.bankruptLabel') : `${p.balance} ${GAME_CONFIG.CURRENCY}`}
                 </span>
@@ -231,11 +251,15 @@ const GameScreen: React.FC<GameScreenProps> = ({
       handleEndTurn={handleEndTurn}
       setIsTradeOpen={setIsTradeOpen}
       sendAction={sendAction}
+      toggleVoiceChat={toggleVoiceChat}
+      isMuted={isMuted}
+      hasJoinedVoice={hasJoinedVoice}
     />
   )
 
   return (
     <>
+      <Toast message={voiceError || null} onClose={() => setVoiceError?.(null)} />
       {/* Mobile Landscape Overlay - only active when on GameScreen */}
       <div className="landscape-overlay">
         <SmartphoneNfc size={64} className="landscape-overlay-icon mb-4" />

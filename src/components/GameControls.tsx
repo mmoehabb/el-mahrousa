@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dice5, Send, Handshake, Flag } from 'lucide-react'
+import { Dice5, Send, Handshake, Flag, Mic, MicOff, PhoneCall } from 'lucide-react'
 import type { GameState, GameAction } from '../types/game'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { useGame } from '../context/GameContext'
@@ -20,6 +20,9 @@ interface GameControlsProps {
   handleEndTurn: () => void
   setIsTradeOpen: (open: boolean) => void
   sendAction: (action: GameAction) => void
+  toggleVoiceChat?: () => void
+  isMuted?: boolean
+  hasJoinedVoice?: boolean
 }
 
 export default function GameControls({
@@ -30,6 +33,9 @@ export default function GameControls({
   handleEndTurn,
   setIsTradeOpen,
   sendAction,
+  toggleVoiceChat,
+  isMuted,
+  hasJoinedVoice,
 }: GameControlsProps) {
   const { t } = useTranslation()
   const { myId } = useGame()
@@ -261,10 +267,34 @@ export default function GameControls({
             />
             <button
               type="submit"
-              className="p-1 bg-slate-200 dark:bg-slate-700 rounded rtl:rotate-180"
+              className="p-2 bg-slate-200 dark:bg-slate-700 rounded rtl:rotate-180 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+              title={t('game.sendChat', 'Send')}
             >
               <Send size={14} />
             </button>
+            {hasJoinedVoice ? (
+              <button
+                type="button"
+                onClick={toggleVoiceChat}
+                className={`p-2 rounded transition-colors ${
+                  isMuted
+                    ? 'bg-slate-200 dark:bg-slate-700 text-slate-500 hover:bg-slate-300 dark:hover:bg-slate-600'
+                    : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200'
+                }`}
+                title={isMuted ? 'Unmute Microphone' : 'Mute Microphone'}
+              >
+                {isMuted ? <MicOff size={14} /> : <Mic size={14} />}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={toggleVoiceChat}
+                className="p-2 rounded bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-200 transition-colors"
+                title="Connect to Voice Chat"
+              >
+                <PhoneCall size={14} />
+              </button>
+            )}
           </form>
         </div>
       </div>

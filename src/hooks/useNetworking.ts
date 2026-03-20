@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import Peer, { type DataConnection } from 'peerjs'
+import Peer, { type DataConnection, type MediaConnection } from 'peerjs'
 import { useGame } from '../context/GameContext'
 import type { GameState, Player } from '../types/game'
 import {
@@ -34,6 +34,11 @@ export const useNetworking = () => {
   const [isConnecting, setIsConnecting] = useState(false)
   const connections = useRef<{ [id: string]: DataConnection }>({})
   const [lobbyId, setLobbyId] = useState<string>('')
+
+  const [myStream, setMyStream] = useState<MediaStream | null>(null)
+  const [remoteStreams, setRemoteStreams] = useState<{ [id: string]: MediaStream }>({})
+  const [voiceError, setVoiceError] = useState<string | null>(null)
+  const mediaConnections = useRef<{ [id: string]: MediaConnection }>({})
 
   const broadcastState = useCallback((state: GameState) => {
     Object.values(connections.current).forEach((conn) => {
@@ -230,6 +235,28 @@ export const useNetworking = () => {
             nextState.activeEvent = null
             break
           }
+          case 'JOIN_VOICE': {
+            const playerIndex = nextState.players.findIndex((p) => p.id === from)
+            if (playerIndex !== -1) {
+              const newPlayers = [...nextState.players]
+              newPlayers[playerIndex] = {
+                ...newPlayers[playerIndex],
+                hasJoinedVoice: true,
+                isMuted: false,
+              }
+              nextState.players = newPlayers
+            }
+            break
+          }
+          case 'TOGGLE_MUTE': {
+            const playerIndex = nextState.players.findIndex((p) => p.id === from)
+            if (playerIndex !== -1) {
+              const newPlayers = [...nextState.players]
+              newPlayers[playerIndex] = { ...newPlayers[playerIndex], isMuted: action.isMuted }
+              nextState.players = newPlayers
+            }
+            break
+          }
           case 'KICK_PLAYER': {
             if (from !== lobbyId && from !== myId) return prev
             const kickedPlayerIndex = nextState.players.findIndex((p) => p.id === action.playerId)
@@ -313,6 +340,41 @@ export const useNetworking = () => {
     handleActionRef.current = handleAction
     isHostRef.current = isHost
   }, [handleAction, isHost])
+
+  const hasJoinedVoice = !!myStream
+
+  // Answer incoming voice calls
+  useEffect(() => {
+    if (!peer || !hasJoinedVoice) return
+
+    const handleCall = (call: MediaConnection) => {
+      // Only answer if we've opted in to voice chat
+      call.answer(myStream || undefined)
+
+      call.on('stream', (remoteStream) => {
+        setRemoteStreams((prev) => ({ ...prev, [call.peer]: remoteStream }))
+      })
+
+      call.on('close', () => {
+        setRemoteStreams((prev) => {
+          const newState = { ...prev }
+          delete newState[call.peer]
+          return newState
+        })
+      })
+
+      call.on('error', (err) => {
+        console.error('Call error:', err)
+      })
+
+      mediaConnections.current[call.peer] = call
+    }
+
+    peer.on('call', handleCall)
+    return () => {
+      peer.off('call', handleCall)
+    }
+  }, [peer, myStream, hasJoinedVoice])
 
   useEffect(() => {
     const newPeer = new Peer(myId)
@@ -443,6 +505,70 @@ export const useNetworking = () => {
     [peer, setGameState, setIsHost, playerName],
   )
 
+  // When other players join voice, call them if we have joined voice
+  useEffect(() => {
+    if (!peer || !myStream) return
+
+    gameState.players.forEach((p) => {
+      // Call them if they joined voice, and we haven't already connected, and they are not us
+      if (p.id !== myId && p.hasJoinedVoice && !mediaConnections.current[p.id]) {
+        const call = peer.call(p.id, myStream)
+        if (call) {
+          call.on('stream', (remoteStream) => {
+            setRemoteStreams((prev) => ({ ...prev, [p.id]: remoteStream }))
+          })
+          call.on('error', (err) => {
+            console.error('Call out error:', err)
+          })
+          mediaConnections.current[p.id] = call
+        }
+      }
+    })
+  }, [gameState.players, peer, myId, myStream])
+
+  const toggleVoiceChat = async () => {
+    try {
+      if (!myStream) {
+        // First time, request permissions
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        setMyStream(stream)
+        setVoiceError(null)
+
+        sendAction({ type: 'JOIN_VOICE' })
+
+        // Call everyone in the lobby who has already joined voice
+        if (peer) {
+          gameState.players.forEach((p) => {
+            if (p.id !== myId && p.hasJoinedVoice) {
+              const call = peer.call(p.id, stream)
+              if (call) {
+                call.on('stream', (remoteStream) => {
+                  setRemoteStreams((prev) => ({ ...prev, [p.id]: remoteStream }))
+                })
+                call.on('error', (err) => {
+                  console.error('Call out error:', err)
+                })
+                mediaConnections.current[p.id] = call
+              }
+            }
+          })
+        }
+      } else {
+        // Toggle mute on existing stream
+        const audioTrack = myStream.getAudioTracks()[0]
+        if (audioTrack) {
+          audioTrack.enabled = !audioTrack.enabled
+          sendAction({ type: 'TOGGLE_MUTE', isMuted: !audioTrack.enabled })
+        }
+      }
+    } catch (err) {
+      console.error('Failed to access microphone', err)
+      setVoiceError('Microphone permission denied.')
+    }
+  }
+
+  const isMuted = myStream ? !myStream.getAudioTracks()[0]?.enabled : true
+
   return {
     createLobby,
     joinLobby,
@@ -451,5 +577,11 @@ export const useNetworking = () => {
     connectionError,
     setConnectionError,
     isConnecting,
+    toggleVoiceChat,
+    isMuted,
+    remoteStreams,
+    voiceError,
+    setVoiceError,
+    hasJoinedVoice,
   }
 }
