@@ -36,6 +36,7 @@ export default function GameControls({
   const [chatMsg, setChatMsg] = useState('')
   const sounds = useGameSounds()
   const [isBankruptDialogOpen, setIsBankruptDialogOpen] = useState(false)
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const me = gameState.players.find((p) => p.id === myId)
@@ -119,7 +120,7 @@ export default function GameControls({
           <button
             onClick={() => {
               sounds.playClick()
-              window.location.href = '/'
+              setIsLeaveDialogOpen(true)
             }}
             className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4 text-[10px]"
           >
@@ -143,6 +144,13 @@ export default function GameControls({
         message={t('game.confirmBankrupt')}
         onConfirm={() => sendAction({ type: 'BANKRUPT' })}
         onCancel={() => setIsBankruptDialogOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={isLeaveDialogOpen}
+        message={t('game.confirmLeave')}
+        onConfirm={() => (window.location.href = import.meta.env.BASE_URL || '/')}
+        onCancel={() => setIsLeaveDialogOpen(false)}
       />
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 dark:border-slate-600 rtl:border-l-4 rtl:border-r-0">
