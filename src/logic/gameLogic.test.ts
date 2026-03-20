@@ -901,6 +901,7 @@ describe('buyHouse', () => {
     chatMessages: [],
     prison: {},
     ...overrides,
+    activeEvent: overrides.activeEvent || null,
   })
 
   test('should not allow buying a house if player does not own all properties in the group', () => {
