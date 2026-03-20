@@ -10,6 +10,7 @@ import {
   executeTrade,
   buyProperty,
   handleBankrupt,
+  buyHouse,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
 import { GAME_CONFIG } from '../config/gameConfig.ts'
@@ -854,6 +855,86 @@ describe('moveOneStep', () => {
     assert.strictEqual(stateWithPlayer.players[0].position, 0)
     assert.notStrictEqual(newState, stateWithPlayer)
     assert.notStrictEqual(newState.players, stateWithPlayer.players)
+  })
+})
+
+describe('buyHouse', () => {
+  const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
+    id: 'p1',
+    name: 'Player 1',
+    position: 0,
+    balance: 1500,
+    properties: [],
+    isBankrupt: false,
+    color: 'red',
+    ...overrides,
+  })
+
+  const createMockTile = (
+    overrides: Partial<import('../types/game.ts').Tile> = {},
+  ): import('../types/game.ts').Tile => ({
+    id: 1,
+    name: 'Property 1',
+    type: 'PROPERTY',
+    price: 100,
+    housePrice: 50,
+    rent: [10, 50, 150],
+    ...overrides,
+  })
+
+  const createMockState = (
+    players: Player[],
+    tiles: import('../types/game.ts').Tile[],
+    overrides: Partial<GameState> = {},
+  ): GameState => ({
+    players,
+    currentPlayerIndex: 0,
+    tiles,
+    status: 'PLAYING',
+    turnPhase: 'ROLL',
+    lastDice: [1, 1],
+    logs: [],
+    chatMessages: [],
+    prison: {},
+    ...overrides,
+  })
+
+  test('should not allow buying a house if player does not own all properties in the group', () => {
+    const player = createMockPlayer({ balance: 500, properties: [1] }) // only owns tile 1
+    const tile1 = createMockTile({ id: 1, group: 'A' })
+    const tile2 = createMockTile({ id: 2, group: 'A' }) // tile 2 is in same group
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile1, tile2])
+
+    const newState = buyHouse(state, 1)
+
+    // Should return exact same state since action is invalid
+    assert.strictEqual(newState, state)
+  })
+
+  test('should allow buying a house if player owns all properties in the group', () => {
+    const player = createMockPlayer({ balance: 500, properties: [1, 2] }) // owns both
+    const tile1 = createMockTile({ id: 1, group: 'A' })
+    const tile2 = createMockTile({ id: 2, group: 'A' })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile1, tile2])
+
+    const newState = buyHouse(state, 1)
+
+    // Should return new state with updated balance and houses
+    assert.notStrictEqual(newState, state)
+    assert.strictEqual(newState.players[0].balance, 450) // 500 - 50 (house price)
+    assert.strictEqual(newState.tiles[1].houses, 1)
+  })
+
+  test('should allow buying a house if property has no group', () => {
+    const player = createMockPlayer({ balance: 500, properties: [1] })
+    const tile1 = createMockTile({ id: 1, group: undefined })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile1])
+
+    const newState = buyHouse(state, 1)
+
+    assert.notStrictEqual(newState, state)
+    assert.strictEqual(newState.players[0].balance, 450)
+    assert.strictEqual(newState.tiles[1].houses, 1)
   })
 })
 

@@ -141,6 +141,13 @@ export const buyHouse = (state: GameState, tileId: number): GameState => {
 
   if (!player.properties.includes(tileId) || !tile.housePrice || !tile.rent) return state
 
+  // Must own all properties in the same group
+  if (tile.group) {
+    const groupTiles = state.tiles.filter((t) => t.group === tile.group)
+    const ownsAll = groupTiles.every((t) => player.properties.includes(t.id))
+    if (!ownsAll) return state
+  }
+
   const currentHouses = tile.houses || 0
   if (currentHouses >= tile.rent.length - 1) return state // Max houses reached
 

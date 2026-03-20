@@ -98,7 +98,8 @@
     "buyHouseBtn": "BUY HOUSE",
     "sellHouseBtn": "SELL HOUSE",
     "sellPropertyBtn": "SELL PROPERTY",
-    "mustSellHousesFirst": "Must sell all houses first to sell property"
+    "mustSellHousesFirst": "Must sell all houses first to sell property",
+    "mustOwnAllInGroup": "Must own all properties in this group to buy houses"
   },
   "trade": {
     "title": "Trade Proposal",
