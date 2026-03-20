@@ -13,6 +13,7 @@ export const createInitialState = (): GameState => ({
   countdown: null,
   chatMessages: [],
   prison: {},
+  activeEvent: null,
 })
 
 // Generates a float between 0 (inclusive) and 1 (exclusive) using crypto
@@ -55,10 +56,155 @@ export const moveOneStep = (state: GameState): GameState => {
   return newState
 }
 
+export const applyEventLogic = (state: GameState): GameState => {
+  const player = state.players[state.currentPlayerIndex]
+  const tile = state.tiles[player.position]
+  const newState = { ...state }
+
+  if (tile.name === 'Hazak') {
+    // Hazak Random Outcomes
+    const events = [
+      {
+        type: 'gain',
+        amount: 150,
+        title: 'Lottery Win',
+        description: 'You won the local lottery! Collect 150.',
+      },
+      {
+        type: 'gain',
+        amount: 50,
+        title: 'Found Wallet',
+        description: 'You found a lost wallet on the street and kept the cash! Collect 50.',
+      },
+      {
+        type: 'gain',
+        amount: 200,
+        title: 'Bank Error',
+        description: 'Bank error in your favor! Collect 200.',
+      },
+      {
+        type: 'loss',
+        amount: 100,
+        title: 'Speeding Ticket',
+        description: 'You were caught speeding. Pay 100.',
+      },
+      { type: 'loss', amount: 50, title: 'Doctor Fee', description: 'Pay hospital fees. Pay 50.' },
+      {
+        type: 'loss',
+        amount: 200,
+        title: 'Scammed',
+        description: 'You fell for a phishing scam! Pay 200.',
+      },
+      {
+        type: 'move',
+        target: 0,
+        title: 'Advance to Start',
+        description: 'Advance to Go! Collect 200.',
+      },
+      {
+        type: 'move',
+        target: 12,
+        title: 'Vacation',
+        description: 'Take a trip to the Vacation tile.',
+      },
+      {
+        type: 'jail',
+        target: 6,
+        title: 'Go to Prison',
+        description: 'Go directly to Prison. Do not pass Go, do not collect 200.',
+      },
+    ] as const
+
+    const event = events[Math.floor(secureRandom() * events.length)]
+    const newPlayers = [...state.players]
+
+    if (event.type === 'gain') {
+      newPlayers[state.currentPlayerIndex] = { ...player, balance: player.balance + event.amount }
+    } else if (event.type === 'loss') {
+      newPlayers[state.currentPlayerIndex] = { ...player, balance: player.balance - event.amount }
+    } else if (event.type === 'move') {
+      // If moving passes start (and not just going backward to start), collect Go Reward
+      if (event.target < player.position && event.target !== 0) {
+        newPlayers[state.currentPlayerIndex] = {
+          ...player,
+          position: event.target,
+          balance: player.balance + GAME_CONFIG.GO_REWARD,
+        }
+      } else if (event.target === 0) {
+        newPlayers[state.currentPlayerIndex] = {
+          ...player,
+          position: event.target,
+          balance: player.balance + GAME_CONFIG.GO_REWARD,
+        }
+      } else {
+        newPlayers[state.currentPlayerIndex] = { ...player, position: event.target }
+      }
+    } else if (event.type === 'jail') {
+      newPlayers[state.currentPlayerIndex] = { ...player, position: event.target }
+      newState.prison = { ...newState.prison, [player.id]: { turnsLeft: 2 } }
+    }
+
+    newState.players = newPlayers
+    newState.activeEvent = {
+      title: event.title,
+      description: event.description,
+      type: event.type,
+      playerName: player.name,
+    }
+
+    // Check if debt forces turn to stay ACTION
+    if (newPlayers[state.currentPlayerIndex].balance >= 0) {
+      newState.turnPhase = 'END'
+    } else {
+      newState.turnPhase = 'ACTION' // Must sell properties or bankrupt
+    }
+  } else if (tile.name === 'Sodfa') {
+    // Sodfa Random Teleportation
+    // Get all PROPERTY, AIRPORT, UTILITY tiles
+    const properties = state.tiles.filter((t) =>
+      ['PROPERTY', 'AIRPORT', 'UTILITY'].includes(t.type),
+    )
+    const randomTile = properties[Math.floor(secureRandom() * properties.length)]
+    const newPlayers = [...state.players]
+
+    if (randomTile.id < player.position) {
+      newPlayers[state.currentPlayerIndex] = {
+        ...player,
+        position: randomTile.id,
+        balance: player.balance + GAME_CONFIG.GO_REWARD,
+      }
+    } else {
+      newPlayers[state.currentPlayerIndex] = { ...player, position: randomTile.id }
+    }
+
+    newState.players = newPlayers
+    newState.activeEvent = {
+      title: 'Sodfa Teleport',
+      description: `Sodfa! You have been teleported to ${randomTile.name}!`,
+      type: 'move',
+      playerName: player.name,
+    }
+
+    // Since they moved, we should apply landing logic for their new tile immediately,
+    // but without clearing the event popup.
+    // However, they can only land on PROPERTY, AIRPORT, UTILITY, so we can run a subset of logic or recurse safely.
+    // For safety, let's just let them end their turn or pay rent here.
+    const tempState = applyLandingLogic({ ...newState, turnPhase: 'ACTION' })
+    tempState.activeEvent = newState.activeEvent // keep event
+    return tempState
+  }
+
+  return newState
+}
+
 export const applyLandingLogic = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[player.position]
   const newState = { ...state }
+
+  if (tile.type === 'EVENT') {
+    return applyEventLogic(newState)
+  }
 
   if (tile.type === 'TAX') {
     const taxAmount = tile.price || 0

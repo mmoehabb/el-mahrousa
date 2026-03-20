@@ -62,6 +62,14 @@ export type GameAction =
   | { type: 'PLAYER_DISCONNECT' }
   | { type: 'BANKRUPT' }
   | { type: 'REMATCH' }
+  | { type: 'CLEAR_EVENT' }
+
+export interface ActiveEvent {
+  title: string
+  description: string
+  type: 'gain' | 'loss' | 'move' | 'jail'
+  playerName: string
+}
 
 export interface GameState {
   players: Player[]
@@ -75,4 +83,5 @@ export interface GameState {
   countdown?: number | null
   chatMessages: ChatMessage[]
   prison: Prison
+  activeEvent: ActiveEvent | null
 }

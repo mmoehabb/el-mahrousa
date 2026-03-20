@@ -201,6 +201,7 @@ export const useNetworking = () => {
               lastDice: [1, 1],
               countdown: null,
               prison: {},
+              activeEvent: null,
               logs: ['Rematch initiated! Waiting to start...'],
               players: nextState.players.map((p) => ({
                 ...p,
@@ -210,6 +211,11 @@ export const useNetworking = () => {
                 isBankrupt: false,
               })),
             }
+            break
+          }
+          case 'CLEAR_EVENT': {
+            // Any client can clear the event (it's synchronized globally)
+            nextState.activeEvent = null
             break
           }
         }
