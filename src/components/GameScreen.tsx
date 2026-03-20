@@ -279,6 +279,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             pinch={{ step: 5 }}
             doubleClick={{ disabled: true }}
             panning={{ disabled: false }}
+            limitToBounds={false}
           >
             <TransformComponent>
               <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
