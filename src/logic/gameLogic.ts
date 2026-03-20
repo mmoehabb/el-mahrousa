@@ -1,5 +1,5 @@
 import type { GameState, Player, Tile, TradeOffer } from '../types/game.ts'
-import { GAME_CONFIG } from '../config/gameConfig.ts'
+import { GAME_CONFIG, HAZAK_EVENTS } from '../config/gameConfig.ts'
 import { BOARD_DATA } from '../config/gameConfig.ts'
 
 export const createInitialState = (): GameState => ({
@@ -63,57 +63,7 @@ export const applyEventLogic = (state: GameState): GameState => {
 
   if (tile.name === 'Hazak') {
     // Hazak Random Outcomes
-    const events = [
-      {
-        type: 'gain',
-        amount: 150,
-        title: 'Lottery Win',
-        description: 'You won the local lottery! Collect 150.',
-      },
-      {
-        type: 'gain',
-        amount: 50,
-        title: 'Found Wallet',
-        description: 'You found a lost wallet on the street and kept the cash! Collect 50.',
-      },
-      {
-        type: 'gain',
-        amount: 200,
-        title: 'Bank Error',
-        description: 'Bank error in your favor! Collect 200.',
-      },
-      {
-        type: 'loss',
-        amount: 100,
-        title: 'Speeding Ticket',
-        description: 'You were caught speeding. Pay 100.',
-      },
-      { type: 'loss', amount: 50, title: 'Doctor Fee', description: 'Pay hospital fees. Pay 50.' },
-      {
-        type: 'loss',
-        amount: 200,
-        title: 'Scammed',
-        description: 'You fell for a phishing scam! Pay 200.',
-      },
-      {
-        type: 'move',
-        target: 0,
-        title: 'Advance to Start',
-        description: 'Advance to Go! Collect 200.',
-      },
-      {
-        type: 'move',
-        target: 12,
-        title: 'Vacation',
-        description: 'Take a trip to the Vacation tile.',
-      },
-      {
-        type: 'jail',
-        target: 6,
-        title: 'Go to Prison',
-        description: 'Go directly to Prison. Do not pass Go, do not collect 200.',
-      },
-    ] as const
+    const events = HAZAK_EVENTS
 
     const event = events[Math.floor(secureRandom() * events.length)]
     const newPlayers = [...state.players]
