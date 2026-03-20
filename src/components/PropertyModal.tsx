@@ -82,11 +82,11 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
           >
             <button
               onClick={onClose}
-              className="absolute top-2 right-2 rtl:left-2 rtl:right-auto bg-black/20 hover:bg-black/40 rounded-full p-1 transition-colors"
+              className="absolute z-10 top-2 right-2 rtl:left-2 rtl:right-auto bg-black/20 hover:bg-black/40 rounded-full p-1 transition-colors"
             >
               <X size={20} className="text-white" />
             </button>
-            <h2 className="text-xl font-black uppercase tracking-wider drop-shadow-md text-white">
+            <h2 className="text-xl font-black uppercase tracking-wider drop-shadow-md text-white relative z-0 px-8">
               {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
             </h2>
           </div>
