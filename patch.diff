@@ -1,0 +1,39 @@
+--- src/index.css
++++ src/index.css
+@@ -42,15 +42,15 @@
+   font-weight: 700;
+   text-align: center;
+   position: relative;
+-  width: 60px;
+-  height: auto;
+-  aspect-ratio: 1 / 1;
++  width: 100%;
++  height: 100%;
+   overflow: hidden;
+ }
+
+ @media screen and (min-width: 640px) {
+   .board-tile {
+-    width: 80px;
+     font-size: 9px;
+     padding: 0.2rem;
+   }
+@@ -58,7 +58,6 @@
+
+ @media screen and (min-width: 768px) {
+   .board-tile {
+-    width: 100px;
+     font-size: 10px;
+     padding: 0.25rem;
+   }
+--- src/components/Board.tsx
++++ src/components/Board.tsx
+@@ -107,7 +107,7 @@
+         turnPhase={gameState.turnPhase}
+         sendAction={sendAction}
+       />
+-      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1">
++      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1 w-[420px] h-[420px] sm:w-[560px] sm:h-[560px] md:w-[700px] md:h-[700px] max-w-full aspect-square">
+         {/* Top Row */}
+         {topRow.map((tile, i) => (
+           <div

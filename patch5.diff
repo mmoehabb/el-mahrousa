@@ -1,0 +1,20 @@
+--- src/components/Board.tsx
++++ src/components/Board.tsx
+@@ -107,7 +107,7 @@
+   }
+
+   return (
+-    <div className="relative p-2 sm:p-4 md:p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold inline-block">
++    <div className="relative p-2 sm:p-4 md:p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold inline-block w-full h-full aspect-square">
+       <PropertyModal
+         isOpen={!!selectedTile}
+         onClose={() => setSelectedTile(null)}
+@@ -119,7 +119,7 @@
+         turnPhase={gameState.turnPhase}
+         sendAction={sendAction}
+       />
+-      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1 w-[420px] h-[420px] sm:w-[560px] sm:h-[560px] md:w-[700px] md:h-[700px] max-w-full aspect-square">
++      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1 w-full h-full aspect-square">
+         {/* Top Row */}
+         {topRow.map((tile, i) => (
+           <div
