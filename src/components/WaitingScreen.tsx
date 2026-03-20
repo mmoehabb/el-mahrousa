@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Users } from 'lucide-react'
+import { Users, UserMinus } from 'lucide-react'
 import type { GameState } from '../types/game'
 
 interface WaitingScreenProps {
@@ -69,6 +69,15 @@ export default function WaitingScreen({
                   <span className="text-xs bg-egyptian-gold text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto">
                     {t('waiting.host')}
                   </span>
+                )}
+                {isHost && p.id !== myId && (
+                  <button
+                    onClick={() => sendAction({ type: 'KICK_PLAYER', playerId: p.id })}
+                    className="ml-auto bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+                    title={t('game.kickPlayer', 'Kick Player')}
+                  >
+                    <UserMinus size={14} />
+                  </button>
                 )}
               </div>
             ))}

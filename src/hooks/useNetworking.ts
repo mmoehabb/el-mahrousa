@@ -230,17 +230,71 @@ export const useNetworking = () => {
             nextState.activeEvent = null
             break
           }
+          case 'KICK_PLAYER': {
+            if (from !== lobbyId && from !== myId) return prev
+            const kickedPlayerIndex = nextState.players.findIndex((p) => p.id === action.playerId)
+            if (kickedPlayerIndex !== -1) {
+              const kickedPlayer = nextState.players[kickedPlayerIndex]
+
+              if (nextState.status === 'PLAYING') {
+                // To keep index safe and clear properties, we handle them as bankrupt
+                nextState = handleBankrupt(nextState, action.playerId)
+                nextState.logs = [`${kickedPlayer.name} was kicked by the host.`, ...nextState.logs]
+
+                if (nextState.players[nextState.currentPlayerIndex].id === action.playerId) {
+                  nextState = endTurn(nextState)
+                }
+
+                const activePlayers = nextState.players.filter((p) => !p.isBankrupt)
+                if (activePlayers.length <= 1) {
+                  nextState.status = 'FINISHED'
+                  const winnerName =
+                    activePlayers.length === 1 ? activePlayers[0].name : kickedPlayer.name
+                  nextState.logs = [`${winnerName} has won the game!`, ...nextState.logs]
+                }
+              } else {
+                // In waiting/lobby, we can just remove them cleanly
+                const newPlayers = [...nextState.players]
+                newPlayers.splice(kickedPlayerIndex, 1)
+                nextState.players = newPlayers
+                nextState.logs = [`${kickedPlayer.name} was kicked by the host.`, ...nextState.logs]
+
+                if (nextState.status === 'WAITING' && nextState.countdown !== null) {
+                  nextState.countdown = null
+                  nextState.logs = [
+                    'Countdown cancelled because a player was kicked.',
+                    ...nextState.logs,
+                  ]
+                }
+
+                if (nextState.players.length > 0) {
+                  if (kickedPlayerIndex < nextState.currentPlayerIndex) {
+                    nextState.currentPlayerIndex -= 1
+                  } else if (nextState.currentPlayerIndex >= nextState.players.length) {
+                    nextState.currentPlayerIndex = 0
+                  }
+                }
+              }
+            }
+            break
+          }
         }
         return nextState
       })
     },
-    [isHost, setGameState, lobbyId],
+    [isHost, setGameState, lobbyId, myId],
   )
 
   const sendAction = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (action: any) => {
       if (isHost) {
+        if (action.type === 'KICK_PLAYER') {
+          const targetConn = connections.current[action.playerId]
+          if (targetConn) {
+            targetConn.close()
+          }
+        }
         handleAction(action, myId)
       } else {
         const hostConn = connections.current[lobbyId]
@@ -374,6 +428,8 @@ export const useNetworking = () => {
       conn.on('close', () => {
         clearTimeout(timeout)
         setIsConnecting(false)
+        setConnectionError('Connection closed by host.')
+        setGameState((prev) => ({ ...prev, status: 'LOBBY' }))
       })
     },
     [peer, setGameState, setIsHost, playerName],

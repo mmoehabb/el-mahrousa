@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, Info, Settings2, X, SmartphoneNfc } from 'lucide-react'
+import { Users, Info, Settings2, X, SmartphoneNfc, UserMinus } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import Board from './Board'
 import TradeModal from './TradeModal'
@@ -149,9 +149,20 @@ const GameScreen: React.FC<GameScreenProps> = ({
                   {p.name} {p.id === myId ? t('waiting.you') : ''}
                 </span>
               </span>
-              <span className="font-bold text-xs shrink-0">
-                {p.isBankrupt ? t('game.bankruptLabel') : `${p.balance} ${GAME_CONFIG.CURRENCY}`}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-xs shrink-0">
+                  {p.isBankrupt ? t('game.bankruptLabel') : `${p.balance} ${GAME_CONFIG.CURRENCY}`}
+                </span>
+                {isHost && p.id !== myId && !p.isBankrupt && (
+                  <button
+                    onClick={() => sendAction({ type: 'KICK_PLAYER', playerId: p.id })}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 p-1 rounded transition-colors"
+                    title={t('game.kickPlayer', 'Kick Player')}
+                  >
+                    <UserMinus size={14} />
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
