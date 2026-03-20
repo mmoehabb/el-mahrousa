@@ -69,6 +69,7 @@
     "endTurnBtn": "END TURN",
     "proposeTradeBtn": "PROPOSE TRADE",
     "leaveGameBtn": "LEAVE GAME",
+    "confirmLeave": "Are you sure you want to leave the game?",
     "bankruptBtn": "BANKRUPT",
     "declareBankrupt": "Declare Bankruptcy",
     "confirmBankrupt": "Are you sure you want to declare bankruptcy? You will lose all your properties and money, but you can continue watching the game as a guest.",
