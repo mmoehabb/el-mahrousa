@@ -11,23 +11,13 @@
   --color-egyptian-red: #ec4899;
   --color-sand: #f97316;
 
-  /* Comic Halftone Pattern Base */
-  --comic-bg-color: #fafaf9;
-  --comic-dot-color: #e5e7eb;
-
-  --background-image-comic:
-    radial-gradient(var(--comic-dot-color) 15%, transparent 16%),
-    radial-gradient(var(--comic-dot-color) 15%, transparent 16%);
+  --background-image-papyrus: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
 }
 
 body {
-  background-color: var(--comic-bg-color);
+  background-color: #fff7ed;
   color: #0f172a;
-  background-image: var(--background-image-comic);
-  background-size: 20px 20px;
-  background-position:
-    0 0,
-    10px 10px;
+  background-image: var(--background-image-papyrus);
 }
 
 body.font-english-pixel {
@@ -179,17 +169,14 @@ body.font-arabic-pixel {
 }
 
 .dark body {
-  --comic-bg-color: #0f172a;
-  --comic-dot-color: #1e293b;
-
   --color-egyptian-gold: #fcd34d;
   --color-egyptian-blue: #22d3ee;
   --color-egyptian-red: #f472b6;
   --color-sand: #fb923c;
 
-  background-color: var(--comic-bg-color);
+  background-color: #0f172a;
   color: #f8fafc;
-  background-image: var(--background-image-comic);
+  background-image: none;
 }
 
 .dark .egyptian-pattern {
