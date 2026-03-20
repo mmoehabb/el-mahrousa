@@ -107,7 +107,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   }
 
   return (
-    <div className="relative p-2 sm:p-4 md:p-8 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold inline-block">
+    <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold aspect-square w-[95vw] sm:w-[600px] md:w-[700px] lg:w-[800px] max-w-full">
       <PropertyModal
         isOpen={!!selectedTile}
         onClose={() => setSelectedTile(null)}
@@ -119,7 +119,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         turnPhase={gameState.turnPhase}
         sendAction={sendAction}
       />
-      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1">
+      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1 w-full h-full">
         {/* Top Row */}
         {topRow.map((tile, i) => (
           <div
