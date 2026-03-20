@@ -11,6 +11,7 @@ import type { GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 interface GameScreenProps {
   lobbyId: string | null
@@ -271,7 +272,18 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* Center: Board - Scrollable wrapper for mobile */}
         <div className="w-full max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 scale-90 sm:scale-100 origin-top">
-          <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
+          <TransformWrapper
+            initialScale={1}
+            minScale={0.5}
+            maxScale={3}
+            pinch={{ step: 5 }}
+            doubleClick={{ disabled: true }}
+            panning={{ disabled: false }}
+          >
+            <TransformComponent>
+              <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
+            </TransformComponent>
+          </TransformWrapper>
         </div>
 
         {/* Desktop Right Panel */}
