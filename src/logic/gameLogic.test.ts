@@ -511,6 +511,37 @@ describe('applyLandingLogic', () => {
     assert.deepStrictEqual(newState.players[0].properties, [])
   })
 
+  test('pays rent calculated by 25 * 2^(count - 1) when landing on an owned AIRPORT or UTILITY', () => {
+    const state = getBaseState()
+
+    const mockTiles = state.tiles.map((t) => ({ ...t }))
+
+    const airport1Index = mockTiles.findIndex((t) => t.type === 'AIRPORT')
+    assert.notStrictEqual(airport1Index, -1, 'Board must have at least one AIRPORT tile')
+
+    const utility1Index = mockTiles.findIndex((t) => t.type === 'UTILITY')
+    assert.notStrictEqual(utility1Index, -1, 'Board must have at least one UTILITY tile')
+
+    const allAirports = mockTiles.filter((t) => t.type === 'AIRPORT')
+    const allUtilities = mockTiles.filter((t) => t.type === 'UTILITY')
+
+    const airport1 = allAirports[0]
+    const utility1 = allUtilities[0]
+
+    // Player 2 owns 1 airport and 1 utility
+    state.players[1].properties = [airport1.id, utility1.id]
+    state.tiles = mockTiles
+
+    state.players[0].position = mockTiles.findIndex((t) => t.id === airport1.id)
+
+    const newState = applyLandingLogic(state)
+
+    // Player 2 owns 2 tiles of these types, so rent should be 25 * 2^(2 - 1) = 50
+    assert.strictEqual(newState.players[0].balance, 1500 - 50)
+    assert.strictEqual(newState.players[1].balance, 1500 + 50)
+    assert.strictEqual(newState.turnPhase, 'END')
+  })
+
   test('makes properties available for purchase after bankrupt player is stripped of them', () => {
     let state = getBaseState()
     const propTileIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')

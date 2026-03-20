@@ -221,11 +221,11 @@ const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): number => {
     const houses = tile.houses || 0
     return tile.rent[houses] || tile.rent[0]
   }
-  if (tile.type === 'AIRPORT') {
-    const airportCount = allTiles.filter(
-      (t) => t.type === 'AIRPORT' && owner.properties.includes(t.id),
+  if (tile.type === 'AIRPORT' || tile.type === 'UTILITY') {
+    const count = allTiles.filter(
+      (t) => (t.type === 'AIRPORT' || t.type === 'UTILITY') && owner.properties.includes(t.id),
     ).length
-    return 25 * Math.pow(2, airportCount - 1)
+    return 25 * Math.pow(2, count - 1)
   }
   return 25
 }
