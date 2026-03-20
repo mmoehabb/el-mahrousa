@@ -214,7 +214,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
     >
       <div
         ref={modalRef}
-        className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-xl shadow-2xl overflow-auto flex flex-col max-h-[90vh]"
       >
         <div className="bg-egyptian-blue text-white p-4 flex justify-between items-center">
           <h2 id="trade-modal-title" className="font-bold uppercase">
