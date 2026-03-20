@@ -316,10 +316,11 @@ const GameScreen: React.FC<GameScreenProps> = ({
             panning={{ disabled: false }}
             limitToBounds={false}
             centerOnInit={true}
-            wrapperClass="w-full h-full flex-1 flex justify-center items-center"
-            contentClass="w-full h-full flex justify-center items-center"
           >
-            <TransformComponent wrapperClass="w-full h-full" contentClass="w-full h-full">
+            <TransformComponent
+              wrapperClass="!w-full !h-full"
+              contentClass="!w-full !h-full flex justify-center items-center"
+            >
               <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
             </TransformComponent>
           </TransformWrapper>
