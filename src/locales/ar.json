@@ -15,7 +15,10 @@
       "light": "فاتح",
       "addIceCandidate": "إضافة خادم ICE",
       "add": "إضافة",
-      "iceCandidateUrl": "stun:stun.l.google.com:19302"
+      "iceCandidateUrl": "stun:stun.l.google.com:19302",
+      "audio": "الصوت",
+      "soundEffects": "مؤثرات صوتية",
+      "backgroundMusic": "موسيقى خلفية"
     }
   },
   "lobby": {
@@ -115,7 +118,15 @@
     "rejectBtn": "رفض",
     "modifyBtn": "تعديل",
     "acceptBtn": "قبول",
-    "noProperties": "لا توجد ممتلكات"
+    "noProperties": "لا توجد ممتلكات",
+    "tradesBtn": "المبادلات",
+    "proposeTradeBtn": "عرض مبادلة",
+    "youGive": "ستعطي",
+    "youReceive": "ستستلم",
+    "cancelOffer": "إلغاء العرض",
+    "reject": "رفض",
+    "acceptOffer": "قبول العرض",
+    "viewAllTrades": "عرض كل المبادلات"
   },
   "logs": {
     "started": "بدأت اللعبة!",
@@ -154,5 +165,11 @@
     "sahl-hasheesh": "سهل هشيش",
     "super-tax": "ضريبة إضافية",
     "telecom-egypt": "المصرية للاتصالات"
-  }
+  },
+  "board": {
+    "title": "المحروسة"
+  },
+  "confirmBtn": "تأكيد",
+  "cancelBtn": "إلغاء",
+  "okBtn": "حسناً"
 }

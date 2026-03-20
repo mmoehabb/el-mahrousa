@@ -149,7 +149,7 @@ export default function GameControls({
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-egyptian-gold rtl:border-l-4 rtl:border-r-0">
         <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
-          <Handshake size={18} /> TRADES
+          <Handshake size={18} /> {t("trade.tradesBtn")}
         </h3>
 
         <button
@@ -159,7 +159,7 @@ export default function GameControls({
           }}
           className="w-full bg-egyptian-gold text-white py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-yellow-600 transition-all text-[10px] mb-3"
         >
-          PROPOSE TRADE
+          {t("trade.proposeTradeBtn")}
         </button>
 
         {myPendingTrades.length > 0 && (
@@ -189,7 +189,7 @@ export default function GameControls({
                         }}
                         className="flex-1 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 text-slate-800 dark:text-white py-1 rounded text-[10px] font-bold"
                       >
-                        Cancel
+                        {t("trade.cancel")}
                       </button>
                     ) : (
                       <>
@@ -200,7 +200,7 @@ export default function GameControls({
                           }}
                           className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1 rounded text-[10px] font-bold"
                         >
-                          Accept
+                          {t("trade.acceptOffer")}
                         </button>
                         <button
                           onClick={() => {
@@ -209,7 +209,7 @@ export default function GameControls({
                           }}
                           className="flex-1 bg-red-600 hover:bg-red-700 text-white py-1 rounded text-[10px] font-bold"
                         >
-                          Reject
+                          {t("trade.reject")}
                         </button>
                       </>
                     )}
@@ -227,7 +227,7 @@ export default function GameControls({
           }}
           className="w-full text-center text-egyptian-gold hover:underline text-xs"
         >
-          View All Trades
+          {t("trade.viewAllTrades")}
         </button>
       </div>
 

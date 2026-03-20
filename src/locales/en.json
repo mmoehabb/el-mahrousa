@@ -15,7 +15,10 @@
       "light": "Light",
       "addIceCandidate": "Add ICE Candidate",
       "add": "Add",
-      "iceCandidateUrl": "stun:stun.l.google.com:19302"
+      "iceCandidateUrl": "stun:stun.l.google.com:19302",
+      "audio": "Audio",
+      "soundEffects": "Sound Effects",
+      "backgroundMusic": "Background Music"
     }
   },
   "lobby": {
@@ -109,14 +112,21 @@
     "cancel": "Cancel",
     "proposeBtn": "PROPOSE TRADE",
     "incomingTrade": "INCOMING TRADE",
-    "incomingTrade": "INCOMING TRADE",
     "from": "From {{name}}",
     "theyOffer": "They Offer",
     "theyWant": "They Want",
     "rejectBtn": "REJECT",
     "modifyBtn": "MODIFY",
     "acceptBtn": "ACCEPT",
-    "noProperties": "No properties"
+    "noProperties": "No properties",
+    "tradesBtn": "TRADES",
+    "proposeTradeBtn": "PROPOSE TRADE",
+    "youGive": "You Give",
+    "youReceive": "You Receive",
+    "cancelOffer": "Cancel Offer",
+    "reject": "Reject",
+    "acceptOffer": "Accept Offer",
+    "viewAllTrades": "View All Trades"
   },
   "logs": {
     "started": "Game started!",
@@ -155,5 +165,11 @@
     "sahl-hasheesh": "Sahl Hasheesh",
     "super-tax": "Super Tax",
     "telecom-egypt": "Telecom Egypt"
-  }
+  },
+  "board": {
+    "title": "EL-MAHROUSA"
+  },
+  "confirmBtn": "Confirm",
+  "cancelBtn": "Cancel",
+  "okBtn": "OK"
 }
