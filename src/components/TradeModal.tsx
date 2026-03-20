@@ -128,7 +128,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
         <div className="flex gap-4 justify-between items-center">
           <div className="flex-1 space-y-2">
-            <div className="font-bold text-xs text-slate-500 uppercase">{t("trade.youGive")}</div>
+            <div className="font-bold text-xs text-slate-500 uppercase">{t('trade.youGive')}</div>
             <div className="font-bold">
               {GAME_CONFIG.CURRENCY} {isSender ? trade.myCash : trade.partnerCash}
             </div>
@@ -137,7 +137,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 <div key={pid}>• {allTiles[pid]?.name}</div>
               ))}
               {(isSender ? trade.myProperties : trade.partnerProperties).length === 0 && (
-                <div className="italic text-slate-400">{t("trade.noProperties")}</div>
+                <div className="italic text-slate-400">{t('trade.noProperties')}</div>
               )}
             </div>
           </div>
@@ -145,7 +145,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
           <ArrowRightLeft className="text-slate-400" />
 
           <div className="flex-1 space-y-2 text-right">
-            <div className="font-bold text-xs text-slate-500 uppercase">{t("trade.youReceive")}</div>
+            <div className="font-bold text-xs text-slate-500 uppercase">
+              {t('trade.youReceive')}
+            </div>
             <div className="font-bold">
               {GAME_CONFIG.CURRENCY} {isSender ? trade.partnerCash : trade.myCash}
             </div>
@@ -154,7 +156,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 <div key={pid}>• {allTiles[pid]?.name}</div>
               ))}
               {(isSender ? trade.partnerProperties : trade.myProperties).length === 0 && (
-                <div className="italic text-slate-400">{t("trade.noProperties")}</div>
+                <div className="italic text-slate-400">{t('trade.noProperties')}</div>
               )}
             </div>
           </div>
@@ -167,7 +169,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 onClick={() => sendAction({ type: 'CANCEL_TRADE', tradeId: trade.id! })}
                 className="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white font-bold rounded text-xs transition-colors"
               >
-                {t("trade.cancelOffer")}
+                {t('trade.cancelOffer')}
               </button>
             ) : (
               <>
@@ -175,13 +177,13 @@ const TradeModal: React.FC<TradeModalProps> = ({
                   onClick={() => sendAction({ type: 'REJECT_TRADE', tradeId: trade.id! })}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded text-xs transition-colors"
                 >
-                  {t("trade.reject")}
+                  {t('trade.reject')}
                 </button>
                 <button
                   onClick={() => sendAction({ type: 'ACCEPT_TRADE', tradeId: trade.id! })}
                   className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded text-xs transition-colors"
                 >
-                  {t("trade.acceptOffer")}
+                  {t('trade.acceptOffer')}
                 </button>
               </>
             )}
