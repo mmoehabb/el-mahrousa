@@ -25,7 +25,13 @@ const GameContext = createContext<GameContextType | undefined>(undefined)
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [gameState, setGameState] = useState<GameState>(createInitialState())
   const [isHost, setIsHost] = useState(false)
-  const [myId] = useState(() => crypto.randomUUID())
+  const [myId] = useState(() => {
+    const storedId = localStorage.getItem('playerId')
+    if (storedId) return storedId
+    const newId = crypto.randomUUID()
+    localStorage.setItem('playerId', newId)
+    return newId
+  })
   const [playerName, setPlayerName] = useState(() => sessionStorage.getItem('playerName') || '')
 
   // Audio settings
