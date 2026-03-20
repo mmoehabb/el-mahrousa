@@ -98,7 +98,8 @@
     "buyHouseBtn": "شراء منزل",
     "sellHouseBtn": "بيع منزل",
     "sellPropertyBtn": "بيع العقار",
-    "mustSellHousesFirst": "يجب بيع جميع المنازل أولاً لبيع العقار"
+    "mustSellHousesFirst": "يجب بيع جميع المنازل أولاً لبيع العقار",
+    "mustOwnAllInGroup": "يجب أن تمتلك كل عقارات هذه المجموعة لشراء منازل"
   },
   "trade": {
     "title": "اقتراح مقايضة",

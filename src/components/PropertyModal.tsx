@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Home } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useGame } from '../context/GameContext'
 import type { Tile, Player, GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 
@@ -29,6 +30,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
   sendAction,
 }) => {
   const { t } = useTranslation()
+  const { gameState } = useGame()
 
   if (!isOpen || !tile) return null
 
@@ -36,6 +38,12 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
   const canAct = isMyTurn && turnPhase === 'ROLL' && isOwner
   const currentHouses = tile.houses || 0
   const maxHouses = tile.rent ? tile.rent.length - 1 : 0
+
+  let ownsAllInGroup = false
+  if (tile.group && owner) {
+    const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
+    ownsAllInGroup = groupTiles.every((t) => owner.properties.includes(t.id))
+  }
 
   const buyCost = tile.housePrice ? tile.housePrice * Math.pow(2, currentHouses) : 0
   const sellHouseRefund =
@@ -172,7 +180,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
               <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button
                   onClick={handleBuyHouse}
-                  disabled={currentHouses >= maxHouses || myBalance < buyCost}
+                  disabled={currentHouses >= maxHouses || myBalance < buyCost || !ownsAllInGroup}
                   className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
                 >
                   <span>{t('game.buyHouseBtn')}</span>
@@ -182,6 +190,11 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                     </span>
                   )}
                 </button>
+                {!ownsAllInGroup && currentHouses < maxHouses && (
+                  <div className="text-xs text-center text-red-500 mt-1">
+                    {t('game.mustOwnAllInGroup')}
+                  </div>
+                )}
 
                 <button
                   onClick={handleSellHouse}
