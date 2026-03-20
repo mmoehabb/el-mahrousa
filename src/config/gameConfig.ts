@@ -6,6 +6,64 @@ export const GAME_CONFIG = {
   GO_REWARD: 200,
 }
 
+export type EventOutcome =
+  | { type: 'gain'; amount: number; title: string; description: string }
+  | { type: 'loss'; amount: number; title: string; description: string }
+  | { type: 'move'; target: number; title: string; description: string }
+  | { type: 'jail'; target: number; title: string; description: string }
+
+export const HAZAK_EVENTS: readonly EventOutcome[] = [
+  {
+    type: 'gain',
+    amount: 150,
+    title: 'Lottery Win',
+    description: 'You won the local lottery! Collect 150.',
+  },
+  {
+    type: 'gain',
+    amount: 50,
+    title: 'Found Wallet',
+    description: 'You found a lost wallet on the street and kept the cash! Collect 50.',
+  },
+  {
+    type: 'gain',
+    amount: 200,
+    title: 'Bank Error',
+    description: 'Bank error in your favor! Collect 200.',
+  },
+  {
+    type: 'loss',
+    amount: 100,
+    title: 'Speeding Ticket',
+    description: 'You were caught speeding. Pay 100.',
+  },
+  { type: 'loss', amount: 50, title: 'Doctor Fee', description: 'Pay hospital fees. Pay 50.' },
+  {
+    type: 'loss',
+    amount: 200,
+    title: 'Scammed',
+    description: 'You fell for a phishing scam! Pay 200.',
+  },
+  {
+    type: 'move',
+    target: 0,
+    title: 'Advance to Start',
+    description: 'Advance to Go! Collect 200.',
+  },
+  {
+    type: 'move',
+    target: 12,
+    title: 'Vacation',
+    description: 'Take a trip to the Vacation tile.',
+  },
+  {
+    type: 'jail',
+    target: 6,
+    title: 'Go to Prison',
+    description: 'Go directly to Prison. Do not pass Go, do not collect 200.',
+  },
+]
+
 export const BOARD_DATA: Tile[] = [
   { id: 0, name: 'GO', type: 'SPECIAL' },
   {

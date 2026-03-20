@@ -35,6 +35,7 @@ const createMockState = (players: Player[], currentPlayerIndex: number): GameSta
   logs: [],
   chatMessages: [],
   prison: {},
+  activeEvent: null,
 })
 
 describe('rollDice', () => {
@@ -121,6 +122,7 @@ describe('executeTrade', () => {
     logs: ['Initial state'],
     chatMessages: [],
     prison: {},
+    activeEvent: null,
   })
 
   test('should correctly exchange cash and properties between two players', () => {
@@ -571,6 +573,7 @@ describe('buyProperty', () => {
     logs: [],
     chatMessages: [],
     prison: {},
+    activeEvent: null,
     ...overrides,
   })
 
@@ -666,6 +669,7 @@ describe('executeTrade', () => {
     logs: [],
     chatMessages: [],
     prison: {},
+    activeEvent: null,
   })
 
   test('should execute a valid trade', () => {
@@ -897,6 +901,7 @@ describe('buyHouse', () => {
     chatMessages: [],
     prison: {},
     ...overrides,
+    activeEvent: overrides.activeEvent || null,
   })
 
   test('should not allow buying a house if player does not own all properties in the group', () => {

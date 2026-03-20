@@ -6,6 +6,7 @@ import Board from './Board'
 import TradeModal from './TradeModal'
 import GameControls from './GameControls'
 import WinnerModal from './WinnerModal'
+import InformationDialog from './InformationDialog'
 import type { TradeOffer, GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -31,9 +32,24 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const sounds = useGameSounds()
   const prevPhaseRef = useRef(gameState.turnPhase)
   const prevLogsLengthRef = useRef(gameState.logs.length)
+  const prevActiveEventRef = useRef(gameState.activeEvent)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const isMyTurn = currentPlayer?.id === myId
+
+  useEffect(() => {
+    if (gameState.activeEvent && gameState.activeEvent !== prevActiveEventRef.current) {
+      const type = gameState.activeEvent.type
+      if (type === 'gain') sounds.playGo()
+      if (type === 'loss') sounds.playRent()
+      if (type === 'move') sounds.playMove()
+      if (type === 'jail') sounds.playJail()
+
+      prevActiveEventRef.current = gameState.activeEvent
+    } else if (!gameState.activeEvent) {
+      prevActiveEventRef.current = null
+    }
+  }, [gameState.activeEvent, sounds])
 
   useEffect(() => {
     // Phase change sounds
@@ -321,6 +337,13 @@ const GameScreen: React.FC<GameScreenProps> = ({
           )}
         </AnimatePresence>
       </div>
+
+      <InformationDialog
+        isOpen={!!gameState.activeEvent}
+        title={gameState.activeEvent?.title || ''}
+        message={gameState.activeEvent?.description || ''}
+        onClose={() => sendAction({ type: 'CLEAR_EVENT' })}
+      />
     </>
   )
 }

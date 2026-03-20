@@ -1,5 +1,5 @@
 import type { GameState, Player, Tile, TradeOffer } from '../types/game.ts'
-import { GAME_CONFIG } from '../config/gameConfig.ts'
+import { GAME_CONFIG, HAZAK_EVENTS } from '../config/gameConfig.ts'
 import { BOARD_DATA } from '../config/gameConfig.ts'
 
 export const createInitialState = (): GameState => ({
@@ -13,6 +13,7 @@ export const createInitialState = (): GameState => ({
   countdown: null,
   chatMessages: [],
   prison: {},
+  activeEvent: null,
 })
 
 // Generates a float between 0 (inclusive) and 1 (exclusive) using crypto
@@ -55,10 +56,105 @@ export const moveOneStep = (state: GameState): GameState => {
   return newState
 }
 
+export const applyEventLogic = (state: GameState): GameState => {
+  const player = state.players[state.currentPlayerIndex]
+  const tile = state.tiles[player.position]
+  const newState = { ...state }
+
+  if (tile.name === 'Hazak') {
+    // Hazak Random Outcomes
+    const events = HAZAK_EVENTS
+
+    const event = events[Math.floor(secureRandom() * events.length)]
+    const newPlayers = [...state.players]
+
+    if (event.type === 'gain') {
+      newPlayers[state.currentPlayerIndex] = { ...player, balance: player.balance + event.amount }
+    } else if (event.type === 'loss') {
+      newPlayers[state.currentPlayerIndex] = { ...player, balance: player.balance - event.amount }
+    } else if (event.type === 'move') {
+      // If moving passes start (and not just going backward to start), collect Go Reward
+      if (event.target < player.position && event.target !== 0) {
+        newPlayers[state.currentPlayerIndex] = {
+          ...player,
+          position: event.target,
+          balance: player.balance + GAME_CONFIG.GO_REWARD,
+        }
+      } else if (event.target === 0) {
+        newPlayers[state.currentPlayerIndex] = {
+          ...player,
+          position: event.target,
+          balance: player.balance + GAME_CONFIG.GO_REWARD,
+        }
+      } else {
+        newPlayers[state.currentPlayerIndex] = { ...player, position: event.target }
+      }
+    } else if (event.type === 'jail') {
+      newPlayers[state.currentPlayerIndex] = { ...player, position: event.target }
+      newState.prison = { ...newState.prison, [player.id]: { turnsLeft: 2 } }
+    }
+
+    newState.players = newPlayers
+    newState.activeEvent = {
+      title: event.title,
+      description: event.description,
+      type: event.type,
+      playerName: player.name,
+    }
+
+    // Check if debt forces turn to stay ACTION
+    if (newPlayers[state.currentPlayerIndex].balance >= 0) {
+      newState.turnPhase = 'END'
+    } else {
+      newState.turnPhase = 'ACTION' // Must sell properties or bankrupt
+    }
+  } else if (tile.name === 'Sodfa') {
+    // Sodfa Random Teleportation
+    // Get all PROPERTY, AIRPORT, UTILITY tiles
+    const properties = state.tiles.filter((t) =>
+      ['PROPERTY', 'AIRPORT', 'UTILITY'].includes(t.type),
+    )
+    const randomTile = properties[Math.floor(secureRandom() * properties.length)]
+    const newPlayers = [...state.players]
+
+    if (randomTile.id < player.position) {
+      newPlayers[state.currentPlayerIndex] = {
+        ...player,
+        position: randomTile.id,
+        balance: player.balance + GAME_CONFIG.GO_REWARD,
+      }
+    } else {
+      newPlayers[state.currentPlayerIndex] = { ...player, position: randomTile.id }
+    }
+
+    newState.players = newPlayers
+    newState.activeEvent = {
+      title: 'Sodfa Teleport',
+      description: `Sodfa! You have been teleported to ${randomTile.name}!`,
+      type: 'move',
+      playerName: player.name,
+    }
+
+    // Since they moved, we should apply landing logic for their new tile immediately,
+    // but without clearing the event popup.
+    // However, they can only land on PROPERTY, AIRPORT, UTILITY, so we can run a subset of logic or recurse safely.
+    // For safety, let's just let them end their turn or pay rent here.
+    const tempState = applyLandingLogic({ ...newState, turnPhase: 'ACTION' })
+    tempState.activeEvent = newState.activeEvent // keep event
+    return tempState
+  }
+
+  return newState
+}
+
 export const applyLandingLogic = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[player.position]
   const newState = { ...state }
+
+  if (tile.type === 'EVENT') {
+    return applyEventLogic(newState)
+  }
 
   if (tile.type === 'TAX') {
     const taxAmount = tile.price || 0
