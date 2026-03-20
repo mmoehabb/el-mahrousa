@@ -306,7 +306,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         <div className="hidden lg:block shrink-0">{playerInfoContent}</div>
 
         {/* Center: Board - Scrollable wrapper for mobile */}
-        <div className="w-full lg:flex-1 max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 scale-90 sm:scale-100 origin-top">
+        <div className="w-full lg:flex-1 h-[700px] lg:h-[800px] max-w-full overflow-hidden flex justify-center relative z-10 scale-90 sm:scale-100 origin-top">
           <TransformWrapper
             initialScale={1}
             minScale={0.5}
@@ -315,8 +315,11 @@ const GameScreen: React.FC<GameScreenProps> = ({
             doubleClick={{ disabled: true }}
             panning={{ disabled: false }}
             limitToBounds={false}
+            centerOnInit={true}
+            wrapperClass="w-full h-full flex-1 flex justify-center items-center"
+            contentClass="w-full h-full flex justify-center items-center"
           >
-            <TransformComponent>
+            <TransformComponent wrapperClass="w-full h-full" contentClass="w-full h-full">
               <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
             </TransformComponent>
           </TransformWrapper>
