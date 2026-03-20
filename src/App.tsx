@@ -18,7 +18,18 @@ function App() {
     volume: bgmVolume,
   })
   const { t } = useTranslation()
-  const { createLobby, joinLobby, lobbyId, sendAction } = useNetworking()
+  const {
+    createLobby,
+    joinLobby,
+    lobbyId,
+    sendAction,
+    toggleVoiceChat,
+    isMuted,
+    remoteStreams,
+    voiceError,
+    setVoiceError,
+    hasJoinedVoice,
+  } = useNetworking()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [showCopied, setShowCopied] = useState(false)
 
@@ -93,6 +104,11 @@ function App() {
           showCopied={showCopied}
           handleShareLink={handleShareLink}
           sendAction={sendAction}
+          toggleVoiceChat={toggleVoiceChat}
+          isMuted={isMuted}
+          voiceError={voiceError}
+          setVoiceError={setVoiceError}
+          hasJoinedVoice={hasJoinedVoice}
         />
       ) : (
         <GameScreen
@@ -100,8 +116,26 @@ function App() {
           sendAction={sendAction}
           showCopied={showCopied}
           handleShareLink={handleShareLink}
+          toggleVoiceChat={toggleVoiceChat}
+          isMuted={isMuted}
+          voiceError={voiceError}
+          setVoiceError={setVoiceError}
+          hasJoinedVoice={hasJoinedVoice}
         />
       )}
+
+      {/* Hidden audio elements for voice chat */}
+      {Object.entries(remoteStreams).map(([peerId, stream]) => (
+        <audio
+          key={peerId}
+          autoPlay
+          ref={(audio) => {
+            if (audio && audio.srcObject !== stream) {
+              audio.srcObject = stream
+            }
+          }}
+        />
+      ))}
     </div>
   )
 }
