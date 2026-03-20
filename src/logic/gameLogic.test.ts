@@ -528,7 +528,7 @@ describe('applyLandingLogic', () => {
     state.players[1].properties = [airport1.id, airport2.id]
     state.tiles = mockTiles
 
-    state.players[0].position = mockTiles.findIndex(t => t.id === airport1.id)
+    state.players[0].position = mockTiles.findIndex((t) => t.id === airport1.id)
 
     const newState = applyLandingLogic(state)
 
