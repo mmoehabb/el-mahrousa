@@ -188,7 +188,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
           <div className="flex flex-col items-center">
             <h1 className="text-[10px] sm:text-xl lg:text-3xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel text-center leading-tight mt-1">
-              EL-MAHROUSA
+              {t('board.title')}
             </h1>
             <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel text-[8px] sm:text-sm lg:text-lg">
               {t('lobby.titleAr')}
