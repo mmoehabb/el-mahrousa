@@ -7,7 +7,6 @@ import {
   createInitialState,
   applyLandingLogic,
   endTurn,
-
   buyProperty,
   handleBankrupt,
   buyHouse,
@@ -45,6 +44,7 @@ const createMockState = (players: Player[], currentPlayerIndex: number): GameSta
   chatMessages: [],
   prison: {},
   activeEvent: null,
+  trades: [],
 })
 
 describe('rollDice', () => {
@@ -132,6 +132,7 @@ describe('proposeAndAcceptTrade', () => {
     chatMessages: [],
     prison: {},
     activeEvent: null,
+    trades: [],
   })
 
   test('should correctly exchange cash and properties between two players', () => {
@@ -583,6 +584,7 @@ describe('buyProperty', () => {
     chatMessages: [],
     prison: {},
     activeEvent: null,
+    trades: [],
     ...overrides,
   })
 
@@ -679,6 +681,7 @@ describe('proposeAndAcceptTrade', () => {
     chatMessages: [],
     prison: {},
     activeEvent: null,
+    trades: [],
   })
 
   test('should execute a valid trade', () => {
@@ -909,6 +912,7 @@ describe('buyHouse', () => {
     logs: [],
     chatMessages: [],
     prison: {},
+    trades: [],
     ...overrides,
     activeEvent: overrides.activeEvent || null,
   })
