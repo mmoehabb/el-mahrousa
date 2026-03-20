@@ -72,7 +72,6 @@ export type GameAction =
   | { type: 'BANKRUPT' }
   | { type: 'REMATCH' }
   | { type: 'CLEAR_EVENT' }
-  | { type: 'KICK_PLAYER'; playerId: string }
 
 export interface ActiveEvent {
   title: string
