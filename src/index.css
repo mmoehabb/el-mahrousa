@@ -118,50 +118,6 @@ body.font-arabic-pixel {
   }
 }
 
-.landscape-overlay {
-  display: none;
-}
-
-@media screen and (max-width: 768px) and (orientation: portrait) {
-  .landscape-overlay {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--color-egyptian-blue);
-    color: white;
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
-  }
-
-  .landscape-overlay-icon {
-    animation: rotate-phone 2s infinite ease-in-out;
-  }
-
-  @keyframes rotate-phone {
-    0% {
-      transform: rotate(0deg);
-    }
-    50% {
-      transform: rotate(-90deg);
-    }
-    100% {
-      transform: rotate(-90deg);
-    }
-  }
-
-  /* Hide GameScreen content on portrait mobile, allowing LoginScreen and Lobby to work normally */
-  .game-screen-container {
-    display: none !important;
-  }
-}
-
 .dark body {
   background-color: #0f172a;
   color: #f8fafc;
@@ -221,8 +177,3 @@ body.font-arabic-pixel {
     );
 }
 
-@media screen and (max-width: 768px) and (orientation: portrait) {
-  .dark .landscape-overlay {
-    background-color: #020617;
-  }
-}
