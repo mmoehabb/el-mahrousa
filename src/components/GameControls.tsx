@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dice5, Send, Handshake, Flag } from 'lucide-react'
 import type { GameState, GameAction } from '../types/game'
+import { useGameSounds } from '../hooks/useGameSounds'
 import { useGame } from '../context/GameContext'
 import ConfirmDialog from './ConfirmDialog'
 
@@ -33,6 +34,7 @@ export default function GameControls({
   const { t } = useTranslation()
   const { myId } = useGame()
   const [chatMsg, setChatMsg] = useState('')
+  const sounds = useGameSounds()
   const [isBankruptDialogOpen, setIsBankruptDialogOpen] = useState(false)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
@@ -105,14 +107,20 @@ export default function GameControls({
           )}
 
           <button
-            onClick={() => setIsTradeOpen(true)}
+            onClick={() => {
+              sounds.playClick()
+              setIsTradeOpen(true)
+            }}
             className="w-full border-2 border-egyptian-gold text-egyptian-gold py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-egyptian-gold hover:text-white transition-all text-[10px]"
           >
             <Handshake size={18} /> PROPOSE TRADE
           </button>
 
           <button
-            onClick={() => (window.location.href = '/')}
+            onClick={() => {
+              sounds.playClick()
+              window.location.href = '/'
+            }}
             className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4 text-[10px]"
           >
             {t('game.leaveGameBtn')}
@@ -151,7 +159,13 @@ export default function GameControls({
               ))
             )}
           </div>
-          <form onSubmit={handleSendChat} className="flex gap-1">
+          <form
+            onSubmit={(e) => {
+              sounds.playClick()
+              handleSendChat(e)
+            }}
+            className="flex gap-1"
+          >
             <input
               type="text"
               className="flex-1 min-w-0 border text-xs p-1 rounded"
