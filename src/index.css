@@ -15,8 +15,9 @@
   --comic-bg-color: #fafaf9;
   --comic-dot-color: #e5e7eb;
 
-  --background-image-comic: radial-gradient(var(--comic-dot-color) 15%, transparent 16%),
-                            radial-gradient(var(--comic-dot-color) 15%, transparent 16%);
+  --background-image-comic:
+    radial-gradient(var(--comic-dot-color) 15%, transparent 16%),
+    radial-gradient(var(--comic-dot-color) 15%, transparent 16%);
 }
 
 body {
@@ -24,7 +25,9 @@ body {
   color: #0f172a;
   background-image: var(--background-image-comic);
   background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
+  background-position:
+    0 0,
+    10px 10px;
 }
 
 body.font-english-pixel {

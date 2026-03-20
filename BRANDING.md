@@ -6,9 +6,9 @@
 
 ## Visual Style
 
-*   **Primary Aesthetic:** A fusion of Retro (Pixel Art) and Comic Book (Pop Art).
-*   **Typography:** We use pixelated fonts (`Press Start 2P` for English, `Lalezar` for Arabic) to keep the nostalgic arcade feel.
-*   **Backgrounds & Textures:** Moving away from the traditional, ancient "papyrus" look. Instead, we embrace a playful, vibrant comic-book-inspired halftone dot pattern or subtle grid that adapts to both light and dark modes.
+- **Primary Aesthetic:** A fusion of Retro (Pixel Art) and Comic Book (Pop Art).
+- **Typography:** We use pixelated fonts (`Press Start 2P` for English, `Lalezar` for Arabic) to keep the nostalgic arcade feel.
+- **Backgrounds & Textures:** Moving away from the traditional, ancient "papyrus" look. Instead, we embrace a playful, vibrant comic-book-inspired halftone dot pattern or subtle grid that adapts to both light and dark modes.
 
 ## Color Palette
 
@@ -16,19 +16,19 @@ The color palette is being overhauled to be much more vibrant and playful, repla
 
 ### Light Mode (Vibrant & Playful)
 
-*   **Primary Accent (Gold/Yellow):** `#FBBF24` (A brighter, more comic-book yellow, replacing the duller Egyptian Gold)
-*   **Secondary (Cyan/Turquoise):** `#06B6D4` (A vibrant cyan/turquoise, replacing the traditional Egyptian Blue)
-*   **Tertiary (Magenta/Red):** `#EC4899` (A bright magenta/pink, replacing the deeper Egyptian Red)
-*   **Quaternary (Orange):** `#F97316` (A bold, energetic orange, replacing the Sand color)
-*   **Background:** `#FAFAF9` (Off-white/Warm white) with a subtle, playful halftone dot or grid pattern.
+- **Primary Accent (Gold/Yellow):** `#FBBF24` (A brighter, more comic-book yellow, replacing the duller Egyptian Gold)
+- **Secondary (Cyan/Turquoise):** `#06B6D4` (A vibrant cyan/turquoise, replacing the traditional Egyptian Blue)
+- **Tertiary (Magenta/Red):** `#EC4899` (A bright magenta/pink, replacing the deeper Egyptian Red)
+- **Quaternary (Orange):** `#F97316` (A bold, energetic orange, replacing the Sand color)
+- **Background:** `#FAFAF9` (Off-white/Warm white) with a subtle, playful halftone dot or grid pattern.
 
 ### Dark Mode (Neon & High Contrast)
 
-*   **Primary Accent (Gold/Yellow):** `#FCD34D` (A softer, neon-like yellow)
-*   **Secondary (Cyan/Turquoise):** `#22D3EE` (A glowing, neon cyan)
-*   **Tertiary (Magenta/Red):** `#F472B6` (A bright, neon pink)
-*   **Quaternary (Orange):** `#FB923C` (A bright, neon orange)
-*   **Background:** `#0F172A` (Deep Slate/Navy) with a dark, subtle halftone dot or grid pattern.
+- **Primary Accent (Gold/Yellow):** `#FCD34D` (A softer, neon-like yellow)
+- **Secondary (Cyan/Turquoise):** `#22D3EE` (A glowing, neon cyan)
+- **Tertiary (Magenta/Red):** `#F472B6` (A bright, neon pink)
+- **Quaternary (Orange):** `#FB923C` (A bright, neon orange)
+- **Background:** `#0F172A` (Deep Slate/Navy) with a dark, subtle halftone dot or grid pattern.
 
 ## Cast of Characters (Avatars)
 
@@ -43,5 +43,5 @@ To make the game more engaging, players can choose from a cast of recognizable, 
 
 ## Voice & Tone
 
-*   **Catchy & Localized:** The game uses local Egyptian terms and slang appropriately (e.g., "Bank El Haz").
-*   **Playful & Humorous:** The game shouldn't take itself too seriously. Event cards (Chance/Community Chest equivalents) and UI messages should feature lighthearted humor relevant to Egyptian daily life and culture.
+- **Catchy & Localized:** The game uses local Egyptian terms and slang appropriately (e.g., "Bank El Haz").
+- **Playful & Humorous:** The game shouldn't take itself too seriously. Event cards (Chance/Community Chest equivalents) and UI messages should feature lighthearted humor relevant to Egyptian daily life and culture.
