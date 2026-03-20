@@ -222,7 +222,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
       <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-7xl justify-center items-center lg:items-start relative">
         {/* Mobile Sticky Nav/FABs */}
-        <div className="lg:hidden fixed top-4 left-4 right-16 rtl:right-4 rtl:left-16 flex justify-between z-30 pointer-events-none">
+        <div className="lg:hidden fixed top-4 left-4 right-4 flex justify-between z-30 pointer-events-none">
           <button
             onClick={() => {
               sounds.playClick()
