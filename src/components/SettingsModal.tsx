@@ -164,18 +164,22 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   </div>
                 </section>
 
-                <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                  <h3 className="text-xl font-bold text-egyptian-blue mb-4">Audio</h3>
+                <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
+                    {t('common.settings.audio', 'Audio')}
+                  </h3>
                   <div className="flex flex-col gap-6">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-4">
-                        <span className="font-bold text-slate-600 flex items-center gap-2">
-                          <Volume2 size={20} /> Sound Effects
+                        <span className="font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                          <Volume2 size={20} /> {t('common.settings.soundEffects', 'Sound Effects')}
                         </span>
                         <button
                           onClick={() => setIsSfxEnabled(!isSfxEnabled)}
                           className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
-                            isSfxEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
+                            isSfxEnabled
+                              ? 'bg-egyptian-blue dark:bg-egyptian-gold'
+                              : 'bg-slate-300 dark:bg-slate-600'
                           }`}
                           role="switch"
                           aria-checked={isSfxEnabled}
@@ -198,9 +202,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           value={sfxVolume}
                           onChange={(e) => setSfxVolume(parseFloat(e.target.value))}
                           disabled={!isSfxEnabled}
-                          className="w-full accent-egyptian-blue disabled:opacity-50"
+                          className="w-full accent-egyptian-blue dark:accent-egyptian-gold disabled:opacity-50"
                         />
-                        <span className="text-sm text-slate-500 w-12 text-right">
+                        <span className="text-sm text-slate-500 dark:text-slate-400 w-12 text-right">
                           {Math.round(sfxVolume * 100)}%
                         </span>
                       </div>
@@ -208,13 +212,16 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-4">
-                        <span className="font-bold text-slate-600 flex items-center gap-2">
-                          <Music size={20} /> Background Music
+                        <span className="font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                          <Music size={20} />{' '}
+                          {t('common.settings.backgroundMusic', 'Background Music')}
                         </span>
                         <button
                           onClick={() => setIsBgmEnabled(!isBgmEnabled)}
                           className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
-                            isBgmEnabled ? 'bg-egyptian-blue' : 'bg-slate-300'
+                            isBgmEnabled
+                              ? 'bg-egyptian-blue dark:bg-egyptian-gold'
+                              : 'bg-slate-300 dark:bg-slate-600'
                           }`}
                           role="switch"
                           aria-checked={isBgmEnabled}
@@ -237,9 +244,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           value={bgmVolume}
                           onChange={(e) => setBgmVolume(parseFloat(e.target.value))}
                           disabled={!isBgmEnabled}
-                          className="w-full accent-egyptian-blue disabled:opacity-50"
+                          className="w-full accent-egyptian-blue dark:accent-egyptian-gold disabled:opacity-50"
                         />
-                        <span className="text-sm text-slate-500 w-12 text-right">
+                        <span className="text-sm text-slate-500 dark:text-slate-400 w-12 text-right">
                           {Math.round(bgmVolume * 100)}%
                         </span>
                       </div>
