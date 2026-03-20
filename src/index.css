@@ -5,12 +5,10 @@
   --font-english-pixel: 'Press Start 2P', system-ui, sans-serif;
   --font-arabic-pixel: 'Lalezar', system-ui, sans-serif;
 
-  /* Light Mode (Vibrant Comic Style) */
-  --color-egyptian-gold: #fbbf24;
-  --color-egyptian-blue: #06b6d4;
-  --color-egyptian-red: #ec4899;
-  --color-sand: #f97316;
-
+  --color-egyptian-gold: #d4af37;
+  --color-egyptian-blue: #1034a6;
+  --color-egyptian-red: #e0115f;
+  --color-sand: #f4a460;
   --background-image-papyrus: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
 }
 
@@ -169,11 +167,6 @@ body.font-arabic-pixel {
 }
 
 .dark body {
-  --color-egyptian-gold: #fcd34d;
-  --color-egyptian-blue: #22d3ee;
-  --color-egyptian-red: #f472b6;
-  --color-sand: #fb923c;
-
   background-color: #0f172a;
   color: #f8fafc;
   background-image: none;
