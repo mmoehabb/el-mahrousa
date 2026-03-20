@@ -5,17 +5,26 @@
   --font-english-pixel: 'Press Start 2P', system-ui, sans-serif;
   --font-arabic-pixel: 'Lalezar', system-ui, sans-serif;
 
-  --color-egyptian-gold: #d4af37;
-  --color-egyptian-blue: #1034a6;
-  --color-egyptian-red: #e0115f;
-  --color-sand: #f4a460;
-  --background-image-papyrus: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
+  /* Light Mode (Vibrant Comic Style) */
+  --color-egyptian-gold: #fbbf24;
+  --color-egyptian-blue: #06b6d4;
+  --color-egyptian-red: #ec4899;
+  --color-sand: #f97316;
+
+  /* Comic Halftone Pattern Base */
+  --comic-bg-color: #fafaf9;
+  --comic-dot-color: #e5e7eb;
+
+  --background-image-comic: radial-gradient(var(--comic-dot-color) 15%, transparent 16%),
+                            radial-gradient(var(--comic-dot-color) 15%, transparent 16%);
 }
 
 body {
-  background-color: #fff7ed;
+  background-color: var(--comic-bg-color);
   color: #0f172a;
-  background-image: var(--background-image-papyrus);
+  background-image: var(--background-image-comic);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
 }
 
 body.font-english-pixel {
@@ -167,9 +176,17 @@ body.font-arabic-pixel {
 }
 
 .dark body {
-  background-color: #0f172a;
+  --comic-bg-color: #0f172a;
+  --comic-dot-color: #1e293b;
+
+  --color-egyptian-gold: #fcd34d;
+  --color-egyptian-blue: #22d3ee;
+  --color-egyptian-red: #f472b6;
+  --color-sand: #fb923c;
+
+  background-color: var(--comic-bg-color);
   color: #f8fafc;
-  background-image: none;
+  background-image: var(--background-image-comic);
 }
 
 .dark .egyptian-pattern {
