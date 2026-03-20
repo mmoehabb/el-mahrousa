@@ -7,7 +7,7 @@ import LobbyScreen from './components/LobbyScreen'
 import WaitingScreen from './components/WaitingScreen'
 import { useTranslation } from 'react-i18next'
 import SettingsModal from './components/SettingsModal'
-import { Settings } from 'lucide-react'
+import { Settings, X } from 'lucide-react'
 import GameScreen from './components/GameScreen'
 import useSound from 'use-sound'
 
@@ -63,26 +63,27 @@ function App() {
     })
   }
 
-  if (!playerName) {
-    return <LoginScreen />
-  }
-
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      {gameState.status === 'LOBBY' ? (
-        <>
-          <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto">
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold transition-colors flex items-center justify-center shadow-md"
-              aria-label={t('common.settings.title')}
-            >
-              <Settings size={24} className="text-egyptian-blue" />
-            </button>
-          </div>
-          <LobbyScreen createLobby={createLobby} joinLobby={joinLobby} />
-        </>
+      <div className="fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]">
+        <button
+          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+          className="bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold transition-colors flex items-center justify-center shadow-md"
+          aria-label={isSettingsOpen ? t('common.settings.close') : t('common.settings.title')}
+        >
+          {isSettingsOpen ? (
+            <X size={24} className="text-egyptian-blue" />
+          ) : (
+            <Settings size={24} className="text-egyptian-blue" />
+          )}
+        </button>
+      </div>
+
+      {!playerName ? (
+        <LoginScreen />
+      ) : gameState.status === 'LOBBY' ? (
+        <LobbyScreen createLobby={createLobby} joinLobby={joinLobby} />
       ) : gameState.status === 'WAITING' ? (
         <WaitingScreen
           gameState={gameState}
