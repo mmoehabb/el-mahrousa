@@ -136,3 +136,7 @@ const newPeer = new Peer(myId, {
 ```
 
 _Note: If you are playing across different networks (not on the same LAN or local machine), you must replace `'localhost'` with the public IP address or domain name of the machine hosting the PeerJS server, and ensure port 9000 is open/forwarded._
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
