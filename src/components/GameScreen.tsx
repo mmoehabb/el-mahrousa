@@ -137,7 +137,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const [showMobileLeft, setShowMobileLeft] = useState(false)
 
   const playerInfoContent = (
-    <div className="w-64 space-y-4">
+    <div className="w-full lg:w-64 space-y-4">
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue rtl:border-r-4 rtl:border-l-0">
         <h3 className="font-bold flex items-center gap-2 mb-2">
           <Users size={18} /> {t('game.players')}
