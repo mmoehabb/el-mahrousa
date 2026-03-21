@@ -77,8 +77,9 @@ function App() {
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      <div className="fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]">
+      <div className="hidden lg:block fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]">
         <button
+          id="global-settings-btn"
           onClick={() => setIsSettingsOpen(!isSettingsOpen)}
           className="bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold transition-colors flex items-center justify-center shadow-md"
           aria-label={isSettingsOpen ? t('common.settings.close') : t('common.settings.title')}

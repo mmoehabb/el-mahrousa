@@ -135,7 +135,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   const [showMobileLeft, setShowMobileLeft] = useState(false)
-  const [showMobileRight, setShowMobileRight] = useState(false)
 
   const playerInfoContent = (
     <div className="w-64 space-y-4">
@@ -278,13 +277,16 @@ const GameScreen: React.FC<GameScreenProps> = ({
           <button
             onClick={() => {
               sounds.playClick()
-              setShowMobileRight(true)
+              const settingsBtn = document.getElementById('global-settings-btn')
+              if (settingsBtn) {
+                settingsBtn.click()
+              }
             }}
-            className="flex flex-col items-center gap-1 text-egyptian-red dark:text-red-400 p-2 rounded-lg active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
-            aria-label={t('game.controlsChat')}
+            className="flex flex-col items-center gap-1 text-egyptian-blue dark:text-blue-400 p-2 rounded-lg active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
+            aria-label={t('common.settings.title', 'Settings')}
           >
             <Settings2 size={24} />
-            <span className="text-[10px] font-bold">{t('game.controlsChat', 'Controls/Chat')}</span>
+            <span className="text-[10px] font-bold">{t('common.settings.title', 'Settings')}</span>
           </button>
         </div>
 
@@ -318,8 +320,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
           </TransformWrapper>
         </div>
 
-        {/* Desktop Right Panel */}
-        <div className="hidden lg:block">{controlsContent}</div>
+        {/* Right Panel (Controls & Chat) - Hidden on desktop if we want to change it? No, keep it on desktop, but render below board on mobile */}
+        <div className="w-full lg:w-auto flex justify-center mt-4 lg:mt-0">{controlsContent}</div>
 
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
@@ -349,29 +351,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 </button>
                 <h2 className="text-xl font-bold mb-4 mt-2">{t('game.infoLogs')}</h2>
                 {playerInfoContent}
-              </div>
-            </motion.div>
-          )}
-
-          {showMobileRight && (
-            <motion.div
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 100 }}
-              className="fixed inset-0 z-50 flex justify-end bg-black/50"
-            >
-              <div className="bg-sand dark:bg-slate-900 p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
-                <button
-                  onClick={() => {
-                    sounds.playClick()
-                    setShowMobileRight(false)
-                  }}
-                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white dark:bg-slate-800 dark:text-white rounded-full p-1 z-50"
-                >
-                  <X size={20} />
-                </button>
-                <h2 className="text-xl font-bold mb-4 mt-2">{t('game.controlsChat')}</h2>
-                {controlsContent}
               </div>
             </motion.div>
           )}
