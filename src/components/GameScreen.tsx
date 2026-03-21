@@ -301,7 +301,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         />
 
         {/* Desktop Left Panel */}
-        <div className="hidden lg:block">{playerInfoContent}</div>
+        <div className="hidden lg:block shrink-0">{playerInfoContent}</div>
 
         {/* Center: Board - Scrollable wrapper for mobile */}
         <div className="w-full max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 sm:scale-100 origin-top mt-2 lg:mt-0">
@@ -313,8 +313,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
             doubleClick={{ disabled: true }}
             panning={{ disabled: false }}
             limitToBounds={false}
+            centerOnInit={true}
           >
-            <TransformComponent>
+            <TransformComponent
+              wrapperClass="!w-full !h-full"
+              contentClass="!w-full !h-full flex justify-center items-center"
+            >
               <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
             </TransformComponent>
           </TransformWrapper>
@@ -339,18 +343,45 @@ const GameScreen: React.FC<GameScreenProps> = ({
               exit={{ opacity: 0, x: -100 }}
               className="fixed inset-0 z-50 flex bg-black/50"
             >
-              <div className="bg-sand dark:bg-slate-900 p-4 h-full w-80 overflow-y-auto shadow-2xl relative">
-                <button
-                  onClick={() => {
-                    sounds.playClick()
-                    setShowMobileLeft(false)
-                  }}
-                  className="absolute top-4 right-4 rtl:left-4 rtl:right-auto bg-white dark:bg-slate-800 dark:text-white rounded-full p-1"
-                >
-                  <X size={20} />
-                </button>
-                <h2 className="text-xl font-bold mb-4 mt-2">{t('game.infoLogs')}</h2>
-                {playerInfoContent}
+              <div className="bg-sand dark:bg-slate-900 h-full w-80 shadow-2xl flex flex-col">
+                <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 bg-sand dark:bg-slate-900 z-10">
+                  <h2 className="text-xl font-bold">{t('game.infoLogs')}</h2>
+                  <button
+                    onClick={() => {
+                      sounds.playClick()
+                      setShowMobileLeft(false)
+                    }}
+                    className="bg-white dark:bg-slate-800 dark:text-white rounded-full p-1"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4">{playerInfoContent}</div>
+              </div>
+            </motion.div>
+          )}
+
+          {showMobileRight && (
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              className="fixed inset-0 z-50 flex justify-end bg-black/50"
+            >
+              <div className="bg-sand dark:bg-slate-900 h-full w-80 shadow-2xl flex flex-col">
+                <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 bg-sand dark:bg-slate-900 z-10">
+                  <h2 className="text-xl font-bold">{t('game.controlsChat')}</h2>
+                  <button
+                    onClick={() => {
+                      sounds.playClick()
+                      setShowMobileRight(false)
+                    }}
+                    className="bg-white dark:bg-slate-800 dark:text-white rounded-full p-1"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4">{controlsContent}</div>
               </div>
             </motion.div>
           )}

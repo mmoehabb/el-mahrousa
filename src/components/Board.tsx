@@ -186,15 +186,6 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
 
         {/* Center */}
         <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
-          <div className="flex flex-col items-center">
-            <h1 className="text-[10px] sm:text-xl lg:text-3xl font-black text-egyptian-blue drop-shadow-md z-10 font-english-pixel text-center leading-tight mt-1">
-              {t('board.title')}
-            </h1>
-            <div className="text-egyptian-gold font-bold z-10 font-arabic-pixel text-[8px] sm:text-sm lg:text-lg">
-              {t('lobby.titleAr')}
-            </div>
-          </div>
-
           <div className="flex gap-2 sm:gap-4 bg-white/50 dark:bg-slate-800/80 p-2 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-75 sm:scale-100">
             <motion.div
               animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
