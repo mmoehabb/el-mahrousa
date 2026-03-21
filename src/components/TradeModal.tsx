@@ -214,7 +214,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
     >
       <div
         ref={modalRef}
-        className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-xl shadow-2xl overflow-auto flex flex-col max-h-[90vh]"
       >
         <div className="bg-egyptian-blue text-white p-4 flex justify-between items-center">
           <h2 id="trade-modal-title" className="font-bold uppercase">
@@ -244,7 +244,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
         <div className="overflow-y-auto flex-1 min-h-[300px] flex flex-col">
           {activeTab === 'PROPOSE' ? (
             <>
-              <div className="p-4 flex gap-4">
+              <div className="p-4 flex flex-col sm:flex-row gap-4 overflow-y-auto">
                 {/* My side */}
                 <div className="flex-1 space-y-4">
                   <h3 className="font-bold border-b pb-1 text-sm">{t('trade.yourOffer')}</h3>
@@ -291,7 +291,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center text-2xl mx-4">↔</div>
+                <div className="flex items-center justify-center text-2xl mx-4 rotate-90 sm:rotate-0">
+                  ↔
+                </div>
 
                 {/* Partner side */}
                 <div className="flex-1 space-y-4">
