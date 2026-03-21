@@ -10,6 +10,8 @@ interface GameContextType {
   myId: string
   playerName: string
   setPlayerName: (name: string) => void
+  avatarName: string
+  setAvatarName: (name: string) => void
   isSfxEnabled: boolean
   setIsSfxEnabled: (enabled: boolean) => void
   isBgmEnabled: boolean
@@ -33,6 +35,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newId
   })
   const [playerName, setPlayerName] = useState(() => sessionStorage.getItem('playerName') || '')
+  const [avatarName, setAvatarName] = useState(
+    () => sessionStorage.getItem('avatarName') || 'merchant',
+  )
 
   // Audio settings
   const [isSfxEnabled, setIsSfxEnabled] = useState(() => {
@@ -55,6 +60,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleSetPlayerName = (name: string) => {
     setPlayerName(name)
     sessionStorage.setItem('playerName', name)
+  }
+
+  const handleSetAvatarName = (name: string) => {
+    setAvatarName(name)
+    sessionStorage.setItem('avatarName', name)
   }
 
   const handleSetSfxEnabled = (enabled: boolean) => {
@@ -87,6 +97,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         myId,
         playerName,
         setPlayerName: handleSetPlayerName,
+        avatarName,
+        setAvatarName: handleSetAvatarName,
         isSfxEnabled,
         setIsSfxEnabled: handleSetSfxEnabled,
         isBgmEnabled,

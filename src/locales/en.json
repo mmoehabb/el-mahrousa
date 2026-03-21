@@ -39,7 +39,8 @@
     "playGuestBtn": "PLAY AS GUEST",
     "errorInvalid": "Please enter a valid name",
     "errorTooLong": "Name must be {{max}} characters or less",
-    "charCount": "{{current}}/{{max}}"
+    "charCount": "{{current}}/{{max}}",
+    "selectAvatar": "Select your character"
   },
   "waiting": {
     "title": "Waiting Room",

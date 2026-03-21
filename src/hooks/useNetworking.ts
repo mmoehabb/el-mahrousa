@@ -28,7 +28,7 @@ const sanitizeName = (name: unknown, defaultName: string): string => {
 }
 
 export const useNetworking = () => {
-  const { gameState, setGameState, isHost, setIsHost, myId, playerName } = useGame()
+  const { gameState, setGameState, isHost, setIsHost, myId, playerName, avatarName } = useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
@@ -129,6 +129,7 @@ export const useNetworking = () => {
               const newPlayer: Player = {
                 id: from,
                 name: sanitizeName(action.name, `Player ${prev.players.length + 1}`),
+                avatar: action.avatar || 'merchant',
                 balance: 1500,
                 position: 0,
                 properties: [],
@@ -445,6 +446,7 @@ export const useNetworking = () => {
         {
           id: myId,
           name: sanitizeName(playerName, 'Host'),
+          avatar: avatarName || 'merchant',
           balance: 1500,
           position: 0,
           properties: [],
@@ -453,7 +455,7 @@ export const useNetworking = () => {
         },
       ],
     }))
-  }, [myId, setIsHost, setGameState, playerName])
+  }, [myId, setIsHost, setGameState, playerName, avatarName])
 
   const joinLobby = useCallback(
     (id: string) => {
@@ -478,7 +480,10 @@ export const useNetworking = () => {
         setIsHost(false)
         setIsConnecting(false)
         // Send JOIN action to the host right after connecting
-        conn.send({ type: 'ACTION', action: { type: 'JOIN', name: playerName } })
+        conn.send({
+          type: 'ACTION',
+          action: { type: 'JOIN', name: playerName, avatar: avatarName },
+        })
       })
 
       conn.on('error', (err) => {
@@ -502,7 +507,7 @@ export const useNetworking = () => {
         setGameState((prev) => ({ ...prev, status: 'LOBBY' }))
       })
     },
-    [peer, setGameState, setIsHost, playerName],
+    [peer, setGameState, setIsHost, playerName, avatarName],
   )
 
   // When other players join voice, call them if we have joined voice

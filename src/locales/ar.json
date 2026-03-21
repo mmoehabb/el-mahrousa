@@ -39,7 +39,8 @@
     "playGuestBtn": "العب كضيف",
     "errorInvalid": "يرجى إدخال اسم صالح",
     "errorTooLong": "يجب أن يكون الاسم {{max}} حرفًا أو أقل",
-    "charCount": "{{current}}/{{max}}"
+    "charCount": "{{current}}/{{max}}",
+    "selectAvatar": "اختر شخصيتك"
   },
   "waiting": {
     "title": "غرفة الانتظار",

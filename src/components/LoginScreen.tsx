@@ -1,8 +1,32 @@
 import React, { useState } from 'react'
 import { useGame } from '../context/GameContext'
 import { useTranslation } from 'react-i18next'
+import merchantAvatar from '../assets/avatars/merchant.jpg'
+import auntAvatar from '../assets/avatars/aunt.jpg'
+import youthAvatar from '../assets/avatars/youth.jpg'
+import ceoAvatar from '../assets/avatars/ceo.jpg'
+import businessAvatar from '../assets/avatars/business.jpg'
+import projectAvatar from '../assets/avatars/project.jpg'
 
 const MAX_NAME_LENGTH = 20
+
+const AVATARS: Record<string, string> = {
+  merchant: merchantAvatar,
+  aunt: auntAvatar,
+  youth: youthAvatar,
+  ceo: ceoAvatar,
+  business: businessAvatar,
+  project: projectAvatar,
+}
+
+const AVATAR_NAMES: Record<string, string> = {
+  merchant: 'The Clever Merchant',
+  aunt: 'The Rich Aunt',
+  youth: 'The Trendy Youth',
+  ceo: 'The CEO/Founder',
+  business: 'The Business Manager',
+  project: 'The Project Manager',
+}
 
 const sanitizeName = (name: string): string => {
   return name.replace(/[<>&"'`]/g, '').trim()
@@ -10,8 +34,9 @@ const sanitizeName = (name: string): string => {
 
 const LoginScreen: React.FC = () => {
   const { t } = useTranslation()
-  const { setPlayerName } = useGame()
+  const { setPlayerName, setAvatarName } = useGame()
   const [name, setName] = useState('')
+  const [selectedAvatar, setSelectedAvatar] = useState('merchant')
   const [error, setError] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,6 +50,7 @@ const LoginScreen: React.FC = () => {
       setError(t('login.errorTooLong', { max: MAX_NAME_LENGTH }))
       return
     }
+    setAvatarName(selectedAvatar)
     setPlayerName(sanitized)
   }
 
@@ -43,6 +69,32 @@ const LoginScreen: React.FC = () => {
         <p className="text-center text-slate-500 dark:text-slate-400 mb-6">{t('login.subtitle')}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="mb-6">
+            <h2 className="text-center font-bold text-slate-700 dark:text-slate-300 mb-3">
+              {t('login.selectAvatar')}
+            </h2>
+            <div className="grid grid-cols-3 gap-3">
+              {Object.entries(AVATARS).map(([key, path]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSelectedAvatar(key)}
+                  className={`relative aspect-square rounded-lg overflow-hidden border-4 transition-all ${
+                    selectedAvatar === key
+                      ? 'border-egyptian-gold scale-105 shadow-lg'
+                      : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
+                  }`}
+                  title={AVATAR_NAMES[key]}
+                >
+                  <img src={path} alt={AVATAR_NAMES[key]} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+            <p className="text-center text-sm mt-2 text-egyptian-blue dark:text-egyptian-gold font-bold">
+              {AVATAR_NAMES[selectedAvatar]}
+            </p>
+          </div>
+
           <div>
             <input
               type="text"
