@@ -325,7 +325,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
         </div>
 
         {/* Right Panel (Controls & Chat) - Render below board on mobile */}
-        <div className="w-full lg:w-auto shrink-0 flex justify-center mt-4 lg:mt-0">{controlsContent}</div>
+        <div className="w-full lg:w-auto shrink-0 flex justify-center mt-4 lg:mt-0">
+          {controlsContent}
+        </div>
 
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
@@ -360,7 +362,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
               </div>
             </motion.div>
           )}
-
         </AnimatePresence>
       </div>
 
