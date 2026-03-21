@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useGame } from '../context/GameContext'
 import { useTranslation } from 'react-i18next'
-import merchantAvatar from '../assets/avatars/merchant.jpg'
-import auntAvatar from '../assets/avatars/aunt.jpg'
-import youthAvatar from '../assets/avatars/youth.jpg'
-import ceoAvatar from '../assets/avatars/ceo.jpg'
-import businessAvatar from '../assets/avatars/business.jpg'
-import projectAvatar from '../assets/avatars/project.jpg'
+import merchantAvatar from '../assets/avatars/merchant.webp'
+import auntAvatar from '../assets/avatars/aunt.webp'
+import youthAvatar from '../assets/avatars/youth.webp'
+import ceoAvatar from '../assets/avatars/ceo.webp'
+import businessAvatar from '../assets/avatars/business.webp'
+import projectAvatar from '../assets/avatars/project.webp'
 
 const MAX_NAME_LENGTH = 20
 
