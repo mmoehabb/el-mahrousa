@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, Info, Settings2, X, SmartphoneNfc, UserMinus, Mic, MicOff } from 'lucide-react'
+import { Users, Info, Settings2, X, UserMinus, Mic, MicOff } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import Toast from './Toast'
 import Board from './Board'
@@ -135,10 +135,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   const [showMobileLeft, setShowMobileLeft] = useState(false)
-  const [showMobileRight, setShowMobileRight] = useState(false)
 
   const playerInfoContent = (
-    <div className="w-64 space-y-4">
+    <div className="w-full lg:w-64 space-y-4">
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-blue rtl:border-r-4 rtl:border-l-0">
         <h3 className="font-bold flex items-center gap-2 mb-2">
           <Users size={18} /> {t('game.players')}
@@ -260,35 +259,34 @@ const GameScreen: React.FC<GameScreenProps> = ({
   return (
     <>
       <Toast message={voiceError || null} onClose={() => setVoiceError?.(null)} />
-      {/* Mobile Landscape Overlay - only active when on GameScreen */}
-      <div className="landscape-overlay">
-        <SmartphoneNfc size={64} className="landscape-overlay-icon mb-4" />
-        <h2 className="text-2xl font-bold mb-2 font-english-pixel">{t('game.pleaseRotate')}</h2>
-        <p className="font-arabic-pixel text-xl">{t('game.rotateInstruction')}</p>
-      </div>
 
-      <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-full lg:max-w-none px-0 lg:px-4 justify-center items-center lg:items-start relative">
-        {/* Mobile Sticky Nav/FABs */}
-        <div className="lg:hidden fixed top-4 left-4 right-4 flex justify-between z-30 pointer-events-none">
+      <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-full lg:max-w-none px-0 lg:px-4 justify-start lg:justify-center items-center lg:items-start relative pb-20 lg:pb-0">
+        {/* Mobile Bottom Navigation Bar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t-2 border-slate-200 dark:border-slate-800 p-2 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
           <button
             onClick={() => {
               sounds.playClick()
               setShowMobileLeft(true)
             }}
-            className="bg-white/90 dark:bg-slate-900/90 p-3 rounded-full shadow-lg border-2 border-egyptian-blue text-egyptian-blue pointer-events-auto"
+            className="flex flex-col items-center gap-1 text-egyptian-blue dark:text-blue-400 p-2 rounded-lg active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
             aria-label={t('game.infoLogs')}
           >
             <Info size={24} />
+            <span className="text-[10px] font-bold">{t('game.infoLogs', 'Info/Logs')}</span>
           </button>
           <button
             onClick={() => {
               sounds.playClick()
-              setShowMobileRight(true)
+              const settingsBtn = document.getElementById('global-settings-btn')
+              if (settingsBtn) {
+                settingsBtn.click()
+              }
             }}
-            className="bg-white/90 dark:bg-slate-900/90 p-3 rounded-full shadow-lg border-2 border-egyptian-red text-egyptian-red pointer-events-auto"
-            aria-label={t('game.controlsChat')}
+            className="flex flex-col items-center gap-1 text-egyptian-blue dark:text-blue-400 p-2 rounded-lg active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
+            aria-label={t('common.settings.title', 'Settings')}
           >
             <Settings2 size={24} />
+            <span className="text-[10px] font-bold">{t('common.settings.title', 'Settings')}</span>
           </button>
         </div>
 
@@ -306,7 +304,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         <div className="hidden lg:block shrink-0">{playerInfoContent}</div>
 
         {/* Center: Board - Scrollable wrapper for mobile */}
-        <div className="w-full lg:flex-1 h-[700px] lg:h-[800px] max-w-full overflow-hidden flex justify-center relative z-10 scale-90 sm:scale-100 origin-top">
+        <div className="w-full lg:flex-1 lg:h-[800px] max-w-full overflow-auto flex justify-center pb-4 lg:pb-0 relative z-10 sm:scale-100 origin-top mt-2 lg:mt-0">
           <TransformWrapper
             initialScale={1}
             minScale={0.5}
@@ -318,16 +316,18 @@ const GameScreen: React.FC<GameScreenProps> = ({
             centerOnInit={true}
           >
             <TransformComponent
-              wrapperClass="!w-full !h-full"
-              contentClass="!w-full !h-full flex justify-center items-center"
+              wrapperClass="!w-full lg:!h-full"
+              contentClass="!w-full lg:!h-full flex justify-center lg:items-center"
             >
               <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
             </TransformComponent>
           </TransformWrapper>
         </div>
 
-        {/* Desktop Right Panel */}
-        <div className="hidden lg:block shrink-0">{controlsContent}</div>
+        {/* Right Panel (Controls & Chat) - Render below board on mobile */}
+        <div className="w-full lg:w-auto shrink-0 flex justify-center mt-4 lg:mt-0">
+          {controlsContent}
+        </div>
 
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
@@ -359,31 +359,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4">{playerInfoContent}</div>
-              </div>
-            </motion.div>
-          )}
-
-          {showMobileRight && (
-            <motion.div
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 100 }}
-              className="fixed inset-0 z-50 flex justify-end bg-black/50"
-            >
-              <div className="bg-sand dark:bg-slate-900 h-full w-80 shadow-2xl flex flex-col">
-                <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 bg-sand dark:bg-slate-900 z-10">
-                  <h2 className="text-xl font-bold">{t('game.controlsChat')}</h2>
-                  <button
-                    onClick={() => {
-                      sounds.playClick()
-                      setShowMobileRight(false)
-                    }}
-                    className="bg-white dark:bg-slate-800 dark:text-white rounded-full p-1"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-                <div className="flex-1 overflow-y-auto p-4">{controlsContent}</div>
               </div>
             </motion.div>
           )}
