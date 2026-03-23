@@ -14,6 +14,7 @@ import {
   sellProperty,
   proposeTrade,
   acceptTrade,
+  cancelTrade,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
 import { createMockPlayer, createMockTile, createMockState } from './testUtils.ts'
@@ -1194,6 +1195,59 @@ describe('sellHouse', () => {
     const state = createMockState([player], [createMockTile({ id: 0 }), tile])
 
     const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+})
+
+describe('cancelTrade', () => {
+  const createMockTrade = (
+    id: string,
+    status: 'PENDING' | 'ACCEPTED' | 'REJECTED' = 'PENDING',
+  ): TradeOffer => ({
+    id,
+    fromId: 'p1',
+    toId: 'p2',
+    status,
+    myCash: 100,
+    partnerCash: 0,
+    myProperties: [],
+    partnerProperties: [],
+  })
+
+  test('should cancel a PENDING trade successfully', () => {
+    const tradeId = 'trade-1'
+    const trade = createMockTrade(tradeId)
+    const state = createMockState([])
+    state.trades = [trade]
+    state.logs = ['Initial state']
+
+    const newState = cancelTrade(state, tradeId)
+
+    assert.notStrictEqual(newState, state)
+    assert.deepStrictEqual(newState.trades, [])
+    assert.strictEqual(newState.logs[0], 'A trade offer was canceled.')
+    assert.strictEqual(newState.logs.length, 2)
+  })
+
+  test('should return unmodified state if trade does not exist', () => {
+    const tradeId = 'trade-1'
+    const trade = createMockTrade(tradeId)
+    const state = createMockState([])
+    state.trades = [trade]
+
+    const newState = cancelTrade(state, 'non-existent-trade-id')
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should return unmodified state if trade status is not PENDING', () => {
+    const tradeId = 'trade-1'
+    const trade = createMockTrade(tradeId, 'ACCEPTED')
+    const state = createMockState([])
+    state.trades = [trade]
+
+    const newState = cancelTrade(state, tradeId)
 
     assert.strictEqual(newState, state)
   })
