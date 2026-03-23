@@ -387,7 +387,10 @@ export const useNetworking = () => {
   }, [peer, myStream, hasJoinedVoice])
 
   useEffect(() => {
-    const config = iceServers.length > 0 ? { config: { iceServers: iceServers.map((url) => ({ urls: url })) } } : undefined
+    const config =
+      iceServers.length > 0
+        ? { config: { iceServers: iceServers.map((url) => ({ urls: url })) } }
+        : undefined
     const newPeer = new Peer(myId, config)
     newPeer.on('open', () => {
       setPeer(newPeer)
