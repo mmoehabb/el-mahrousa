@@ -84,11 +84,14 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   const topRow = tiles.slice(12, 19) // 12 to 18
   const rightCol = tiles.slice(19, 24) // 19 to 23
 
-  const { playersByPosition, ownerByTile } = useMemo(() => {
+  const { playersByPosition, ownerByTile, playerById } = useMemo(() => {
     const playersMap: Record<number, Player[]> = {}
     const ownerMap: Record<number, Player> = {}
+    const playerMap: Record<string, Player> = {}
 
     gameState.players.forEach((p) => {
+      playerMap[p.id] = p
+
       if (!playersMap[p.position]) {
         playersMap[p.position] = []
       }
@@ -99,7 +102,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
       })
     })
 
-    return { playersByPosition: playersMap, ownerByTile: ownerMap }
+    return { playersByPosition: playersMap, ownerByTile: ownerMap, playerById: playerMap }
   }, [gameState.players])
 
   const handleTileClick = (tile: Tile) => {
@@ -115,7 +118,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         owner={selectedTile ? ownerByTile[selectedTile.id] : undefined}
         isMyTurn={isMyTurn}
         myId={myId}
-        myBalance={gameState.players.find((p) => p.id === myId)?.balance || 0}
+        myBalance={playerById[myId]?.balance || 0}
         turnPhase={gameState.turnPhase}
         sendAction={sendAction}
       />
