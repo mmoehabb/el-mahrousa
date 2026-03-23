@@ -4,6 +4,7 @@ import { GAME_CONFIG } from '../config/gameConfig'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Home } from 'lucide-react'
+import { getAvatarPath, AVATAR_NAMES } from '../utils/avatars'
 
 interface TileProps {
   tile: Tile
@@ -49,19 +50,27 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
       ) : null}
 
       {/* Container for players, absolutely positioned near the center to avoid shifting layout */}
-      <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-0.5 md:gap-1 z-20 pointer-events-none p-1 pt-6">
+      <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-1 md:gap-1.5 z-20 pointer-events-none p-1 pt-6">
         {tilePlayers.map((p) => (
           <motion.div
             key={p.id}
             layoutId={`player-${p.id}`}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className={`w-2 h-2 md:w-3 md:h-3 rounded-full border shadow-sm ${p.isBankrupt ? 'border-slate-400 opacity-60' : 'border-white'}`}
-            style={{ backgroundColor: p.isBankrupt ? '#94a3b8' : p.color }}
+            className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-2 md:border-3 shadow-md overflow-hidden bg-white ${
+              p.isBankrupt ? 'border-slate-400 opacity-60 grayscale' : ''
+            }`}
+            style={{ borderColor: p.isBankrupt ? '#94a3b8' : p.color }}
             title={`${p.name}${p.isBankrupt ? ` (${t('game.bankruptLabel')})` : ''}`}
             role="img"
             aria-label={`${p.name} piece`}
             tabIndex={0}
-          />
+          >
+            <img
+              src={getAvatarPath(p.avatar)}
+              alt={AVATAR_NAMES[p.avatar] || p.name}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
         ))}
       </div>
 

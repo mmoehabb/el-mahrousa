@@ -1,33 +1,10 @@
 import React, { useState } from 'react'
 import { useGame } from '../context/GameContext'
 import { useTranslation } from 'react-i18next'
-import merchantAvatar from '../assets/avatars/merchant.webp'
-import auntAvatar from '../assets/avatars/aunt.webp'
-import youthAvatar from '../assets/avatars/youth.webp'
-import ceoAvatar from '../assets/avatars/ceo.webp'
-import businessAvatar from '../assets/avatars/business.webp'
-import projectAvatar from '../assets/avatars/project.webp'
+import { AVATARS, AVATAR_NAMES } from '../utils/avatars'
 
 const MAX_NAME_LENGTH = 12
 const MIN_NAME_LENGTH = 2
-
-const AVATARS: Record<string, string> = {
-  merchant: merchantAvatar,
-  aunt: auntAvatar,
-  youth: youthAvatar,
-  ceo: ceoAvatar,
-  business: businessAvatar,
-  project: projectAvatar,
-}
-
-const AVATAR_NAMES: Record<string, string> = {
-  merchant: 'The Clever Merchant',
-  aunt: 'The Rich Aunt',
-  youth: 'The Trendy Youth',
-  ceo: 'The CEO/Founder',
-  business: 'The Business Manager',
-  project: 'The Project Manager',
-}
 
 const isValidName = (name: string): boolean => {
   // Allow Arabic characters, English letters, numbers, and spaces
