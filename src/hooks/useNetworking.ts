@@ -334,7 +334,7 @@ export const useNetworking = () => {
         return nextState
       })
     },
-    [isHost, setGameState, lobbyId, myId],
+    [isHost, setGameState, lobbyId, myId, t],
   )
 
   const sendAction = useCallback(
@@ -401,7 +401,7 @@ export const useNetworking = () => {
     return () => {
       peer.off('call', handleCall)
     }
-  }, [peer, myStream, hasJoinedVoice])
+  }, [peer, myStream, hasJoinedVoice, t])
 
   useEffect(() => {
     const config =
@@ -460,7 +460,7 @@ export const useNetworking = () => {
     return () => {
       newPeer.destroy()
     }
-  }, [myId, setGameState, iceServers])
+  }, [myId, setGameState, iceServers, t])
 
   useEffect(() => {
     if (isHost) {
@@ -543,7 +543,7 @@ export const useNetworking = () => {
         setGameState((prev) => ({ ...prev, status: 'LOBBY' }))
       })
     },
-    [peer, setGameState, setIsHost, playerName, avatarName],
+    [peer, setGameState, setIsHost, playerName, avatarName, t],
   )
 
   // When other players join voice, call them if we have joined voice
@@ -565,7 +565,7 @@ export const useNetworking = () => {
         }
       }
     })
-  }, [gameState.players, peer, myId, myStream])
+  }, [gameState.players, peer, myId, myStream, t])
 
   const toggleVoiceChat = async () => {
     try {
