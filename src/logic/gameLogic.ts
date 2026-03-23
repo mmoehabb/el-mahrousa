@@ -1,6 +1,7 @@
 import type { GameState, Player, Tile, TradeOffer } from '../types/game.ts'
 import { GAME_CONFIG, HAZAK_EVENTS } from '../config/gameConfig.ts'
 import { BOARD_DATA } from '../config/gameConfig.ts'
+import { validateTrade, applyTradeToPlayers } from './utils/tradeUtils.ts'
 
 export const createInitialState = (): GameState => ({
   players: [],
@@ -455,53 +456,15 @@ export const acceptTrade = (state: GameState, tradeId: string): GameState => {
   const p1 = state.players.find((p) => p.id === trade.fromId)
   const p2 = state.players.find((p) => p.id === trade.toId)
 
-  if (!p1 || !p2) {
+  const validation = validateTrade(p1, p2, trade)
+  if (!validation.valid) {
     return {
       ...state,
-      logs: [`Trade failed: One or both players not found.`, ...state.logs],
+      logs: [validation.error!, ...state.logs],
     }
   }
 
-  // Validate cash
-  if (p1.balance < trade.myCash || p2.balance < trade.partnerCash) {
-    return {
-      ...state,
-      logs: [`Trade failed: Insufficient funds.`, ...state.logs],
-    }
-  }
-
-  // Validate properties
-  const p1OwnsAll = trade.myProperties.every((id) => p1.properties.includes(id))
-  const p2OwnsAll = trade.partnerProperties.every((id) => p2.properties.includes(id))
-
-  if (!p1OwnsAll || !p2OwnsAll) {
-    return {
-      ...state,
-      logs: [`Trade failed: Properties not owned.`, ...state.logs],
-    }
-  }
-
-  const newPlayers = state.players.map((p) => {
-    if (p.id === trade.fromId) {
-      return {
-        ...p,
-        balance: p.balance - trade.myCash + trade.partnerCash,
-        properties: p.properties
-          .filter((id: number) => !trade.myProperties.includes(id))
-          .concat(trade.partnerProperties),
-      }
-    }
-    if (p.id === trade.toId) {
-      return {
-        ...p,
-        balance: p.balance - trade.partnerCash + trade.myCash,
-        properties: p.properties
-          .filter((id: number) => !trade.partnerProperties.includes(id))
-          .concat(trade.myProperties),
-      }
-    }
-    return p
-  })
+  const newPlayers = applyTradeToPlayers(state.players, trade)
 
   const newTrades = state.trades.map((t) =>
     t.id === tradeId ? { ...t, status: 'ACCEPTED' as const } : t,
@@ -511,7 +474,7 @@ export const acceptTrade = (state: GameState, tradeId: string): GameState => {
     ...state,
     players: newPlayers,
     trades: newTrades,
-    logs: [`Trade executed between ${p1.name} and ${p2.name}`, ...state.logs],
+    logs: [`Trade executed between ${p1!.name} and ${p2!.name}`, ...state.logs],
   }
 }
 
