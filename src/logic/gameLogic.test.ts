@@ -54,7 +54,7 @@ describe('rollDice', () => {
       // Mock crypto.getRandomValues to return 0 (should result in 1)
       cryptoMock.mock.mockImplementation(<T extends ArrayBufferView | null>(array: T) => {
         if (array && '0' in array) {
-          ; (array as unknown as Uint32Array)[0] = 0
+          ;(array as unknown as Uint32Array)[0] = 0
         }
         return array
       })
@@ -63,7 +63,7 @@ describe('rollDice', () => {
       // Mock crypto.getRandomValues to return near max Uint32 (should result in 6)
       cryptoMock.mock.mockImplementation(<T extends ArrayBufferView | null>(array: T) => {
         if (array && '0' in array) {
-          ; (array as unknown as Uint32Array)[0] = 0xffffffff
+          ;(array as unknown as Uint32Array)[0] = 0xffffffff
         }
         return array
       })
@@ -76,7 +76,7 @@ describe('rollDice', () => {
         if (array && '0' in array) {
           // 0.1 * (0xffffffff + 1) -> 1
           // 0.8 * (0xffffffff + 1) -> 5
-          ; (array as unknown as Uint32Array)[0] =
+          ;(array as unknown as Uint32Array)[0] =
             count === 1 ? Math.floor(0.1 * (0xffffffff + 1)) : Math.floor(0.8 * (0xffffffff + 1))
         }
         return array
@@ -1026,7 +1026,9 @@ describe('sellProperty', () => {
   test('should not allow selling property if turnPhase is not ROLL', () => {
     const player = createMockPlayer({ balance: 1000, properties: [1] })
     const tile = createMockTile({ id: 1, price: 200 })
-    const state = createMockState([player], [createMockTile({ id: 0 }), tile], { turnPhase: 'ACTION' })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
+      turnPhase: 'ACTION',
+    })
 
     const newState = sellProperty(state, 1)
 
@@ -1126,7 +1128,9 @@ describe('sellHouse', () => {
   test('should not allow selling house if turnPhase is not ROLL', () => {
     const player = createMockPlayer({ properties: [1] })
     const tile = createMockTile({ id: 1, houses: 1 })
-    const state = createMockState([player], [createMockTile({ id: 0 }), tile], { turnPhase: 'ACTION' })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
+      turnPhase: 'ACTION',
+    })
 
     const newState = sellHouse(state, 1)
 
