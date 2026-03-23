@@ -28,16 +28,8 @@ const sanitizeName = (name: unknown, defaultName: string): string => {
 }
 
 export const useNetworking = () => {
-  const {
-    gameState,
-    setGameState,
-    isHost,
-    setIsHost,
-    myId,
-    playerName,
-    avatarName,
-    iceServers,
-  } = useGame()
+  const { gameState, setGameState, isHost, setIsHost, myId, playerName, avatarName, iceServers } =
+    useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
