@@ -10,11 +10,15 @@ import {
   buyProperty,
   handleBankrupt,
   buyHouse,
+  sellHouse,
+  sellProperty,
   proposeTrade,
   acceptTrade,
   rejectTrade,
+  cancelTrade,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
+import { createMockPlayer, createMockTile, createMockState } from './testUtils.ts'
 
 const proposeAndAcceptTrade = (state: GameState, p1Id: string, p2Id: string, offer: TradeOffer) => {
   const tempState = proposeTrade(state, p1Id, p2Id, offer)
@@ -23,31 +27,6 @@ const proposeAndAcceptTrade = (state: GameState, p1Id: string, p2Id: string, off
 }
 
 import { GAME_CONFIG } from '../config/gameConfig.ts'
-
-const createMockPlayer = (id: string, isBankrupt: boolean = false): Player => ({
-  avatar: 'merchant',
-  id,
-  name: `Player ${id}`,
-  position: 0,
-  balance: 1500,
-  properties: [],
-  isBankrupt,
-  color: '#000000',
-})
-
-const createMockState = (players: Player[], currentPlayerIndex: number): GameState => ({
-  players,
-  currentPlayerIndex,
-  tiles: [],
-  status: 'PLAYING',
-  turnPhase: 'END',
-  lastDice: [1, 1],
-  logs: [],
-  chatMessages: [],
-  prison: {},
-  activeEvent: null,
-  trades: [],
-})
 
 describe('rollDice', () => {
   test('should return an array of two numbers', () => {
@@ -113,35 +92,10 @@ describe('rollDice', () => {
 })
 
 describe('proposeAndAcceptTrade', () => {
-  const createMockPlayer = (id: string, balance: number, properties: number[]): Player => ({
-    id,
-    name: `Player ${id}`,
-    position: 0,
-    balance,
-    properties,
-    avatar: 'merchant',
-    isBankrupt: false,
-    color: '#000000',
-  })
-
-  const createMockGameState = (players: Player[]): GameState => ({
-    players,
-    currentPlayerIndex: 0,
-    tiles: [],
-    status: 'PLAYING',
-    turnPhase: 'ACTION',
-    lastDice: [1, 1],
-    logs: ['Initial state'],
-    chatMessages: [],
-    prison: {},
-    activeEvent: null,
-    trades: [],
-  })
-
   test('should correctly exchange cash and properties between two players', () => {
-    const p1 = createMockPlayer('p1', 1000, [1, 2])
-    const p2 = createMockPlayer('p2', 500, [3, 4])
-    const state = createMockGameState([p1, p2])
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player p1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player p2', balance: 500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
 
     const offer: TradeOffer = {
       myCash: 200, // p1 gives 200
@@ -174,9 +128,9 @@ describe('proposeAndAcceptTrade', () => {
   })
 
   test('should handle cash-only trades', () => {
-    const p1 = createMockPlayer('p1', 1000, [1, 2])
-    const p2 = createMockPlayer('p2', 500, [3, 4])
-    const state = createMockGameState([p1, p2])
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player p1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player p2', balance: 500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
 
     const offer: TradeOffer = {
       myCash: 100,
@@ -203,9 +157,9 @@ describe('proposeAndAcceptTrade', () => {
   })
 
   test('should handle properties-only trades', () => {
-    const p1 = createMockPlayer('p1', 1000, [1, 2])
-    const p2 = createMockPlayer('p2', 500, [3, 4])
-    const state = createMockGameState([p1, p2])
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player p1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player p2', balance: 500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
 
     const offer: TradeOffer = {
       myCash: 0,
@@ -230,10 +184,10 @@ describe('proposeAndAcceptTrade', () => {
   })
 
   test('should leave other players unaffected', () => {
-    const p1 = createMockPlayer('p1', 1000, [1])
-    const p2 = createMockPlayer('p2', 500, [2])
-    const p3 = createMockPlayer('p3', 1500, [3])
-    const state = createMockGameState([p1, p2, p3])
+    const p1 = createMockPlayer({ id: 'p1', balance: 1000, properties: [1] })
+    const p2 = createMockPlayer({ id: 'p2', balance: 500, properties: [2] })
+    const p3 = createMockPlayer({ id: 'p3', balance: 1500, properties: [3] })
+    const state = createMockState([p1, p2, p3])
 
     const offer: TradeOffer = {
       myCash: 100,
@@ -255,8 +209,9 @@ describe('proposeAndAcceptTrade', () => {
 describe('endTurn', () => {
   test('should transition to the next player', () => {
     const state = createMockState(
-      [createMockPlayer('1'), createMockPlayer('2'), createMockPlayer('3')],
-      0,
+      [createMockPlayer({ id: '1' }), createMockPlayer({ id: '2' }), createMockPlayer({ id: '3' })],
+      undefined,
+      { currentPlayerIndex: 0 },
     )
 
     const newState = endTurn(state)
@@ -266,8 +221,9 @@ describe('endTurn', () => {
 
   test('should wrap around to the first player', () => {
     const state = createMockState(
-      [createMockPlayer('1'), createMockPlayer('2'), createMockPlayer('3')],
-      2,
+      [createMockPlayer({ id: '1' }), createMockPlayer({ id: '2' }), createMockPlayer({ id: '3' })],
+      undefined,
+      { currentPlayerIndex: 2 },
     )
 
     const newState = endTurn(state)
@@ -277,8 +233,13 @@ describe('endTurn', () => {
 
   test('should skip a bankrupt player', () => {
     const state = createMockState(
-      [createMockPlayer('1'), createMockPlayer('2', true), createMockPlayer('3')],
-      0,
+      [
+        createMockPlayer({ id: '1' }),
+        createMockPlayer({ id: '2', isBankrupt: true }),
+        createMockPlayer({ id: '3' }),
+      ],
+      undefined,
+      { currentPlayerIndex: 0 },
     )
 
     const newState = endTurn(state)
@@ -287,8 +248,13 @@ describe('endTurn', () => {
 
   test('should wrap around and skip a bankrupt player', () => {
     const state = createMockState(
-      [createMockPlayer('1', true), createMockPlayer('2'), createMockPlayer('3')],
-      2,
+      [
+        createMockPlayer({ id: '1', isBankrupt: true }),
+        createMockPlayer({ id: '2' }),
+        createMockPlayer({ id: '3' }),
+      ],
+      undefined,
+      { currentPlayerIndex: 2 },
     )
 
     const newState = endTurn(state)
@@ -297,8 +263,13 @@ describe('endTurn', () => {
 
   test('should return to same player if all others are bankrupt', () => {
     const state = createMockState(
-      [createMockPlayer('1'), createMockPlayer('2', true), createMockPlayer('3', true)],
-      0,
+      [
+        createMockPlayer({ id: '1' }),
+        createMockPlayer({ id: '2', isBankrupt: true }),
+        createMockPlayer({ id: '3', isBankrupt: true }),
+      ],
+      undefined,
+      { currentPlayerIndex: 0 },
     )
 
     const newState = endTurn(state)
@@ -587,18 +558,6 @@ describe('applyLandingLogic', () => {
 })
 
 describe('buyProperty', () => {
-  const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
-    id: 'p1',
-    name: 'Player 1',
-    position: 0,
-    balance: 1500,
-    properties: [],
-    avatar: 'merchant',
-    isBankrupt: false,
-    color: 'red',
-    ...overrides,
-  })
-
   const createMockTile = (
     overrides: Partial<import('../types/game.ts').Tile> = {},
   ): import('../types/game.ts').Tile => ({
@@ -691,43 +650,10 @@ describe('buyProperty', () => {
 })
 
 describe('proposeAndAcceptTrade', () => {
-  const createMockState = (): GameState => ({
-    players: [
-      {
-        id: 'p1',
-        name: 'Player 1',
-        position: 0,
-        balance: 1000,
-        properties: [1, 2],
-        avatar: 'merchant',
-        isBankrupt: false,
-        color: '#ff0000',
-      },
-      {
-        id: 'p2',
-        name: 'Player 2',
-        position: 0,
-        balance: 1500,
-        properties: [3, 4],
-        avatar: 'merchant',
-        isBankrupt: false,
-        color: '#0000ff',
-      },
-    ],
-    currentPlayerIndex: 0,
-    tiles: [],
-    status: 'PLAYING',
-    turnPhase: 'ACTION',
-    lastDice: [1, 1],
-    logs: [],
-    chatMessages: [],
-    prison: {},
-    activeEvent: null,
-    trades: [],
-  })
-
   test('should execute a valid trade', () => {
-    const state = createMockState()
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player 1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player 2', balance: 1500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
     const offer = {
       myCash: 200,
       partnerCash: 100,
@@ -737,20 +663,22 @@ describe('proposeAndAcceptTrade', () => {
 
     const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
-    const p1 = newState.players.find((p) => p.id === 'p1')!
-    const p2 = newState.players.find((p) => p.id === 'p2')!
+    const newP1 = newState.players.find((p) => p.id === 'p1')!
+    const newP2 = newState.players.find((p) => p.id === 'p2')!
 
-    assert.strictEqual(p1.balance, 1000 - 200 + 100)
-    assert.deepStrictEqual(p1.properties, [2, 3])
+    assert.strictEqual(newP1.balance, 1000 - 200 + 100)
+    assert.deepStrictEqual(newP1.properties, [2, 3])
 
-    assert.strictEqual(p2.balance, 1500 - 100 + 200)
-    assert.deepStrictEqual(p2.properties, [4, 1])
+    assert.strictEqual(newP2.balance, 1500 - 100 + 200)
+    assert.deepStrictEqual(newP2.properties, [4, 1])
 
     assert.strictEqual(newState.logs[0], 'Trade executed between Player 1 and Player 2')
   })
 
   test('should fail if p1 has insufficient funds', () => {
-    const state = createMockState()
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player 1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player 2', balance: 1500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
     const offer = {
       myCash: 2000, // p1 only has 1000
       partnerCash: 0,
@@ -760,13 +688,15 @@ describe('proposeAndAcceptTrade', () => {
 
     const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
-    const p1 = newState.players.find((p) => p.id === 'p1')!
-    assert.strictEqual(p1.balance, 1000) // unchanged
+    const newP1 = newState.players.find((p) => p.id === 'p1')!
+    assert.strictEqual(newP1.balance, 1000) // unchanged
     assert.strictEqual(newState.logs[0], 'Trade failed: Insufficient funds.')
   })
 
   test('should fail if p2 has insufficient funds', () => {
-    const state = createMockState()
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player 1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player 2', balance: 1500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
     const offer = {
       myCash: 0,
       partnerCash: 2000, // p2 only has 1500
@@ -776,13 +706,15 @@ describe('proposeAndAcceptTrade', () => {
 
     const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
-    const p2 = newState.players.find((p) => p.id === 'p2')!
-    assert.strictEqual(p2.balance, 1500) // unchanged
+    const newP2 = newState.players.find((p) => p.id === 'p2')!
+    assert.strictEqual(newP2.balance, 1500) // unchanged
     assert.strictEqual(newState.logs[0], 'Trade failed: Insufficient funds.')
   })
 
   test('should fail if p1 offers unowned property', () => {
-    const state = createMockState()
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player 1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player 2', balance: 1500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
     const offer = {
       myCash: 0,
       partnerCash: 0,
@@ -792,13 +724,15 @@ describe('proposeAndAcceptTrade', () => {
 
     const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
-    const p1 = newState.players.find((p) => p.id === 'p1')!
-    assert.deepStrictEqual(p1.properties, [1, 2]) // unchanged
+    const newP1 = newState.players.find((p) => p.id === 'p1')!
+    assert.deepStrictEqual(newP1.properties, [1, 2]) // unchanged
     assert.strictEqual(newState.logs[0], 'Trade failed: Properties not owned.')
   })
 
   test('should fail if p2 offers unowned property', () => {
-    const state = createMockState()
+    const p1 = createMockPlayer({ id: 'p1', name: 'Player 1', balance: 1000, properties: [1, 2] })
+    const p2 = createMockPlayer({ id: 'p2', name: 'Player 2', balance: 1500, properties: [3, 4] })
+    const state = createMockState([p1, p2])
     const offer = {
       myCash: 0,
       partnerCash: 0,
@@ -808,8 +742,8 @@ describe('proposeAndAcceptTrade', () => {
 
     const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
 
-    const p2 = newState.players.find((p) => p.id === 'p2')!
-    assert.deepStrictEqual(p2.properties, [3, 4]) // unchanged
+    const newP2 = newState.players.find((p) => p.id === 'p2')!
+    assert.deepStrictEqual(newP2.properties, [3, 4]) // unchanged
     assert.strictEqual(newState.logs[0], 'Trade failed: Properties not owned.')
   })
 })
@@ -920,18 +854,6 @@ describe('moveOneStep', () => {
 })
 
 describe('buyHouse', () => {
-  const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
-    id: 'p1',
-    name: 'Player 1',
-    position: 0,
-    balance: 1500,
-    properties: [],
-    avatar: 'merchant',
-    isBankrupt: false,
-    color: 'red',
-    ...overrides,
-  })
-
   const createMockTile = (
     overrides: Partial<import('../types/game.ts').Tile> = {},
   ): import('../types/game.ts').Tile => ({
@@ -1132,5 +1054,291 @@ describe('handleBankrupt', () => {
       nextState.players.some((p) => p.properties.includes(3)),
       false,
     )
+  })
+})
+
+describe('sellProperty', () => {
+  const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
+    id: 'p1',
+    name: 'Player 1',
+    position: 0,
+    balance: 1500,
+    properties: [],
+    avatar: 'merchant',
+    isBankrupt: false,
+    color: 'red',
+    ...overrides,
+  })
+
+  const createMockTile = (
+    overrides: Partial<import('../types/game.ts').Tile> = {},
+  ): import('../types/game.ts').Tile => ({
+    id: 1,
+    name: 'Property 1',
+    type: 'PROPERTY',
+    price: 200,
+    ...overrides,
+  })
+
+  const createMockState = (
+    players: Player[],
+    tiles: import('../types/game.ts').Tile[],
+    overrides: Partial<GameState> = {},
+  ): GameState => ({
+    players,
+    currentPlayerIndex: 0,
+    tiles,
+    status: 'PLAYING',
+    turnPhase: 'ROLL',
+    lastDice: [1, 1],
+    logs: [],
+    chatMessages: [],
+    prison: {},
+    trades: [],
+    ...overrides,
+    activeEvent: overrides.activeEvent || null,
+  })
+
+  test('should successfully sell a property and refund 50% of the price', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 200 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellProperty(state, 1)
+
+    assert.notStrictEqual(newState, state)
+    assert.strictEqual(newState.players[0].balance, 1100) // 1000 + 100
+    assert.deepStrictEqual(newState.players[0].properties, [])
+    assert.strictEqual(newState.logs.length, 1)
+    const log = newState.logs[0] as { key: string; params: Record<string, string | number> }
+    assert.strictEqual(log.key, 'soldProperty')
+  })
+
+  test('should not allow selling property if turnPhase is not ROLL', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 200 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
+      turnPhase: 'ACTION',
+    })
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling property if player does not own it', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [] })
+    const tile = createMockTile({ id: 1, price: 200 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling property if it has houses', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 200, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling property if it has no price', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: undefined })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+})
+
+describe('sellHouse', () => {
+  test('should successfully sell a house and refund 50% of the price', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    // With houses: 1, price refund: (100 * 2^(1-1)) / 2 = 50
+    const tile = createMockTile({ id: 1, houses: 1, housePrice: 100 })
+
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+    const newState = sellHouse(state, 1)
+
+    assert.notStrictEqual(newState, state)
+
+    assert.strictEqual(newState.players[0].balance, 1050)
+    assert.strictEqual(newState.tiles[1].houses, 0)
+  })
+
+  test('should successfully sell a house and refund for higher house level', () => {
+    // Current houses: 3, housePrice: 50
+    // Refund: (50 * Math.pow(2, 3 - 1)) / 2 = (50 * 4) / 2 = 100
+    const player = createMockPlayer({ properties: [1], balance: 500 })
+    const tile = createMockTile({ id: 1, housePrice: 50, houses: 3 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.notStrictEqual(newState, state)
+    // Decreased house count
+    assert.strictEqual(newState.tiles[1].houses, 2)
+    // Refund = 100, New balance = 500 + 100 = 600
+    assert.strictEqual(newState.players[0].balance, 600)
+  })
+
+  test('should return original state if turnPhase is not ROLL', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, housePrice: 50, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
+      turnPhase: 'ACTION',
+    })
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should successfully sell multiple houses in sequence and handle exponential refund', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    // With houses: 2, price refund: (100 * 2^(2-1)) / 2 = 100
+    const tile = createMockTile({ id: 1, houses: 2, housePrice: 100 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const stateAfterFirstSale = sellHouse(state, 1)
+    assert.strictEqual(stateAfterFirstSale.players[0].balance, 1100)
+    assert.strictEqual(stateAfterFirstSale.tiles[1].houses, 1)
+
+    // With houses: 1, price refund: (100 * 2^(1-1)) / 2 = 50
+    const stateAfterSecondSale = sellHouse(stateAfterFirstSale, 1)
+    assert.strictEqual(stateAfterSecondSale.players[0].balance, 1150)
+    assert.strictEqual(stateAfterSecondSale.tiles[1].houses, 0)
+  })
+
+  test('should not allow selling house if turnPhase is not ROLL', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
+      turnPhase: 'ACTION',
+    })
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should return original state if player does not own the tile', () => {
+    const player = createMockPlayer({ properties: [] })
+    const tile = createMockTile({ id: 1, housePrice: 50, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling house if player does not own property', () => {
+    const player = createMockPlayer({ properties: [] })
+    const tile = createMockTile({ id: 1, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should return original state if tile has no housePrice', () => {
+    const player = createMockPlayer({ properties: [1] })
+    // Missing housePrice
+    const tile = createMockTile({ id: 1, housePrice: undefined, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling house if property has no houses', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, houses: 0 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should return original state if tile has 0 houses', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, housePrice: 50, houses: 0 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling house if property has no housePrice', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, houses: 1, housePrice: undefined })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+})
+
+describe('cancelTrade', () => {
+  const createMockTrade = (
+    id: string,
+    status: 'PENDING' | 'ACCEPTED' | 'REJECTED' = 'PENDING',
+  ): TradeOffer => ({
+    id,
+    fromId: 'p1',
+    toId: 'p2',
+    status,
+    myCash: 100,
+    partnerCash: 0,
+    myProperties: [],
+    partnerProperties: [],
+  })
+
+  test('should cancel a PENDING trade successfully', () => {
+    const tradeId = 'trade-1'
+    const trade = createMockTrade(tradeId)
+    const state = createMockState([])
+    state.trades = [trade]
+    state.logs = ['Initial state']
+
+    const newState = cancelTrade(state, tradeId)
+
+    assert.notStrictEqual(newState, state)
+    assert.deepStrictEqual(newState.trades, [])
+    assert.strictEqual(newState.logs[0], 'A trade offer was canceled.')
+    assert.strictEqual(newState.logs.length, 2)
+  })
+
+  test('should return unmodified state if trade does not exist', () => {
+    const tradeId = 'trade-1'
+    const trade = createMockTrade(tradeId)
+    const state = createMockState([])
+    state.trades = [trade]
+
+    const newState = cancelTrade(state, 'non-existent-trade-id')
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should return unmodified state if trade status is not PENDING', () => {
+    const tradeId = 'trade-1'
+    const trade = createMockTrade(tradeId, 'ACCEPTED')
+    const state = createMockState([])
+    state.trades = [trade]
+
+    const newState = cancelTrade(state, tradeId)
+
+    assert.strictEqual(newState, state)
   })
 })

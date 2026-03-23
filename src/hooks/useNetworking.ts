@@ -17,6 +17,7 @@ import {
   cancelTrade,
   handleBankrupt,
 } from '../logic/gameLogic'
+import { isValidGameAction } from '../logic/validation.ts'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 
@@ -28,7 +29,8 @@ const sanitizeName = (name: unknown, defaultName: string): string => {
 }
 
 export const useNetworking = () => {
-  const { gameState, setGameState, isHost, setIsHost, myId, playerName, avatarName } = useGame()
+  const { gameState, setGameState, isHost, setIsHost, myId, playerName, avatarName, iceServers } =
+    useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
@@ -52,6 +54,10 @@ export const useNetworking = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (action: any, from: string) => {
       if (!isHost) return
+      if (!isValidGameAction(action)) {
+        console.error('Invalid action received:', action)
+        return
+      }
 
       setGameState((prev) => {
         let nextState = { ...prev }
@@ -59,13 +65,14 @@ export const useNetworking = () => {
 
         switch (action.type) {
           case 'ROLL': {
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             const [d1, d2] = rollDice()
             nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' }
             // Dice roll log removed per requirements
             break
           }
           case 'FINISH_ROLL':
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             if (nextState.turnPhase !== 'ROLLING') return prev
             nextState = {
               ...nextState,
@@ -74,6 +81,7 @@ export const useNetworking = () => {
             }
             break
           case 'MOVE_STEP':
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             if (nextState.turnPhase !== 'MOVING' || (nextState.stepsLeft || 0) <= 0) return prev
             nextState = moveOneStep(nextState)
             nextState.stepsLeft = (nextState.stepsLeft || 1) - 1
@@ -83,47 +91,57 @@ export const useNetworking = () => {
             }
             break
           case 'BUY':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = buyProperty(nextState, currentPlayer.position)
             break
           case 'BUY_HOUSE':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = buyHouse(nextState, action.tileId)
             break
           case 'SELL_HOUSE':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = sellHouse(nextState, action.tileId)
             break
           case 'SELL_PROPERTY':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = sellProperty(nextState, action.tileId)
             break
           case 'END_TURN':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = endTurn(nextState)
             break
 
-          case 'CHAT':
-            {
-              const sender = nextState.players.find((p) => p.id === from)?.name || 'Unknown'
-              nextState.chatMessages = [
-                ...nextState.chatMessages,
-                { sender, message: action.message },
-              ]
-            }
+          case 'CHAT': {
+            const player = nextState.players.find((p) => p.id === from)
+            if (!player) return prev
+            nextState.chatMessages = [
+              ...nextState.chatMessages,
+              { sender: player.name, message: action.message },
+            ]
             break
+          }
           case 'PROPOSE_TRADE':
+            // Validation of offer is done in isValidGameAction
             nextState = proposeTrade(nextState, from, action.partnerId, action.offer)
             break
-          case 'ACCEPT_TRADE':
+          case 'ACCEPT_TRADE': {
+            const trade = nextState.trades.find((t) => t.id === action.tradeId)
+            if (!trade || trade.toId !== from) return prev
             nextState = acceptTrade(nextState, action.tradeId)
             break
-          case 'REJECT_TRADE':
+          }
+          case 'REJECT_TRADE': {
+            const trade = nextState.trades.find((t) => t.id === action.tradeId)
+            if (!trade || trade.toId !== from) return prev
             nextState = rejectTrade(nextState, action.tradeId)
             break
-          case 'CANCEL_TRADE':
+          }
+          case 'CANCEL_TRADE': {
+            const trade = nextState.trades.find((t) => t.id === action.tradeId)
+            if (!trade || trade.fromId !== from) return prev
             nextState = cancelTrade(nextState, action.tradeId)
             break
+          }
           case 'JOIN':
             if (!prev.players.find((p) => p.id === from)) {
               const newPlayer: Player = {
@@ -141,12 +159,14 @@ export const useNetworking = () => {
             }
             break
           case 'START_COUNTDOWN':
+            if (from !== lobbyId) return prev
             if (nextState.status === 'WAITING' && nextState.countdown === null) {
               nextState.countdown = 5
               nextState.logs = ['Host started the game countdown.', ...nextState.logs]
             }
             break
           case 'TICK_COUNTDOWN':
+            if (from !== lobbyId) return prev
             if (nextState.status === 'WAITING' && typeof nextState.countdown === 'number') {
               nextState.countdown -= 1
               if (nextState.countdown <= 0) {
@@ -157,6 +177,7 @@ export const useNetworking = () => {
             }
             break
           case 'CANCEL_COUNTDOWN':
+            if (from !== lobbyId) return prev
             if (nextState.status === 'WAITING' && nextState.countdown !== null) {
               nextState.countdown = null
               nextState.logs = ['Host cancelled the game start.', ...nextState.logs]
@@ -232,7 +253,8 @@ export const useNetworking = () => {
             break
           }
           case 'CLEAR_EVENT': {
-            // Any client can clear the event (it's synchronized globally)
+            // Only the current player or the host can clear the event
+            if (from !== lobbyId && (!currentPlayer || from !== currentPlayer.id)) return prev
             nextState.activeEvent = null
             break
           }
@@ -378,7 +400,11 @@ export const useNetworking = () => {
   }, [peer, myStream, hasJoinedVoice])
 
   useEffect(() => {
-    const newPeer = new Peer(myId)
+    const config =
+      iceServers.length > 0
+        ? { config: { iceServers: iceServers.map((url) => ({ urls: url })) } }
+        : undefined
+    const newPeer = new Peer(myId, config)
     newPeer.on('open', () => {
       setPeer(newPeer)
       setConnectionError(null)
@@ -427,7 +453,7 @@ export const useNetworking = () => {
     return () => {
       newPeer.destroy()
     }
-  }, [myId, setGameState])
+  }, [myId, setGameState, iceServers])
 
   useEffect(() => {
     if (isHost) {

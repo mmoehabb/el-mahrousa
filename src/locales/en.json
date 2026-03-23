@@ -18,7 +18,9 @@
       "iceCandidateUrl": "stun:stun.l.google.com:19302",
       "audio": "Audio",
       "soundEffects": "Sound Effects",
-      "backgroundMusic": "Background Music"
+      "backgroundMusic": "Background Music",
+      "remove": "Remove",
+      "currentServers": "Current Servers"
     }
   },
   "lobby": {

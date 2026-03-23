@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dice5, Send, Handshake, Flag, Mic, MicOff, PhoneCall } from 'lucide-react'
-import type { GameState, GameAction } from '../types/game'
+import type { Player, GameState, GameAction } from '../types/game'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { useGame } from '../context/GameContext'
 import ConfirmDialog from './ConfirmDialog'
@@ -47,6 +47,18 @@ export default function GameControls({
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const me = gameState.players.find((p) => p.id === myId)
 
+  const { ownerByTile } = useMemo(() => {
+    const ownerMap: Record<number, Player> = {}
+
+    gameState.players.forEach((p) => {
+      p.properties.forEach((propId) => {
+        ownerMap[propId] = p
+      })
+    })
+
+    return { ownerByTile: ownerMap }
+  }, [gameState.players])
+
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault()
     const sanitized = sanitizeMessage(chatMsg)
@@ -83,7 +95,7 @@ export default function GameControls({
           {gameState.turnPhase === 'ACTION' && (
             <div className="space-y-2">
               {gameState.tiles[currentPlayer.position]?.price &&
-                !gameState.players.some((p) => p.properties.includes(currentPlayer.position)) && (
+                !ownerByTile[currentPlayer.position] && (
                   <button
                     onClick={handleBuy}
                     disabled={
