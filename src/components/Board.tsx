@@ -221,7 +221,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
             {gameState.turnPhase === 'ACTION' && (
               <div className="space-y-1 sm:space-y-2">
                 {gameState.tiles[currentPlayer.position]?.price &&
-                  !gameState.players.some((p) => p.properties.includes(currentPlayer.position)) && (
+                  !ownerByTile[currentPlayer.position] && (
                     <button
                       onClick={() => sendAction({ type: 'BUY' })}
                       disabled={
