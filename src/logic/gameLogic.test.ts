@@ -14,6 +14,7 @@ import {
   sellProperty,
   proposeTrade,
   acceptTrade,
+  rejectTrade,
   cancelTrade,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
@@ -920,6 +921,95 @@ describe('buyHouse', () => {
     assert.notStrictEqual(newState, state)
     assert.strictEqual(newState.players[0].balance, 450)
     assert.strictEqual(newState.tiles[1].houses, 1)
+  })
+})
+
+describe('rejectTrade', () => {
+  const createMockPlayer = (id: string, name: string): Player => ({
+    id,
+    name,
+    position: 0,
+    balance: 1000,
+    properties: [],
+    avatar: 'merchant',
+    isBankrupt: false,
+    color: '#000000',
+  })
+
+  const createMockStateWithTrades = (
+    players: Player[],
+    trades: import('../types/game.ts').TradeOffer[],
+  ): GameState => ({
+    players,
+    currentPlayerIndex: 0,
+    tiles: [],
+    status: 'PLAYING',
+    turnPhase: 'ACTION',
+    lastDice: [1, 1],
+    logs: ['Initial state'],
+    chatMessages: [],
+    prison: {},
+    activeEvent: null,
+    trades,
+  })
+
+  test('should successfully reject a PENDING trade and append the correct log', () => {
+    const p1 = createMockPlayer('p1', 'Player One')
+    const p2 = createMockPlayer('p2', 'Player Two')
+
+    const trade: import('../types/game.ts').TradeOffer = {
+      id: 'trade-123',
+      fromId: 'p1', // Proposer
+      toId: 'p2', // Rejecter
+      status: 'PENDING',
+      myCash: 100,
+      partnerCash: 0,
+      myProperties: [],
+      partnerProperties: [],
+    }
+
+    const state = createMockStateWithTrades([p1, p2], [trade])
+
+    const newState = rejectTrade(state, 'trade-123')
+
+    assert.notStrictEqual(newState, state) // New state reference
+    assert.strictEqual(newState.trades.length, 1)
+    assert.strictEqual(newState.trades[0].status, 'REJECTED')
+    assert.strictEqual(newState.logs.length, 2) // "Initial state" + new log
+    assert.deepStrictEqual(newState.logs[0], {
+      key: 'tradeRejected',
+      params: { name: 'Player Two', partner: 'Player One' },
+    })
+  })
+
+  test('should return exact same state if tradeId does not exist', () => {
+    const state = createMockStateWithTrades([], [])
+
+    const newState = rejectTrade(state, 'invalid-id')
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should return exact same state if trade is not PENDING', () => {
+    const p1 = createMockPlayer('p1', 'Player One')
+    const p2 = createMockPlayer('p2', 'Player Two')
+
+    const trade: import('../types/game.ts').TradeOffer = {
+      id: 'trade-123',
+      fromId: 'p1',
+      toId: 'p2',
+      status: 'ACCEPTED',
+      myCash: 100,
+      partnerCash: 0,
+      myProperties: [],
+      partnerProperties: [],
+    }
+
+    const state = createMockStateWithTrades([p1, p2], [trade])
+
+    const newState = rejectTrade(state, 'trade-123')
+
+    assert.strictEqual(newState, state) // Should return exact same state reference
   })
 })
 

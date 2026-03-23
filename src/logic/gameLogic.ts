@@ -521,14 +521,22 @@ export const rejectTrade = (state: GameState, tradeId: string): GameState => {
     return state
   }
 
+  const p1 = state.players.find((p) => p.id === trade.toId)
+  const p2 = state.players.find((p) => p.id === trade.fromId)
+
   const newTrades = state.trades.map((t) =>
     t.id === tradeId ? { ...t, status: 'REJECTED' as const } : t,
   )
 
+  const logEntry =
+    p1 && p2
+      ? { key: 'tradeRejected', params: { name: p1.name, partner: p2.name } }
+      : `A trade offer was rejected.`
+
   return {
     ...state,
     trades: newTrades,
-    logs: [`A trade offer was rejected.`, ...state.logs],
+    logs: [logEntry, ...state.logs],
   }
 }
 
