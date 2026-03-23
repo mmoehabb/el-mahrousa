@@ -8,7 +8,8 @@ import ceoAvatar from '../assets/avatars/ceo.webp'
 import businessAvatar from '../assets/avatars/business.webp'
 import projectAvatar from '../assets/avatars/project.webp'
 
-const MAX_NAME_LENGTH = 20
+const MAX_NAME_LENGTH = 12
+const MIN_NAME_LENGTH = 2
 
 const AVATARS: Record<string, string> = {
   merchant: merchantAvatar,
@@ -28,8 +29,10 @@ const AVATAR_NAMES: Record<string, string> = {
   project: 'The Project Manager',
 }
 
-const sanitizeName = (name: string): string => {
-  return name.replace(/[<>&"'`]/g, '').trim()
+const isValidName = (name: string): boolean => {
+  // Allow Arabic characters, English letters, numbers, and spaces
+  const nameRegex = /^[\u0600-\u06FFa-zA-Z0-9\s]+$/
+  return nameRegex.test(name)
 }
 
 const LoginScreen: React.FC = () => {
@@ -41,17 +44,28 @@ const LoginScreen: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const sanitized = sanitizeName(name)
-    if (!sanitized) {
-      setError(t('login.errorInvalid'))
+    const trimmed = name.trim()
+
+    if (trimmed.length < MIN_NAME_LENGTH) {
+      setError(
+        t('login.errorTooShort', {
+          min: MIN_NAME_LENGTH,
+          defaultValue: `Name must be at least ${MIN_NAME_LENGTH} characters`,
+        }),
+      )
       return
     }
-    if (sanitized.length > MAX_NAME_LENGTH) {
+    if (trimmed.length > MAX_NAME_LENGTH) {
       setError(t('login.errorTooLong', { max: MAX_NAME_LENGTH }))
       return
     }
+    if (!isValidName(trimmed)) {
+      setError(t('login.errorInvalidChars', { defaultValue: 'Name contains invalid characters' }))
+      return
+    }
+
     setAvatarName(selectedAvatar)
-    setPlayerName(sanitized)
+    setPlayerName(trimmed)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

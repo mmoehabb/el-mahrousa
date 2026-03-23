@@ -41,6 +41,8 @@
     "playGuestBtn": "العب كضيف",
     "errorInvalid": "يرجى إدخال اسم صالح",
     "errorTooLong": "يجب أن يكون الاسم {{max}} حرفًا أو أقل",
+    "errorTooShort": "الاسم يجب أن يكون على الأقل {{min}} أحرف",
+    "errorInvalidChars": "الاسم يحتوي على أحرف غير صالحة",
     "charCount": "{{current}}/{{max}}",
     "selectAvatar": "اختر شخصيتك"
   },
