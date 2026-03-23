@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Users, UserMinus, Mic, MicOff, PhoneCall } from 'lucide-react'
 import type { GameState } from '../types/game'
-import Toast from './Toast'
 
 interface WaitingScreenProps {
   gameState: GameState
@@ -28,15 +27,12 @@ export default function WaitingScreen({
   sendAction,
   toggleVoiceChat,
   isMuted,
-  voiceError,
-  setVoiceError,
   hasJoinedVoice,
 }: WaitingScreenProps) {
   const { t } = useTranslation()
 
   return (
     <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20 relative">
-      <Toast message={voiceError || null} onClose={() => setVoiceError?.(null)} />
       <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest">
         {t('waiting.title')}
       </h1>

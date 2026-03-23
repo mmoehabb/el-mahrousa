@@ -174,5 +174,23 @@
   },
   "confirmBtn": "Confirm",
   "cancelBtn": "Cancel",
-  "okBtn": "OK"
+  "okBtn": "OK",
+  "errors": {
+    "callError": "A voice call error occurred.",
+    "callOutError": "Failed to call out to player.",
+    "peerConnectionError": "Peer connection error. Please try again.",
+    "invalidAction": "Invalid action received.",
+    "connectionError": "Connection error. Please try again.",
+    "invalidSync": "Invalid SYNC message received.",
+    "joinConnectionError": "Join connection error.",
+    "lobbyNotFound": "Lobby not found. Please check the ID and try again.",
+    "networkError": "Connection failed. Please check your internet and try again.",
+    "unavailableId": "This name is already in use. Please refresh and try again.",
+    "failedToConnect": "Failed to connect to player. Please try again.",
+    "joinLobbyFailed": "Failed to join lobby. Please check the ID and try again.",
+    "connectionClosedByHost": "Connection closed by host.",
+    "connectionTimedOut": "Connection timed out. Please try again.",
+    "notConnectedYet": "Not connected yet. Please wait and try again.",
+    "micPermissionDenied": "Microphone permission denied."
+  }
 }
