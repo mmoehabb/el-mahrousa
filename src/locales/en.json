@@ -41,6 +41,8 @@
     "playGuestBtn": "PLAY AS GUEST",
     "errorInvalid": "Please enter a valid name",
     "errorTooLong": "Name must be {{max}} characters or less",
+    "errorTooShort": "Name must be at least {{min}} characters",
+    "errorInvalidChars": "Name contains invalid characters",
     "charCount": "{{current}}/{{max}}",
     "selectAvatar": "Select your character"
   },
