@@ -18,7 +18,9 @@
       "iceCandidateUrl": "stun:stun.l.google.com:19302",
       "audio": "الصوت",
       "soundEffects": "مؤثرات صوتية",
-      "backgroundMusic": "موسيقى خلفية"
+      "backgroundMusic": "موسيقى خلفية",
+      "remove": "إزالة",
+      "currentServers": "الخوادم الحالية"
     }
   },
   "lobby": {

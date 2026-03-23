@@ -20,6 +20,8 @@ interface GameContextType {
   setSfxVolume: (volume: number) => void
   bgmVolume: number
   setBgmVolume: (volume: number) => void
+  iceServers: string[]
+  setIceServers: (servers: string[]) => void
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -56,6 +58,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const stored = localStorage.getItem('bgmVolume')
     return stored ? JSON.parse(stored) : 0.3
   })
+  const [iceServers, setIceServersState] = useState<string[]>(() => {
+    const stored = localStorage.getItem('iceServers')
+    return stored ? JSON.parse(stored) : []
+  })
 
   const handleSetPlayerName = (name: string) => {
     setPlayerName(name)
@@ -87,6 +93,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('bgmVolume', JSON.stringify(volume))
   }
 
+  const handleSetIceServers = (servers: string[]) => {
+    setIceServersState(servers)
+    localStorage.setItem('iceServers', JSON.stringify(servers))
+  }
+
   return (
     <GameContext.Provider
       value={{
@@ -107,6 +118,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSfxVolume: handleSetSfxVolume,
         bgmVolume,
         setBgmVolume: handleSetBgmVolume,
+        iceServers,
+        setIceServers: handleSetIceServers,
       }}
     >
       {children}

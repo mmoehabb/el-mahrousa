@@ -29,7 +29,8 @@ const sanitizeName = (name: unknown, defaultName: string): string => {
 }
 
 export const useNetworking = () => {
-  const { gameState, setGameState, isHost, setIsHost, myId, playerName, avatarName } = useGame()
+  const { gameState, setGameState, isHost, setIsHost, myId, playerName, avatarName, iceServers } =
+    useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
@@ -399,7 +400,11 @@ export const useNetworking = () => {
   }, [peer, myStream, hasJoinedVoice])
 
   useEffect(() => {
-    const newPeer = new Peer(myId)
+    const config =
+      iceServers.length > 0
+        ? { config: { iceServers: iceServers.map((url) => ({ urls: url })) } }
+        : undefined
+    const newPeer = new Peer(myId, config)
     newPeer.on('open', () => {
       setPeer(newPeer)
       setConnectionError(null)
@@ -448,7 +453,7 @@ export const useNetworking = () => {
     return () => {
       newPeer.destroy()
     }
-  }, [myId, setGameState])
+  }, [myId, setGameState, iceServers])
 
   useEffect(() => {
     if (isHost) {

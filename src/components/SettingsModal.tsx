@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Settings, Server, Volume2, Music } from 'lucide-react'
+import { X, Settings, Server, Volume2, Music, Trash2 } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 
 interface SettingsModalProps {
@@ -21,6 +21,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     setSfxVolume,
     bgmVolume,
     setBgmVolume,
+    iceServers,
+    setIceServers,
   } = useGame()
   const [activeTab, setActiveTab] = useState<Tab>('general')
   const [isDarkMode, setIsDarkMode] = useState(() =>
@@ -50,9 +52,17 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   const handleAddIceCandidate = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement adding ICE candidate logic
-    console.log('TODO: Add ICE Candidate:', iceUrl)
+    const url = iceUrl.trim()
+    if (url && !iceServers.includes(url)) {
+      setIceServers([...iceServers, url])
+    }
     setIceUrl('')
+  }
+
+  const handleRemoveIceCandidate = (index: number) => {
+    const newServers = [...iceServers]
+    newServers.splice(index, 1)
+    setIceServers(newServers)
   }
 
   return (
@@ -281,7 +291,33 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       {t('common.settings.add')}
                     </button>
                   </form>
-                  {/* TODO: Display list of added ICE candidates here */}
+
+                  {iceServers.length > 0 && (
+                    <div className="mt-6 space-y-2">
+                      <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        {t('common.settings.currentServers', 'Current Servers')}
+                      </h4>
+                      <div className="space-y-2">
+                        {iceServers.map((server, index) => (
+                          <div
+                            key={`${server}-${index}`}
+                            className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 rounded-lg group"
+                          >
+                            <code className="text-sm font-mono text-slate-700 dark:text-slate-300 break-all">
+                              {server}
+                            </code>
+                            <button
+                              onClick={() => handleRemoveIceCandidate(index)}
+                              className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                              aria-label={t('common.settings.remove', 'Remove')}
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </section>
               </div>
             )}
