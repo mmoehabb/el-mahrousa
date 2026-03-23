@@ -11,6 +11,7 @@ import {
   handleBankrupt,
   buyHouse,
   sellHouse,
+  sellProperty,
   proposeTrade,
   acceptTrade,
 } from './gameLogic.ts'
@@ -53,7 +54,7 @@ describe('rollDice', () => {
       // Mock crypto.getRandomValues to return 0 (should result in 1)
       cryptoMock.mock.mockImplementation(<T extends ArrayBufferView | null>(array: T) => {
         if (array && '0' in array) {
-          ;(array as unknown as Uint32Array)[0] = 0
+          ; (array as unknown as Uint32Array)[0] = 0
         }
         return array
       })
@@ -62,7 +63,7 @@ describe('rollDice', () => {
       // Mock crypto.getRandomValues to return near max Uint32 (should result in 6)
       cryptoMock.mock.mockImplementation(<T extends ArrayBufferView | null>(array: T) => {
         if (array && '0' in array) {
-          ;(array as unknown as Uint32Array)[0] = 0xffffffff
+          ; (array as unknown as Uint32Array)[0] = 0xffffffff
         }
         return array
       })
@@ -75,7 +76,7 @@ describe('rollDice', () => {
         if (array && '0' in array) {
           // 0.1 * (0xffffffff + 1) -> 1
           // 0.8 * (0xffffffff + 1) -> 5
-          ;(array as unknown as Uint32Array)[0] =
+          ; (array as unknown as Uint32Array)[0] =
             count === 1 ? Math.floor(0.1 * (0xffffffff + 1)) : Math.floor(0.8 * (0xffffffff + 1))
         }
         return array
@@ -965,21 +966,117 @@ describe('handleBankrupt', () => {
   })
 })
 
-describe('sellHouse', () => {
-  test('should successfully sell a house and refund correct amount based on house count', () => {
-    // Current houses: 2, housePrice: 50
-    // Refund: (50 * Math.pow(2, 2 - 1)) / 2 = (50 * 2) / 2 = 50
-    const player = createMockPlayer({ properties: [1], balance: 500 })
-    const tile = createMockTile({ id: 1, housePrice: 50, houses: 2 })
+describe('sellProperty', () => {
+  const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
+    id: 'p1',
+    name: 'Player 1',
+    position: 0,
+    balance: 1500,
+    properties: [],
+    avatar: 'merchant',
+    isBankrupt: false,
+    color: 'red',
+    ...overrides,
+  })
+
+  const createMockTile = (
+    overrides: Partial<import('../types/game.ts').Tile> = {},
+  ): import('../types/game.ts').Tile => ({
+    id: 1,
+    name: 'Property 1',
+    type: 'PROPERTY',
+    price: 200,
+    ...overrides,
+  })
+
+  const createMockState = (
+    players: Player[],
+    tiles: import('../types/game.ts').Tile[],
+    overrides: Partial<GameState> = {},
+  ): GameState => ({
+    players,
+    currentPlayerIndex: 0,
+    tiles,
+    status: 'PLAYING',
+    turnPhase: 'ROLL',
+    lastDice: [1, 1],
+    logs: [],
+    chatMessages: [],
+    prison: {},
+    trades: [],
+    ...overrides,
+    activeEvent: overrides.activeEvent || null,
+  })
+
+  test('should successfully sell a property and refund 50% of the price', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 200 })
     const state = createMockState([player], [createMockTile({ id: 0 }), tile])
 
+    const newState = sellProperty(state, 1)
+
+    assert.notStrictEqual(newState, state)
+    assert.strictEqual(newState.players[0].balance, 1100) // 1000 + 100
+    assert.deepStrictEqual(newState.players[0].properties, [])
+    assert.strictEqual(newState.logs.length, 1)
+    const log = newState.logs[0] as { key: string; params: Record<string, string | number> }
+    assert.strictEqual(log.key, 'soldProperty')
+  })
+
+  test('should not allow selling property if turnPhase is not ROLL', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 200 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], { turnPhase: 'ACTION' })
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling property if player does not own it', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [] })
+    const tile = createMockTile({ id: 1, price: 200 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling property if it has houses', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 200, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling property if it has no price', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: undefined })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellProperty(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+})
+
+describe('sellHouse', () => {
+  test('should successfully sell a house and refund 50% of the price', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    // With houses: 1, price refund: (100 * 2^(1-1)) / 2 = 50
+    const tile = createMockTile({ id: 1, houses: 1, housePrice: 100 })
+
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
     const newState = sellHouse(state, 1)
 
     assert.notStrictEqual(newState, state)
-    // Decreased house count
-    assert.strictEqual(newState.tiles[1].houses, 1)
-    // Refund = 50, New balance = 500 + 50 = 550
-    assert.strictEqual(newState.players[0].balance, 550)
+
+    assert.strictEqual(newState.players[0].balance, 1050)
+    assert.strictEqual(newState.tiles[1].houses, 0)
   })
 
   test('should successfully sell a house and refund for higher house level', () => {
@@ -1010,9 +1107,45 @@ describe('sellHouse', () => {
     assert.strictEqual(newState, state)
   })
 
+  test('should successfully sell multiple houses in sequence and handle exponential refund', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    // With houses: 2, price refund: (100 * 2^(2-1)) / 2 = 100
+    const tile = createMockTile({ id: 1, houses: 2, housePrice: 100 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const stateAfterFirstSale = sellHouse(state, 1)
+    assert.strictEqual(stateAfterFirstSale.players[0].balance, 1100)
+    assert.strictEqual(stateAfterFirstSale.tiles[1].houses, 1)
+
+    // With houses: 1, price refund: (100 * 2^(1-1)) / 2 = 50
+    const stateAfterSecondSale = sellHouse(stateAfterFirstSale, 1)
+    assert.strictEqual(stateAfterSecondSale.players[0].balance, 1150)
+    assert.strictEqual(stateAfterSecondSale.tiles[1].houses, 0)
+  })
+
+  test('should not allow selling house if turnPhase is not ROLL', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], { turnPhase: 'ACTION' })
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
   test('should return original state if player does not own the tile', () => {
     const player = createMockPlayer({ properties: [] })
     const tile = createMockTile({ id: 1, housePrice: 50, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling house if player does not own property', () => {
+    const player = createMockPlayer({ properties: [] })
+    const tile = createMockTile({ id: 1, houses: 1 })
     const state = createMockState([player], [createMockTile({ id: 0 }), tile])
 
     const newState = sellHouse(state, 1)
@@ -1031,9 +1164,29 @@ describe('sellHouse', () => {
     assert.strictEqual(newState, state)
   })
 
+  test('should not allow selling house if property has no houses', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, houses: 0 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
   test('should return original state if tile has 0 houses', () => {
     const player = createMockPlayer({ properties: [1] })
     const tile = createMockTile({ id: 1, housePrice: 50, houses: 0 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile])
+
+    const newState = sellHouse(state, 1)
+
+    assert.strictEqual(newState, state)
+  })
+
+  test('should not allow selling house if property has no housePrice', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, houses: 1, housePrice: undefined })
     const state = createMockState([player], [createMockTile({ id: 0 }), tile])
 
     const newState = sellHouse(state, 1)
