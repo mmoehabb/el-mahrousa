@@ -17,7 +17,7 @@ import {
   cancelTrade,
   handleBankrupt,
 } from '../logic/gameLogic'
-import { isValidGameAction } from '../logic/validation.ts'
+import { isValidGameAction, isValidGameState } from '../logic/validation.ts'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 
@@ -358,11 +358,13 @@ export const useNetworking = () => {
 
   const handleActionRef = useRef(handleAction)
   const isHostRef = useRef(isHost)
+  const lobbyIdRef = useRef(lobbyId)
 
   useEffect(() => {
     handleActionRef.current = handleAction
     isHostRef.current = isHost
-  }, [handleAction, isHost])
+    lobbyIdRef.current = lobbyId
+  }, [handleAction, isHost, lobbyId])
 
   const hasJoinedVoice = !!myStream
 
@@ -436,7 +438,11 @@ export const useNetworking = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       conn.on('data', (data: any) => {
         if (data.type === 'SYNC') {
-          setGameState(data.state)
+          if (conn.peer === lobbyIdRef.current && isValidGameState(data.state)) {
+            setGameState(data.state)
+          } else {
+            console.error('Invalid SYNC message or not from host')
+          }
         } else if (data.type === 'ACTION' && isHostRef.current) {
           handleActionRef.current(data.action, conn.peer)
         }
@@ -522,7 +528,11 @@ export const useNetworking = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       conn.on('data', (data: any) => {
         if (data.type === 'SYNC') {
-          setGameState(data.state)
+          if (conn.peer === id && isValidGameState(data.state)) {
+            setGameState(data.state)
+          } else {
+            console.error('Invalid SYNC message or not from host')
+          }
         }
       })
 

@@ -1,4 +1,4 @@
-import type { GameAction, TradeOffer } from '../types/game'
+import type { GameAction, TradeOffer, GameState } from '../types/game'
 
 export const isValidTradeOffer = (offer: unknown): offer is TradeOffer => {
   if (!offer || typeof offer !== 'object') return false
@@ -17,6 +17,40 @@ export const isValidTradeOffer = (offer: unknown): offer is TradeOffer => {
     !o.partnerProperties.every((id: unknown) => typeof id === 'number' && Number.isInteger(id))
   )
     return false
+  return true
+}
+
+export const isValidGameState = (state: unknown): state is GameState => {
+  if (!state || typeof state !== 'object') return false
+  const s = state as Record<string, unknown>
+
+  if (!Array.isArray(s.players)) return false
+  for (const p of s.players) {
+    if (!p || typeof p !== 'object') return false
+    const player = p as Record<string, unknown>
+    if (typeof player.id !== 'string') return false
+    if (typeof player.name !== 'string') return false
+    if (typeof player.position !== 'number') return false
+    if (typeof player.balance !== 'number') return false
+    if (!Array.isArray(player.properties)) return false
+    if (typeof player.isBankrupt !== 'boolean') return false
+    if (typeof player.color !== 'string') return false
+  }
+
+  if (typeof s.currentPlayerIndex !== 'number') return false
+  if (!Array.isArray(s.tiles)) return false
+  if (!['LOBBY', 'PLAYING', 'FINISHED', 'WAITING'].includes(s.status as string)) return false
+  if (!['ROLL', 'ROLLING', 'MOVING', 'ACTION', 'END'].includes(s.turnPhase as string)) return false
+
+  if (!Array.isArray(s.lastDice) || s.lastDice.length !== 2) return false
+  if (typeof s.lastDice[0] !== 'number' || typeof s.lastDice[1] !== 'number') return false
+
+  if (!Array.isArray(s.logs)) return false
+  if (!Array.isArray(s.chatMessages)) return false
+
+  if (typeof s.prison !== 'object' || s.prison === null) return false
+  if (!Array.isArray(s.trades)) return false
+
   return true
 }
 
