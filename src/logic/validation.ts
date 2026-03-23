@@ -5,11 +5,7 @@ export const isValidTradeOffer = (offer: unknown): offer is TradeOffer => {
   const o = offer as Record<string, unknown>
 
   if (typeof o.myCash !== 'number' || o.myCash < 0 || !Number.isFinite(o.myCash)) return false
-  if (
-    typeof o.partnerCash !== 'number' ||
-    o.partnerCash < 0 ||
-    !Number.isFinite(o.partnerCash)
-  )
+  if (typeof o.partnerCash !== 'number' || o.partnerCash < 0 || !Number.isFinite(o.partnerCash))
     return false
   if (
     !Array.isArray(o.myProperties) ||
