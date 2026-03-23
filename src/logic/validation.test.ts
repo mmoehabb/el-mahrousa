@@ -1,6 +1,82 @@
 import { test, describe } from 'node:test'
 import assert from 'node:assert'
-import { isValidGameAction, isValidTradeOffer } from './validation.ts'
+import { isValidGameAction, isValidTradeOffer, isValidGameState } from './validation.ts'
+
+describe('isValidGameState', () => {
+  test('should return true for valid game state', () => {
+    const validState = {
+      players: [
+        {
+          id: 'p1',
+          name: 'Player 1',
+          position: 0,
+          balance: 1500,
+          properties: [],
+          isBankrupt: false,
+          color: '#1034A6',
+        },
+      ],
+      currentPlayerIndex: 0,
+      tiles: [],
+      status: 'WAITING',
+      turnPhase: 'ROLL',
+      lastDice: [1, 1],
+      logs: [],
+      chatMessages: [],
+      prison: {},
+      trades: [],
+    }
+    assert.strictEqual(isValidGameState(validState), true)
+  })
+
+  test('should return false for missing required fields', () => {
+    const invalidState = {
+      players: [],
+      currentPlayerIndex: 0,
+      tiles: [],
+      // missing status, turnPhase, etc.
+    }
+    assert.strictEqual(isValidGameState(invalidState), false)
+  })
+
+  test('should return false for invalid player structure', () => {
+    const invalidState = {
+      players: [
+        {
+          id: 'p1',
+          name: 'Player 1',
+          // missing properties, etc.
+        },
+      ],
+      currentPlayerIndex: 0,
+      tiles: [],
+      status: 'WAITING',
+      turnPhase: 'ROLL',
+      lastDice: [1, 1],
+      logs: [],
+      chatMessages: [],
+      prison: {},
+      trades: [],
+    }
+    assert.strictEqual(isValidGameState(invalidState), false)
+  })
+
+  test('should return false for invalid lastDice array length', () => {
+    const invalidState = {
+      players: [],
+      currentPlayerIndex: 0,
+      tiles: [],
+      status: 'WAITING',
+      turnPhase: 'ROLL',
+      lastDice: [1, 1, 3], // invalid length
+      logs: [],
+      chatMessages: [],
+      prison: {},
+      trades: [],
+    }
+    assert.strictEqual(isValidGameState(invalidState), false)
+  })
+})
 
 describe('isValidTradeOffer', () => {
   test('should validate a correct trade offer', () => {
