@@ -64,14 +64,14 @@ export const useNetworking = () => {
 
         switch (action.type) {
           case 'ROLL': {
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             const [d1, d2] = rollDice()
             nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' }
             // Dice roll log removed per requirements
             break
           }
           case 'FINISH_ROLL':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             if (nextState.turnPhase !== 'ROLLING') return prev
             nextState = {
               ...nextState,
@@ -80,7 +80,7 @@ export const useNetworking = () => {
             }
             break
           case 'MOVE_STEP':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             if (nextState.turnPhase !== 'MOVING' || (nextState.stepsLeft || 0) <= 0) return prev
             nextState = moveOneStep(nextState)
             nextState.stepsLeft = (nextState.stepsLeft || 1) - 1
@@ -90,40 +90,37 @@ export const useNetworking = () => {
             }
             break
           case 'BUY':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = buyProperty(nextState, currentPlayer.position)
             break
           case 'BUY_HOUSE':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = buyHouse(nextState, action.tileId)
             break
           case 'SELL_HOUSE':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = sellHouse(nextState, action.tileId)
             break
           case 'SELL_PROPERTY':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = sellProperty(nextState, action.tileId)
             break
           case 'END_TURN':
-            if (currentPlayer.id !== from) return prev
+            if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = endTurn(nextState)
             break
 
-          case 'CHAT':
-            {
-              const sender = nextState.players.find((p) => p.id === from)?.name || 'Unknown'
-              nextState.chatMessages = [
-                ...nextState.chatMessages,
-                { sender, message: action.message },
-              ]
-            }
+          case 'CHAT': {
+            const player = nextState.players.find((p) => p.id === from)
+            if (!player) return prev
+            nextState.chatMessages = [
+              ...nextState.chatMessages,
+              { sender: player.name, message: action.message },
+            ]
             break
+          }
           case 'PROPOSE_TRADE':
-            if (from !== action.fromId && from !== myId) {
-              // The proposeTrade logic uses 'from' as sender, so we just need to ensure the caller is who they say they are
-              // In this case, 'from' is already the peer id, so we use that.
-            }
+            // Validation of offer is done in isValidGameAction
             nextState = proposeTrade(nextState, from, action.partnerId, action.offer)
             break
           case 'ACCEPT_TRADE': {
@@ -256,7 +253,7 @@ export const useNetworking = () => {
           }
           case 'CLEAR_EVENT': {
             // Only the current player or the host can clear the event
-            if (from !== currentPlayer.id && from !== lobbyId) return prev
+            if (from !== lobbyId && (!currentPlayer || from !== currentPlayer.id)) return prev
             nextState.activeEvent = null
             break
           }

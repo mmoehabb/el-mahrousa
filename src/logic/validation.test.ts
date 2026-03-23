@@ -40,7 +40,7 @@ describe('isValidTradeOffer', () => {
       myProperties: '1',
       partnerProperties: [],
     }
-    assert.strictEqual(isValidTradeOffer(offer as any), false)
+    assert.strictEqual(isValidTradeOffer(offer), false)
   })
 })
 

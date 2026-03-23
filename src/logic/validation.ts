@@ -1,32 +1,36 @@
 import type { GameAction, TradeOffer } from '../types/game'
 
-export const isValidTradeOffer = (offer: any): offer is TradeOffer => {
+export const isValidTradeOffer = (offer: unknown): offer is TradeOffer => {
   if (!offer || typeof offer !== 'object') return false
-  if (typeof offer.myCash !== 'number' || offer.myCash < 0 || !Number.isFinite(offer.myCash))
-    return false
+  const o = offer as Record<string, unknown>
+
+  if (typeof o.myCash !== 'number' || o.myCash < 0 || !Number.isFinite(o.myCash)) return false
   if (
-    typeof offer.partnerCash !== 'number' ||
-    offer.partnerCash < 0 ||
-    !Number.isFinite(offer.partnerCash)
+    typeof o.partnerCash !== 'number' ||
+    o.partnerCash < 0 ||
+    !Number.isFinite(o.partnerCash)
   )
     return false
   if (
-    !Array.isArray(offer.myProperties) ||
-    !offer.myProperties.every((id: any) => typeof id === 'number' && Number.isInteger(id))
+    !Array.isArray(o.myProperties) ||
+    !o.myProperties.every((id: unknown) => typeof id === 'number' && Number.isInteger(id))
   )
     return false
   if (
-    !Array.isArray(offer.partnerProperties) ||
-    !offer.partnerProperties.every((id: any) => typeof id === 'number' && Number.isInteger(id))
+    !Array.isArray(o.partnerProperties) ||
+    !o.partnerProperties.every((id: unknown) => typeof id === 'number' && Number.isInteger(id))
   )
     return false
   return true
 }
 
-export const isValidGameAction = (action: any): action is GameAction => {
-  if (!action || typeof action !== 'object' || typeof action.type !== 'string') return false
+export const isValidGameAction = (action: unknown): action is GameAction => {
+  if (!action || typeof action !== 'object') return false
+  const a = action as Record<string, unknown>
 
-  switch (action.type) {
+  if (typeof a.type !== 'string') return false
+
+  switch (a.type) {
     case 'ROLL':
     case 'FINISH_ROLL':
     case 'MOVE_STEP':
@@ -44,21 +48,21 @@ export const isValidGameAction = (action: any): action is GameAction => {
     case 'BUY_HOUSE':
     case 'SELL_HOUSE':
     case 'SELL_PROPERTY':
-      return typeof action.tileId === 'number' && Number.isInteger(action.tileId)
+      return typeof a.tileId === 'number' && Number.isInteger(a.tileId)
     case 'CHAT':
-      return typeof action.message === 'string'
+      return typeof a.message === 'string'
     case 'PROPOSE_TRADE':
-      return typeof action.partnerId === 'string' && isValidTradeOffer(action.offer)
+      return typeof a.partnerId === 'string' && isValidTradeOffer(a.offer)
     case 'ACCEPT_TRADE':
     case 'REJECT_TRADE':
     case 'CANCEL_TRADE':
-      return typeof action.tradeId === 'string'
+      return typeof a.tradeId === 'string'
     case 'JOIN':
-      return typeof action.name === 'string' && typeof action.avatar === 'string'
+      return typeof a.name === 'string' && typeof a.avatar === 'string'
     case 'KICK_PLAYER':
-      return typeof action.playerId === 'string'
+      return typeof a.playerId === 'string'
     case 'TOGGLE_MUTE':
-      return typeof action.isMuted === 'boolean'
+      return typeof a.isMuted === 'boolean'
     default:
       return false
   }
