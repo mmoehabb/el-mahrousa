@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Home } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -32,18 +32,18 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
   const { t } = useTranslation()
   const { gameState } = useGame()
 
+  const ownsAllInGroup = useMemo(() => {
+    if (!tile?.group || !owner) return false
+    const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
+    return groupTiles.every((t) => owner.properties.includes(t.id))
+  }, [tile, owner, gameState.tiles])
+
   if (!isOpen || !tile) return null
 
   const isOwner = owner?.id === myId
   const canAct = isMyTurn && turnPhase === 'ROLL' && isOwner
   const currentHouses = tile.houses || 0
   const maxHouses = tile.rent ? tile.rent.length - 1 : 0
-
-  let ownsAllInGroup = false
-  if (tile.group && owner) {
-    const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
-    ownsAllInGroup = groupTiles.every((t) => owner.properties.includes(t.id))
-  }
 
   const buyCost = tile.housePrice ? tile.housePrice * Math.pow(2, currentHouses) : 0
   const sellHouseRefund =
