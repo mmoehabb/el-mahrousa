@@ -10,6 +10,7 @@ import SettingsModal from './components/SettingsModal'
 import { Settings, X } from 'lucide-react'
 import GameScreen from './components/GameScreen'
 import useSound from 'use-sound'
+import Toast from './components/Toast'
 
 function App() {
   const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume } = useGame()
@@ -29,6 +30,8 @@ function App() {
     voiceError,
     setVoiceError,
     hasJoinedVoice,
+    connectionError,
+    setConnectionError,
   } = useNetworking()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [showCopied, setShowCopied] = useState(false)
@@ -77,6 +80,8 @@ function App() {
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <Toast message={voiceError || null} onClose={() => setVoiceError?.(null)} />
+      <Toast message={connectionError || null} onClose={() => setConnectionError?.(null)} />
       <div className="hidden lg:block fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]">
         <button
           id="global-settings-btn"
@@ -107,8 +112,6 @@ function App() {
           sendAction={sendAction}
           toggleVoiceChat={toggleVoiceChat}
           isMuted={isMuted}
-          voiceError={voiceError}
-          setVoiceError={setVoiceError}
           hasJoinedVoice={hasJoinedVoice}
         />
       ) : (
@@ -119,8 +122,6 @@ function App() {
           handleShareLink={handleShareLink}
           toggleVoiceChat={toggleVoiceChat}
           isMuted={isMuted}
-          voiceError={voiceError}
-          setVoiceError={setVoiceError}
           hasJoinedVoice={hasJoinedVoice}
         />
       )}
