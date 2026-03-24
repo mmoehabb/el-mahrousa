@@ -276,7 +276,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                             type="checkbox"
                             id={`my-property-${pid}`}
                             checked={offer.myProperties.includes(pid)}
-                            onChange={(e) => toggleProperty(pid, e.target.checked)}
+                            onChange={() => toggleProperty(pid, true)}
                             className="w-3 h-3 text-egyptian-gold focus:ring-2 focus:ring-egyptian-gold"
                           />
                           <label
@@ -343,7 +343,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                                 type="checkbox"
                                 id={`partner-property-${pid}`}
                                 checked={offer.partnerProperties.includes(pid)}
-                                onChange={(e) => toggleProperty(pid, e.target.checked)}
+                                onChange={() => toggleProperty(pid, false)}
                                 className="w-3 h-3 text-egyptian-gold focus:ring-2 focus:ring-egyptian-gold"
                               />
                               <label
