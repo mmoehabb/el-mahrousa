@@ -24,6 +24,7 @@ export interface Player {
   isMuted?: boolean
   isSpeaking?: boolean
   hasJoinedVoice?: boolean
+  isBot?: boolean
 }
 
 export interface ChatMessage {
@@ -79,6 +80,7 @@ export type GameAction =
   | { type: 'KICK_PLAYER'; playerId: string }
   | { type: 'TOGGLE_MUTE'; isMuted: boolean }
   | { type: 'JOIN_VOICE' }
+  | { type: 'ADD_BOT' }
 
 export interface ActiveEvent {
   title: string
