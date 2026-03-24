@@ -122,7 +122,13 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         turnPhase={gameState.turnPhase}
         sendAction={sendAction}
       />
-      <div className="grid grid-cols-11 grid-rows-11 gap-0.5 sm:gap-1 w-full h-full">
+      <div
+        className="grid gap-0.5 sm:gap-1 w-full h-full"
+        style={{
+          gridTemplateColumns: 'minmax(12%, 1.2fr) repeat(9, 1fr) minmax(12%, 1.2fr)',
+          gridTemplateRows: 'minmax(12%, 1.2fr) repeat(9, 1fr) minmax(12%, 1.2fr)'
+        }}
+      >
         {/* Top Row */}
         {topRow.map((tile, i) => (
           <div
