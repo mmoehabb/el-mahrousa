@@ -78,11 +78,11 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
     return JSON.stringify(log)
   }
 
-  // Split tiles for the 4 sides of the 6x6 board
-  const bottomRow = tiles.slice(0, 7).reverse() // 0 to 6
-  const leftCol = tiles.slice(7, 12).reverse() // 7 to 11
-  const topRow = tiles.slice(12, 19) // 12 to 18
-  const rightCol = tiles.slice(19, 24) // 19 to 23
+  // Split tiles for the 4 sides of the 10x10 board (40 tiles)
+  const bottomRow = tiles.slice(0, 11).reverse() // 0 to 10
+  const leftCol = tiles.slice(11, 20).reverse() // 11 to 19
+  const topRow = tiles.slice(20, 31) // 20 to 30
+  const rightCol = tiles.slice(31, 40) // 31 to 39
 
   const { playersByPosition, ownerByTile, playerById } = useMemo(() => {
     const playersMap: Record<number, Player[]> = {}
@@ -122,7 +122,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         turnPhase={gameState.turnPhase}
         sendAction={sendAction}
       />
-      <div className="grid grid-cols-7 grid-rows-7 gap-0.5 sm:gap-1 w-full h-full">
+      <div className="grid grid-cols-11 grid-rows-11 gap-0.5 sm:gap-1 w-full h-full">
         {/* Top Row */}
         {topRow.map((tile, i) => (
           <div
@@ -159,8 +159,8 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         {rightCol.map((tile, i) => (
           <div
             key={tile.id}
-            className="col-start-7"
-            style={{ gridColumnStart: 7, gridRowStart: i + 2 }}
+            className="col-start-11"
+            style={{ gridColumnStart: 11, gridRowStart: i + 2 }}
           >
             <TileComponent
               tile={tile}
@@ -176,7 +176,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
           <div
             key={tile.id}
             className="col-start-1"
-            style={{ gridColumnStart: i + 1, gridRowStart: 7 }}
+            style={{ gridColumnStart: i + 1, gridRowStart: 11 }}
           >
             <TileComponent
               tile={tile}
@@ -188,7 +188,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         ))}
 
         {/* Center */}
-        <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
+        <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
           <div className="flex gap-2 sm:gap-4 bg-white/50 dark:bg-slate-800/80 p-2 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-75 sm:scale-100">
             <motion.div
               animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
