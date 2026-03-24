@@ -65,21 +65,27 @@ const LoginScreen: React.FC = () => {
               {t('login.selectAvatar')}
             </h2>
             <div className="grid grid-cols-3 gap-3">
-              {Object.entries(AVATARS).map(([key, path]) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setSelectedAvatar(key)}
-                  className={`relative aspect-square rounded-lg overflow-hidden border-4 transition-all ${
-                    selectedAvatar === key
-                      ? 'border-egyptian-gold scale-105 shadow-lg'
-                      : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
-                  }`}
-                  title={AVATAR_NAMES[key]}
-                >
-                  <img src={path} alt={AVATAR_NAMES[key]} className="w-full h-full object-cover" />
-                </button>
-              ))}
+              {Object.entries(AVATARS)
+                .filter(([key]) => key !== 'bot')
+                .map(([key, path]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setSelectedAvatar(key)}
+                    className={`relative aspect-square rounded-lg overflow-hidden border-4 transition-all ${
+                      selectedAvatar === key
+                        ? 'border-egyptian-gold scale-105 shadow-lg'
+                        : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
+                    }`}
+                    title={AVATAR_NAMES[key]}
+                  >
+                    <img
+                      src={path}
+                      alt={AVATAR_NAMES[key]}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
             </div>
             <p className="text-center text-sm mt-2 text-egyptian-blue dark:text-egyptian-gold font-bold">
               {AVATAR_NAMES[selectedAvatar]}
