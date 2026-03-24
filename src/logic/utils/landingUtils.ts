@@ -81,9 +81,12 @@ export const handlePrisonLanding = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
   const newPlayers = [...state.players]
 
+  const prisonIndex = state.tiles.findIndex((t) => t.name === 'Prison')
+  const finalPosition = prisonIndex !== -1 ? prisonIndex : 10 // Fallback to 10 if not found
+
   newPlayers[state.currentPlayerIndex] = {
     ...player,
-    position: 6,
+    position: finalPosition,
   }
 
   const newState = { ...state, players: newPlayers }

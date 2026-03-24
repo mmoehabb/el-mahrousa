@@ -78,7 +78,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       newLogs.forEach((log) => {
         if (typeof log === 'string') {
           if (log.includes('paid') && log.includes('tax')) sounds.playRent()
-          if (log.includes('Prison')) sounds.playJail()
+          if (log.includes('was sent to Prison')) sounds.playJail()
           if (log.includes('bankrupt')) sounds.playBankrupt()
           if (log.includes('won')) sounds.playWin()
         } else if (log.key) {

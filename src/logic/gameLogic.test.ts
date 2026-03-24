@@ -456,11 +456,14 @@ describe('applyLandingLogic', () => {
     const prisonTileIndex = state.tiles.findIndex((t) => t.name === 'Go To Prison')
     assert.notStrictEqual(prisonTileIndex, -1, 'Board must have "Go To Prison" tile')
 
+    const actualPrisonIndex = state.tiles.findIndex((t) => t.name === 'Prison')
+    assert.notStrictEqual(actualPrisonIndex, -1, 'Board must have "Prison" tile')
+
     state.players[0].position = prisonTileIndex
 
     const newState = applyLandingLogic(state)
 
-    assert.strictEqual(newState.players[0].position, 6) // Assumes position 6 is Prison
+    assert.strictEqual(newState.players[0].position, actualPrisonIndex)
     assert.deepStrictEqual(newState.prison[state.players[0].id], { turnsLeft: 2 })
     assert.strictEqual(newState.turnPhase, 'END')
   })
