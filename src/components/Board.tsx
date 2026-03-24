@@ -110,7 +110,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   }
 
   return (
-    <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold aspect-square w-[95vw] sm:w-[600px] md:w-[700px] lg:w-[800px] max-w-full">
+    <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold aspect-square w-[95vw] sm:w-[750px] md:w-[900px] lg:w-[1000px] xl:w-[1200px] max-w-full">
       <PropertyModal
         isOpen={!!selectedTile}
         onClose={() => setSelectedTile(null)}
@@ -188,8 +188,8 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         ))}
 
         {/* Center */}
-        <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
-          <div className="flex gap-2 sm:gap-4 bg-white/50 dark:bg-slate-800/80 p-2 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-75 sm:scale-100">
+        <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-4 md:m-8 lg:m-12 border-2 md:border-4 border-egyptian-gold/40 rounded-lg relative p-4 sm:p-8 space-y-4 sm:space-y-6">
+          <div className="flex gap-4 sm:gap-6 md:gap-8 bg-white/50 dark:bg-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-100 sm:scale-125 md:scale-150">
             <motion.div
               animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
               transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
@@ -210,19 +210,19 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
             </motion.div>
           </div>
 
-          <div className="w-full max-w-[200px] sm:max-w-xs space-y-1 sm:space-y-2">
+          <div className="w-full max-w-[250px] sm:max-w-sm md:max-w-md space-y-2 sm:space-y-4 md:mt-6">
             {gameState.turnPhase === 'ROLL' && (
               <button
                 onClick={handleRoll}
                 disabled={!isMyTurn}
-                className="w-full bg-egyptian-blue text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-black flex items-center justify-center gap-1 sm:gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-[10px] sm:text-sm shadow-md"
+                className="w-full bg-egyptian-blue text-white py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-xs sm:text-base md:text-xl shadow-lg"
               >
-                <Dice5 className="w-4 h-4 sm:w-6 sm:h-6" /> {t('game.rollDiceBtn')}
+                <Dice5 className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8" /> {t('game.rollDiceBtn')}
               </button>
             )}
 
             {gameState.turnPhase === 'ACTION' && (
-              <div className="space-y-1 sm:space-y-2">
+              <div className="space-y-2 sm:space-y-4">
                 {gameState.tiles[currentPlayer.position]?.price &&
                   !ownerByTile[currentPlayer.position] && (
                     <button
@@ -231,7 +231,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                         !isMyTurn ||
                         currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
                       }
-                      className="w-full bg-green-600 text-white py-1.5 sm:py-2 rounded md:rounded-lg font-bold hover:bg-green-700 text-[9px] sm:text-sm shadow-md"
+                      className="w-full bg-green-600 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-green-700 text-[10px] sm:text-sm md:text-lg shadow-md"
                     >
                       {t('game.buyForBtn', {
                         price: gameState.tiles[currentPlayer.position].price,
@@ -241,7 +241,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                 <button
                   onClick={() => sendAction({ type: 'END_TURN' })}
                   disabled={!isMyTurn}
-                  className="w-full bg-slate-500 text-white py-1.5 sm:py-2 rounded md:rounded-lg font-bold hover:bg-slate-600 text-[9px] sm:text-sm shadow-md"
+                  className="w-full bg-slate-500 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-slate-600 text-[10px] sm:text-sm md:text-lg shadow-md"
                 >
                   {t('game.skipEndTurnBtn')}
                 </button>
@@ -252,14 +252,14 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               <button
                 onClick={() => sendAction({ type: 'END_TURN' })}
                 disabled={!isMyTurn}
-                className="w-full bg-egyptian-blue text-white py-1.5 sm:py-2 rounded md:rounded-lg font-bold text-[9px] sm:text-sm shadow-md"
+                className="w-full bg-egyptian-blue text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-[10px] sm:text-sm md:text-lg shadow-md"
               >
                 {t('game.endTurnBtn')}
               </button>
             )}
 
             {/* Game Logs placed right below actions */}
-            <div className="w-full mt-2 p-1 sm:p-2 text-start font-bold flex flex-col items-start overflow-y-auto max-h-24 sm:max-h-32 hide-scrollbar">
+            <div className="w-full mt-4 p-2 sm:p-4 bg-white/40 dark:bg-slate-800/60 rounded-xl backdrop-blur-sm border border-white/30 dark:border-slate-600/30 text-start font-bold flex flex-col items-start overflow-y-auto max-h-32 sm:max-h-48 md:max-h-56 hide-scrollbar shadow-inner">
               {recentLogs.length > 0 ? (
                 recentLogs.map((log, i) => {
                   const scale = 1 - (i / 6) * 0.35 // 100% to 65%
@@ -267,11 +267,11 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                   return (
                     <div
                       key={i}
-                      className="text-[8px] sm:text-[10px] text-slate-700 dark:text-slate-200 leading-tight w-full origin-top-left rtl:origin-top-right"
+                      className="text-[10px] sm:text-xs md:text-sm text-slate-800 dark:text-slate-100 leading-tight w-full origin-top-left rtl:origin-top-right py-0.5"
                       style={{
                         transform: `scale(${scale})`,
                         opacity: opacity,
-                        marginBottom: i === recentLogs.length - 1 ? 0 : '0.25rem',
+                        marginBottom: i === recentLogs.length - 1 ? 0 : '0.3rem',
                       }}
                     >
                       {renderLog(log)}
@@ -279,7 +279,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                   )
                 })
               ) : (
-                <div className="text-[8px] sm:text-[10px] text-slate-700 dark:text-slate-200 leading-tight w-full">
+                <div className="text-[10px] sm:text-xs md:text-sm text-slate-700 dark:text-slate-200 leading-tight w-full">
                   {t('game.gameLogs')}
                 </div>
               )}
