@@ -312,7 +312,13 @@ const GameScreen: React.FC<GameScreenProps> = ({
           >
             <TransformComponent
               wrapperStyle={{ width: '100%', height: '100%', overflow: 'visible' }}
-              contentStyle={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              contentStyle={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
               wrapperClass="!w-full !h-full"
               contentClass="!w-full !h-full flex justify-center items-center"
             >
