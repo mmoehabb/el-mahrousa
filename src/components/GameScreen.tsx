@@ -369,7 +369,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       </div>
 
       <InformationDialog
-        isOpen={!!gameState.activeEvent}
+        isOpen={!!gameState.activeEvent && gameState.activeEvent.playerId === myId}
         title={gameState.activeEvent?.title || ''}
         message={gameState.activeEvent?.description || ''}
         onClose={() => sendAction({ type: 'CLEAR_EVENT' })}

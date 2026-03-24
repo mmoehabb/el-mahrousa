@@ -82,24 +82,22 @@ export default function GameControls({
         </div>
 
         <div className="space-y-2 relative">
-          {gameState.turnPhase === 'ROLL' && (
+          {isMyTurn && gameState.turnPhase === 'ROLL' && (
             <button
               onClick={handleRoll}
-              disabled={!isMyTurn}
               className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-[10px]"
             >
               <Dice5 /> {t('game.rollDiceBtn')}
             </button>
           )}
 
-          {gameState.turnPhase === 'ACTION' && (
+          {isMyTurn && gameState.turnPhase === 'ACTION' && (
             <div className="space-y-2">
               {gameState.tiles[currentPlayer.position]?.price &&
                 !ownerByTile[currentPlayer.position] && (
                   <button
                     onClick={handleBuy}
                     disabled={
-                      !isMyTurn ||
                       currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
                     }
                     className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed text-[10px]"
@@ -111,7 +109,6 @@ export default function GameControls({
                 )}
               <button
                 onClick={handleEndTurn}
-                disabled={!isMyTurn}
                 className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600 text-[10px]"
               >
                 {t('game.skipEndTurnBtn')}
@@ -119,10 +116,9 @@ export default function GameControls({
             </div>
           )}
 
-          {gameState.turnPhase === 'END' && (
+          {isMyTurn && gameState.turnPhase === 'END' && (
             <button
               onClick={handleEndTurn}
-              disabled={!isMyTurn}
               className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold text-[10px]"
             >
               {t('game.endTurnBtn')}
