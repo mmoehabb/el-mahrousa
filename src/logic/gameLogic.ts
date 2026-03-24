@@ -107,6 +107,7 @@ export const applyEventLogic = (state: GameState): GameState => {
       description: event.description,
       type: event.type,
       playerName: player.name,
+      playerId: player.id,
     }
 
     // Check if debt forces turn to stay ACTION
@@ -140,6 +141,7 @@ export const applyEventLogic = (state: GameState): GameState => {
       description: `Sodfa! You have been teleported to ${randomTile.name}!`,
       type: 'move',
       playerName: player.name,
+      playerId: player.id,
     }
 
     // Since they moved, we should apply landing logic for their new tile immediately,

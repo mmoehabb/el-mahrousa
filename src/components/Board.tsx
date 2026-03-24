@@ -225,24 +225,22 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
           </div>
 
           <div className="w-full max-w-[250px] sm:max-w-sm md:max-w-md space-y-2 sm:space-y-4 md:mt-6">
-            {gameState.turnPhase === 'ROLL' && (
+            {isMyTurn && gameState.turnPhase === 'ROLL' && (
               <button
                 onClick={handleRoll}
-                disabled={!isMyTurn}
                 className="w-full bg-egyptian-blue text-white py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-xs sm:text-base md:text-xl shadow-lg"
               >
                 <Dice5 className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8" /> {t('game.rollDiceBtn')}
               </button>
             )}
 
-            {gameState.turnPhase === 'ACTION' && (
+            {isMyTurn && gameState.turnPhase === 'ACTION' && (
               <div className="space-y-2 sm:space-y-4">
                 {gameState.tiles[currentPlayer.position]?.price &&
                   !ownerByTile[currentPlayer.position] && (
                     <button
                       onClick={() => sendAction({ type: 'BUY' })}
                       disabled={
-                        !isMyTurn ||
                         currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
                       }
                       className="w-full bg-green-600 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-green-700 text-[10px] sm:text-sm md:text-lg shadow-md"
@@ -254,7 +252,6 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
                   )}
                 <button
                   onClick={() => sendAction({ type: 'END_TURN' })}
-                  disabled={!isMyTurn}
                   className="w-full bg-slate-500 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-slate-600 text-[10px] sm:text-sm md:text-lg shadow-md"
                 >
                   {t('game.skipEndTurnBtn')}
@@ -262,10 +259,9 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               </div>
             )}
 
-            {gameState.turnPhase === 'END' && (
+            {isMyTurn && gameState.turnPhase === 'END' && (
               <button
                 onClick={() => sendAction({ type: 'END_TURN' })}
-                disabled={!isMyTurn}
                 className="w-full bg-egyptian-blue text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-[10px] sm:text-sm md:text-lg shadow-md"
               >
                 {t('game.endTurnBtn')}

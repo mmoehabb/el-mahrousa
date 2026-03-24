@@ -87,6 +87,7 @@ export interface ActiveEvent {
   description: string
   type: 'gain' | 'loss' | 'move' | 'jail'
   playerName: string
+  playerId: string
 }
 
 export interface GameState {
