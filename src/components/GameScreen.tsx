@@ -299,9 +299,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
         <div className="hidden lg:block shrink-0">{playerInfoContent}</div>
 
         {/* Center: Board - Scrollable wrapper for mobile */}
-        <div className="w-full lg:flex-1 lg:h-[800px] max-w-full overflow-visible flex justify-center pb-4 lg:pb-0 relative z-10 sm:scale-100 origin-top mt-2 lg:mt-0">
+        <div className="w-full lg:flex-1 lg:h-[800px] max-w-full overflow-hidden flex justify-center pb-4 lg:pb-0 relative z-10 sm:scale-100 origin-top mt-2 lg:mt-0">
           <TransformWrapper
-            initialScale={1}
+            initialScale={0.7}
             minScale={0.2}
             maxScale={3}
             pinch={{ step: 5 }}
@@ -311,7 +311,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             centerOnInit={true}
           >
             <TransformComponent
-              wrapperStyle={{ width: '100%', height: '100%', overflow: 'visible' }}
+              wrapperStyle={{ width: '100%', height: '100%' }}
               contentStyle={{
                 width: '100%',
                 height: '100%',
