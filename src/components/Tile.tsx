@@ -27,12 +27,12 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
           style={{ backgroundColor: tile.color }}
         />
       )}
-      <div className="mt-3 md:mt-5 font-bold uppercase tracking-tighter text-[10px] sm:text-[12px] md:text-[14px] font-arabic-pixel leading-tight">
+      <div className="mt-3 md:mt-5 font-bold uppercase tracking-tighter text-[8px] sm:text-[10px] md:text-[12px] font-arabic-pixel leading-tight">
         {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
       </div>
 
       {tile.price && (
-        <div className="text-[6px] sm:text-[7px] md:text-[8px] text-slate-600 dark:text-slate-300 font-english-pixel mt-auto mb-0.5 md:mb-1">
+        <div className="text-[5px] sm:text-[6px] md:text-[7px] text-slate-600 dark:text-slate-300 font-english-pixel mt-auto mb-0.5 md:mb-1">
           {tile.price} {GAME_CONFIG.CURRENCY}
         </div>
       )}

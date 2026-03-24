@@ -110,7 +110,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   }
 
   return (
-    <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold aspect-square w-[800px] sm:w-[850px] md:w-[950px] lg:w-[1050px] xl:w-[1200px] max-w-none overflow-hidden">
+    <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold aspect-square w-[1200px] sm:w-[1300px] md:w-[1500px] lg:w-[1650px] xl:w-[1800px] max-w-none overflow-hidden">
       <PropertyModal
         isOpen={!!selectedTile}
         onClose={() => setSelectedTile(null)}

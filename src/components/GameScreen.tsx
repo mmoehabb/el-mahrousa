@@ -301,8 +301,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {/* Center: Board - Scrollable wrapper for mobile */}
         <div className="w-full lg:flex-1 lg:h-[800px] max-w-full overflow-hidden flex justify-center pb-4 lg:pb-0 relative z-10 sm:scale-100 origin-top mt-2 lg:mt-0">
           <TransformWrapper
-            initialScale={0.7}
-            minScale={0.2}
+            initialScale={0.3}
+            minScale={0.1}
             maxScale={3}
             pinch={{ step: 5 }}
             doubleClick={{ disabled: true }}
