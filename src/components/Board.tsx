@@ -191,8 +191,12 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
         <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-2 border-2 border-egyptian-gold/40 rounded-lg relative p-2 sm:p-4 space-y-2 sm:space-y-4">
           <div className="flex gap-2 sm:gap-4 bg-white/50 dark:bg-slate-800/80 p-2 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-75 sm:scale-100">
             <motion.div
-              animate={gameState.turnPhase === 'ROLLING' ? { rotate: 360 } : {}}
-              transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
+              animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
+              transition={{
+                repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                duration: 0.5,
+                ease: 'easeInOut',
+              }}
             >
               <DiceFace
                 value={effectiveDisplayDice[0]}
@@ -200,8 +204,12 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
               />
             </motion.div>
             <motion.div
-              animate={gameState.turnPhase === 'ROLLING' ? { rotate: -360 } : {}}
-              transition={{ repeat: Infinity, duration: 0.5, ease: 'easeInOut' }}
+              animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
+              transition={{
+                repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                duration: 0.5,
+                ease: 'easeInOut',
+              }}
             >
               <DiceFace
                 value={effectiveDisplayDice[1]}
