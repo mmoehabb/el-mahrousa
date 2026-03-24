@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Trophy, RotateCcw } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Player } from '../types/game'
-import ConfirmDialog from './ConfirmDialog'
 
 interface WinnerModalProps {
   isOpen: boolean
@@ -14,7 +13,6 @@ interface WinnerModalProps {
 
 const WinnerModal: React.FC<WinnerModalProps> = ({ isOpen, winner, isHost, onRematch }) => {
   const { t } = useTranslation()
-  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false)
 
   if (!isOpen) return null
 
@@ -59,7 +57,7 @@ const WinnerModal: React.FC<WinnerModalProps> = ({ isOpen, winner, isHost, onRem
             )}
 
             <button
-              onClick={() => setIsLeaveDialogOpen(true)}
+              onClick={() => (window.location.href = import.meta.env.BASE_URL || '/')}
               className="w-full bg-slate-200 text-slate-800 py-3 rounded-lg font-bold hover:bg-slate-300 transition-colors"
             >
               {t('game.leaveGameBtn')}
@@ -67,13 +65,6 @@ const WinnerModal: React.FC<WinnerModalProps> = ({ isOpen, winner, isHost, onRem
           </div>
         </motion.div>
       </motion.div>
-
-      <ConfirmDialog
-        isOpen={isLeaveDialogOpen}
-        message={t('game.confirmLeave')}
-        onConfirm={() => (window.location.href = import.meta.env.BASE_URL || '/')}
-        onCancel={() => setIsLeaveDialogOpen(false)}
-      />
     </AnimatePresence>
   )
 }

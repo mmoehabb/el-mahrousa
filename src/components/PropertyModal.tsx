@@ -181,7 +181,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 <button
                   onClick={handleBuyHouse}
                   disabled={currentHouses >= maxHouses || myBalance < buyCost || !ownsAllInGroup}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
+                  className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
                 >
                   <span>{t('game.buyHouseBtn')}</span>
                   {currentHouses < maxHouses && (

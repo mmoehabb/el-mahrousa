@@ -102,7 +102,7 @@ export default function GameControls({
                       !isMyTurn ||
                       currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
                     }
-                    className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 text-[10px]"
+                    className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed text-[10px]"
                   >
                     {t('game.buyForBtn', {
                       price: gameState.tiles[currentPlayer.position].price,
