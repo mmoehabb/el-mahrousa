@@ -74,6 +74,7 @@ export const isValidGameAction = (action: unknown): action is GameAction => {
     case 'REMATCH':
     case 'CLEAR_EVENT':
     case 'JOIN_VOICE':
+    case 'ADD_BOT':
       return true
     case 'BUY_HOUSE':
     case 'SELL_HOUSE':

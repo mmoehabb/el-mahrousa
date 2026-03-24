@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Users, UserMinus, Mic, MicOff, PhoneCall } from 'lucide-react'
+import { Users, UserMinus, Mic, MicOff, PhoneCall, Bot } from 'lucide-react'
 import type { GameState } from '../types/game'
 
 interface WaitingScreenProps {
@@ -78,6 +78,11 @@ export default function WaitingScreen({
                     {t('waiting.host')}
                   </span>
                 )}
+                {p.isBot && (
+                  <span className="text-xs bg-slate-500 text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto flex items-center gap-1">
+                    <Bot size={12} /> {t('waiting.bot', 'Bot')}
+                  </span>
+                )}
                 <div className="ml-auto rtl:mr-auto rtl:ml-0 flex items-center gap-2">
                   {p.id === myId ? (
                     hasJoinedVoice ? (
@@ -134,12 +139,20 @@ export default function WaitingScreen({
         <div className="pt-4 border-t border-slate-200 dark:border-slate-700 text-center">
           {isHost ? (
             gameState.countdown === null ? (
-              <button
-                onClick={() => sendAction({ type: 'START_COUNTDOWN' })}
-                className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors text-lg"
-              >
-                {t('waiting.startGameBtn')}
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={() => sendAction({ type: 'ADD_BOT' })}
+                  className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                >
+                  <Bot size={18} /> {t('waiting.addBotBtn', 'Add Bot')}
+                </button>
+                <button
+                  onClick={() => sendAction({ type: 'START_COUNTDOWN' })}
+                  className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors text-lg"
+                >
+                  {t('waiting.startGameBtn')}
+                </button>
+              </div>
             ) : (
               <div className="space-y-3">
                 <div className="text-2xl font-black text-egyptian-red animate-pulse">

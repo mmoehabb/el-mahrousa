@@ -19,6 +19,7 @@ import {
   handleBankrupt,
 } from '../logic/gameLogic'
 import { isValidGameAction, isValidGameState } from '../logic/validation.ts'
+import { getBotAction } from '../logic/bots.ts'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 
@@ -260,6 +261,24 @@ export const useNetworking = () => {
             nextState.activeEvent = null
             break
           }
+          case 'ADD_BOT': {
+            if (from !== lobbyId) return prev
+            const botCount = prev.players.filter((p) => p.isBot).length
+            const newBot: Player = {
+              id: crypto.randomUUID(), // Assign random ID
+              name: `Bot ${botCount + 1}`,
+              avatar: 'bot',
+              balance: 1500,
+              position: 0,
+              properties: [],
+              isBankrupt: false,
+              color: COLORS[prev.players.length % COLORS.length],
+              isBot: true,
+            }
+            nextState = { ...nextState, players: [...prev.players, newBot] }
+            nextState.logs = [`${newBot.name} joined the game.`, ...nextState.logs]
+            break
+          }
           case 'JOIN_VOICE': {
             const playerIndex = nextState.players.findIndex((p) => p.id === from)
             if (playerIndex !== -1) {
@@ -369,6 +388,44 @@ export const useNetworking = () => {
   }, [handleAction, isHost, lobbyId])
 
   const hasJoinedVoice = !!myStream
+
+  // Bot logic integration
+  useEffect(() => {
+    if (!isHostRef.current || gameState.status !== 'PLAYING') return
+
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+
+    // Check if current player is a bot
+    if (currentPlayer && currentPlayer.isBot && !currentPlayer.isBankrupt) {
+      // Small delay to simulate thinking/allow UI updates
+      const timer = setTimeout(() => {
+        const action = getBotAction(gameState)
+        if (action) {
+          handleActionRef.current(action, currentPlayer.id)
+        }
+      }, 1000)
+
+      return () => clearTimeout(timer)
+    }
+
+    // Check for pending trades involving bots even if it's not their turn
+    // We only process one trade per tick to avoid conflicts
+    const pendingTrade = gameState.trades.find((t) => {
+      const toPlayer = gameState.players.find((p) => p.id === t.toId)
+      return t.status === 'PENDING' && toPlayer?.isBot
+    })
+    if (pendingTrade && pendingTrade.id && pendingTrade.toId) {
+      const timer = setTimeout(() => {
+        // Bots automatically reject trades for now as handled by getBotAction,
+        // but since getBotAction uses currentPlayer we need a direct reject here
+        handleActionRef.current(
+          { type: 'REJECT_TRADE', tradeId: pendingTrade.id! },
+          pendingTrade.toId!,
+        )
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [gameState])
 
   // Answer incoming voice calls
   useEffect(() => {

@@ -4,6 +4,7 @@ import youthAvatar from '../assets/avatars/youth.webp'
 import ceoAvatar from '../assets/avatars/ceo.webp'
 import businessAvatar from '../assets/avatars/business.webp'
 import projectAvatar from '../assets/avatars/project.webp'
+import botAvatar from '../assets/avatars/bot.svg'
 
 export const AVATARS: Record<string, string> = {
   merchant: merchantAvatar,
@@ -12,6 +13,7 @@ export const AVATARS: Record<string, string> = {
   ceo: ceoAvatar,
   business: businessAvatar,
   project: projectAvatar,
+  bot: botAvatar,
 }
 
 export const AVATAR_NAMES: Record<string, string> = {
@@ -21,6 +23,7 @@ export const AVATAR_NAMES: Record<string, string> = {
   ceo: 'The CEO/Founder',
   business: 'The Business Manager',
   project: 'The Project Manager',
+  bot: 'Bot',
 }
 
 export const getAvatarPath = (avatarKey: string): string => {
