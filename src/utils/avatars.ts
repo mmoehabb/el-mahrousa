@@ -4,7 +4,7 @@ import youthAvatar from '../assets/avatars/youth.webp'
 import ceoAvatar from '../assets/avatars/ceo.webp'
 import businessAvatar from '../assets/avatars/business.webp'
 import projectAvatar from '../assets/avatars/project.webp'
-import botAvatar from '../assets/avatars/bot.svg'
+import botAvatar from '../assets/avatars/bot.webp'
 
 export const AVATARS: Record<string, string> = {
   merchant: merchantAvatar,

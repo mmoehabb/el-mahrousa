@@ -399,7 +399,7 @@ export const useNetworking = () => {
     if (currentPlayer && currentPlayer.isBot && !currentPlayer.isBankrupt) {
       // Small delay to simulate thinking/allow UI updates.
       // Make moving faster so it doesn't take forever, but keep other actions slightly delayed
-      const delay = gameState.turnPhase === 'MOVING' ? 100 : 400
+      const delay = gameState.turnPhase === 'MOVING' ? 250 : 400
       const timer = setTimeout(() => {
         const action = getBotAction(gameState)
         if (action) {
