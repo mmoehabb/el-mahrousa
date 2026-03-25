@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { Users, Info, Settings2, X, UserMinus, Mic, MicOff } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import Board from './Board'
+import PropertyModal from './PropertyModal'
 import TradeModal from './TradeModal'
 import GameControls from './GameControls'
 import WinnerModal from './WinnerModal'
 import InformationDialog from './InformationDialog'
-import type { GameAction } from '../types/game'
+import type { GameAction, Tile } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
@@ -37,6 +38,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const { t } = useTranslation()
   const { gameState, myId, isHost } = useGame()
   const [isTradeOpen, setIsTradeOpen] = useState(false)
+  const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
   const isRollingRef = useRef(false)
   const sounds = useGameSounds()
   const prevPhaseRef = useRef(gameState.turnPhase)
@@ -256,6 +258,21 @@ const GameScreen: React.FC<GameScreenProps> = ({
   return (
     <>
       <div className="game-screen-container flex flex-col lg:flex-row gap-4 lg:gap-8 w-full max-w-full lg:max-w-none px-0 lg:px-4 justify-start lg:justify-center items-center lg:items-start relative pb-20 lg:pb-0">
+        <PropertyModal
+          isOpen={!!selectedTile}
+          onClose={() => setSelectedTile(null)}
+          tile={selectedTile}
+          owner={
+            selectedTile
+              ? gameState.players.find((p) => p.properties.includes(selectedTile.id))
+              : undefined
+          }
+          isMyTurn={isMyTurn}
+          myId={myId}
+          myBalance={gameState.players.find((p) => p.id === myId)?.balance || 0}
+          turnPhase={gameState.turnPhase}
+          sendAction={sendAction}
+        />
         {/* Mobile Bottom Navigation Bar */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t-2 border-slate-200 dark:border-slate-800 p-2 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
           <button
@@ -322,7 +339,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
               wrapperClass="!w-full !h-full"
               contentClass="!w-full !h-full flex justify-center items-center"
             >
-              <Board handleRoll={handleRoll} isMyTurn={isMyTurn} sendAction={sendAction} />
+              <Board
+                handleRoll={handleRoll}
+                isMyTurn={isMyTurn}
+                sendAction={sendAction}
+                onTileClick={setSelectedTile}
+              />
             </TransformComponent>
           </TransformWrapper>
         </div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { useGame } from '../context/GameContext'
 import type { Player, GameAction, Tile } from '../types/game'
 import TileComponent from './Tile'
-import PropertyModal from './PropertyModal'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Dice5 } from 'lucide-react'
@@ -32,14 +31,13 @@ interface BoardProps {
   handleRoll: () => void
   isMyTurn: boolean
   sendAction: (action: GameAction) => void
+  onTileClick: (tile: Tile) => void
 }
 
-const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
+const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileClick }) => {
   const { t } = useTranslation()
-  const { gameState, myId } = useGame()
+  const { gameState } = useGame()
   const tiles = gameState.tiles
-
-  const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
 
   const isRolling = gameState.turnPhase === 'ROLLING'
   const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
@@ -84,7 +82,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
   const topRow = tiles.slice(20, 31) // 20 to 30
   const rightCol = tiles.slice(31, 40) // 31 to 39
 
-  const { playersByPosition, ownerByTile, playerById } = useMemo(() => {
+  const { playersByPosition, ownerByTile } = useMemo(() => {
     const playersMap: Record<number, Player[]> = {}
     const ownerMap: Record<number, Player> = {}
     const playerMap: Record<string, Player> = {}
@@ -102,26 +100,15 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction }) => {
       })
     })
 
-    return { playersByPosition: playersMap, ownerByTile: ownerMap, playerById: playerMap }
+    return { playersByPosition: playersMap, ownerByTile: ownerMap }
   }, [gameState.players])
 
   const handleTileClick = (tile: Tile) => {
-    setSelectedTile(tile)
+    onTileClick(tile)
   }
 
   return (
     <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold aspect-square w-[800px] sm:w-[850px] md:w-[950px] lg:w-[1050px] xl:w-[1200px] max-w-none overflow-hidden">
-      <PropertyModal
-        isOpen={!!selectedTile}
-        onClose={() => setSelectedTile(null)}
-        tile={selectedTile}
-        owner={selectedTile ? ownerByTile[selectedTile.id] : undefined}
-        isMyTurn={isMyTurn}
-        myId={myId}
-        myBalance={playerById[myId]?.balance || 0}
-        turnPhase={gameState.turnPhase}
-        sendAction={sendAction}
-      />
       <div
         className="grid gap-0.5 sm:gap-1 w-full h-full"
         style={{
