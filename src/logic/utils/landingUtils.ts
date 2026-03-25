@@ -1,5 +1,4 @@
 import type { GameState, Player, Tile } from '../../types/game.ts'
-import { GAME_CONFIG } from '../../config/gameConfig.ts'
 
 export const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): number => {
   if (tile.type === 'PROPERTY') {
@@ -29,7 +28,7 @@ export const handleTaxLanding = (state: GameState): GameState => {
 
   const newState = { ...state, players: newPlayers }
   newState.logs = [
-    `${player.name} paid ${taxAmount} ${GAME_CONFIG.CURRENCY} in tax`,
+    { key: 'paidTax', params: { name: player.name, amount: taxAmount, property: tile.name } },
     ...newState.logs,
   ]
 

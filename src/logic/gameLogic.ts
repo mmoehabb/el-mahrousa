@@ -110,6 +110,11 @@ export const applyEventLogic = (state: GameState): GameState => {
       playerId: player.id,
     }
 
+    newState.logs = [
+      { key: 'eventHazak', params: { name: player.name, title: event.title } },
+      ...newState.logs,
+    ]
+
     // Check if debt forces turn to stay ACTION
     if (newPlayers[state.currentPlayerIndex].balance >= 0) {
       newState.turnPhase = 'END'
@@ -143,6 +148,11 @@ export const applyEventLogic = (state: GameState): GameState => {
       playerName: player.name,
       playerId: player.id,
     }
+
+    newState.logs = [
+      { key: 'eventSodfa', params: { name: player.name, property: randomTile.name } },
+      ...newState.logs,
+    ]
 
     // Since they moved, we should apply landing logic for their new tile immediately,
     // but without clearing the event popup.

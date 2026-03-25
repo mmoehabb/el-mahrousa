@@ -145,7 +145,10 @@
     "tradeRejected": "{{name}} rejected trade from {{partner}}",
     "boughtHouse": "{{name}} bought a house on {{property}} for {{price}}",
     "soldHouse": "{{name}} sold a house on {{property}} for {{price}}",
-    "soldProperty": "{{name}} sold {{property}} for {{price}}"
+    "soldProperty": "{{name}} sold {{property}} for {{price}}",
+    "eventHazak": "{{name}} drew a Hazak card: {{title}}",
+    "eventSodfa": "{{name}} drew a Sodfa card and teleported to {{property}}",
+    "paidTax": "{{name}} paid {{amount}} for {{property}}"
   },
   "tiles": {
     "go": "GO",
