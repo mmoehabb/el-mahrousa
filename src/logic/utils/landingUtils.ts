@@ -21,7 +21,9 @@ export const handleTaxLanding = (state: GameState): GameState => {
 
   let taxAmount = tile.price || 0
   if (tile.name === 'Income Tax') {
-    taxAmount = Math.floor(player.balance * 0.025 + player.balance * player.properties.length * 0.005)
+    taxAmount = Math.floor(
+      player.balance * 0.025 + player.balance * player.properties.length * 0.005,
+    )
   } else if (tile.name === 'Super Tax') {
     taxAmount = Math.floor(player.balance * 0.05 + player.balance * player.properties.length * 0.01)
   }
