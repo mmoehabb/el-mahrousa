@@ -260,7 +260,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
   return (
     <>
-      <div className="game-screen-container flex flex-col w-full max-w-full justify-start items-center relative pb-20 lg:pb-0 lg:fixed lg:inset-0 lg:h-screen lg:w-screen overflow-hidden">
+      <div className="game-screen-container flex flex-col w-full max-w-full justify-start items-center relative pb-16 lg:pb-0 fixed inset-0 h-screen w-screen overflow-hidden">
         <PropertyModal
           isOpen={!!selectedTile}
           onClose={() => setSelectedTile(null)}
@@ -432,7 +432,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         </AnimatePresence>
 
         {/* Center: Board */}
-        <div className="w-full lg:flex-1 lg:h-full lg:w-full max-w-full overflow-hidden flex justify-center pb-4 lg:pb-0 relative z-10 sm:scale-100 origin-top mt-2 lg:mt-0">
+        <div className="w-full h-full flex-1 max-w-full overflow-hidden flex justify-center relative z-10 sm:scale-100 origin-top">
           <TransformWrapper
             initialScale={0.7}
             minScale={0.2}
