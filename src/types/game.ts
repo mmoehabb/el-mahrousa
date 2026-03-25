@@ -25,6 +25,7 @@ export interface Player {
   isSpeaking?: boolean
   hasJoinedVoice?: boolean
   isBot?: boolean
+  debtTo?: string // ID of the player they owe money to, or 'bank'
 }
 
 export interface ChatMessage {

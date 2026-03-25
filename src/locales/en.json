@@ -107,7 +107,8 @@
     "sellHouseBtn": "SELL HOUSE",
     "sellPropertyBtn": "SELL PROPERTY",
     "mustSellHousesFirst": "Must sell all houses first to sell property",
-    "mustOwnAllInGroup": "Must own all properties in this group to buy houses"
+    "mustOwnAllInGroup": "Must own all properties in this group to buy houses",
+    "mustPayDebts": "You must pay your debts or declare bankruptcy before ending your turn!"
   },
   "trade": {
     "title": "Trade Proposal",

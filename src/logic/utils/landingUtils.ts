@@ -21,9 +21,15 @@ export const handleTaxLanding = (state: GameState): GameState => {
   const taxAmount = tile.price || 0
   const newPlayers = [...state.players]
 
+  const newBalance = player.balance - taxAmount
+
   newPlayers[state.currentPlayerIndex] = {
     ...player,
-    balance: player.balance - taxAmount,
+    balance: newBalance,
+  }
+
+  if (newBalance < 0) {
+    newPlayers[state.currentPlayerIndex].debtTo = 'bank'
   }
 
   const newState = { ...state, players: newPlayers }
@@ -34,6 +40,8 @@ export const handleTaxLanding = (state: GameState): GameState => {
 
   if (newPlayers[state.currentPlayerIndex].balance >= 0) {
     newState.turnPhase = 'END'
+  } else {
+    newState.turnPhase = 'ACTION' // Must sell properties or bankrupt
   }
 
   return newState
@@ -49,15 +57,25 @@ export const handlePropertyLanding = (state: GameState): GameState => {
     const rent = calculateRent(tile, owner, state.tiles)
     const newPlayers = [...state.players]
 
+    const newBalance = player.balance - rent
+
     newPlayers[state.currentPlayerIndex] = {
       ...player,
-      balance: player.balance - rent,
+      balance: newBalance,
     }
+
+    if (newBalance < 0) {
+      newPlayers[state.currentPlayerIndex].debtTo = owner.id
+    }
+
+    // Owner only gets what the player can pay immediately.
+    // The rest will be paid when the player sells properties.
+    const amountPaidImmediately = rent + (newBalance < 0 ? newBalance : 0)
 
     const ownerIndex = newPlayers.findIndex((p) => p.id === owner.id)
     newPlayers[ownerIndex] = {
       ...newPlayers[ownerIndex],
-      balance: newPlayers[ownerIndex].balance + rent,
+      balance: newPlayers[ownerIndex].balance + amountPaidImmediately,
     }
 
     const newState = { ...state, players: newPlayers }
@@ -68,6 +86,8 @@ export const handlePropertyLanding = (state: GameState): GameState => {
 
     if (newPlayers[state.currentPlayerIndex].balance >= 0) {
       newState.turnPhase = 'END'
+    } else {
+      newState.turnPhase = 'ACTION' // Must sell properties or bankrupt
     }
 
     return newState

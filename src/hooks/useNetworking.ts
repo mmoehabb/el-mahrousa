@@ -17,6 +17,7 @@ import {
   rejectTrade,
   cancelTrade,
   handleBankrupt,
+  processDebtRepayment,
 } from '../logic/gameLogic'
 import { isValidGameAction, isValidGameState } from '../logic/validation.ts'
 import { getBotAction } from '../logic/bots.ts'
@@ -350,7 +351,7 @@ export const useNetworking = () => {
             break
           }
         }
-        return nextState
+        return processDebtRepayment(prev, nextState)
       })
     },
     [isHost, setGameState, lobbyId, myId, t],
