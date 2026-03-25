@@ -5,6 +5,7 @@ import type { Player, GameState, GameAction } from '../types/game'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { useGame } from '../context/GameContext'
 import ConfirmDialog from './ConfirmDialog'
+import Toast from './Toast'
 
 const MAX_CHAT_LENGTH = 200
 
@@ -43,6 +44,7 @@ export default function GameControls({
   const sounds = useGameSounds()
   const [isBankruptDialogOpen, setIsBankruptDialogOpen] = useState(false)
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const me = gameState.players.find((p) => p.id === myId)
@@ -65,6 +67,15 @@ export default function GameControls({
     if (!sanitized.trim()) return
     sendAction({ type: 'CHAT', message: sanitized })
     setChatMsg('')
+  }
+
+  const handleEndTurnClick = () => {
+    if (currentPlayer && currentPlayer.balance < 0) {
+      setToastMessage(t('game.mustPayDebts'))
+      sounds.playBankrupt()
+    } else {
+      handleEndTurn()
+    }
   }
 
   const myPendingTrades = (gameState.trades || []).filter(
@@ -108,7 +119,7 @@ export default function GameControls({
                   </button>
                 )}
               <button
-                onClick={handleEndTurn}
+                onClick={handleEndTurnClick}
                 className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600 text-[10px]"
               >
                 {t('game.skipEndTurnBtn')}
@@ -118,7 +129,7 @@ export default function GameControls({
 
           {isMyTurn && gameState.turnPhase === 'END' && (
             <button
-              onClick={handleEndTurn}
+              onClick={handleEndTurnClick}
               className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold text-[10px]"
             >
               {t('game.endTurnBtn')}
@@ -160,6 +171,8 @@ export default function GameControls({
         onConfirm={() => (window.location.href = import.meta.env.BASE_URL || '/')}
         onCancel={() => setIsLeaveDialogOpen(false)}
       />
+
+      <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-egyptian-gold rtl:border-l-4 rtl:border-r-0">
         <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">

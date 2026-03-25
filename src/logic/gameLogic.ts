@@ -8,6 +8,63 @@ import {
   handlePrisonLanding,
 } from './utils/landingUtils.ts'
 
+export const processDebtRepayment = (prevState: GameState, newState: GameState): GameState => {
+  let hasDebtRepaid = false
+  const updatedPlayers = [...newState.players]
+
+  for (let i = 0; i < updatedPlayers.length; i++) {
+    const player = updatedPlayers[i]
+    const prevPlayer = prevState.players.find((p) => p.id === player.id)
+
+    // Check if the player gained balance and has a debt
+    if (prevPlayer && player.balance > prevPlayer.balance && player.debtTo) {
+      // Wait, let's keep it simple: the amount they owe is tracked implicitly by their negative balance.
+      // But we need to know exactly how much of their debt was repaid in this step.
+      // E.g., prevBalance = -400, newBalance = +100. Gained = 500. Debt repaid = 400.
+      // E.g., prevBalance = -400, newBalance = -300. Gained = 100. Debt repaid = 100.
+      // E.g., prevBalance = -400, newBalance = 0. Gained = 400. Debt repaid = 400.
+      let debtRepaid = 0
+      if (prevPlayer.balance < 0) {
+        if (player.balance >= 0) {
+          debtRepaid = -prevPlayer.balance // Paid off entirely
+          updatedPlayers[i] = { ...player, debtTo: undefined }
+        } else {
+          debtRepaid = player.balance - prevPlayer.balance // Paid partially
+        }
+      }
+
+      if (debtRepaid > 0 && player.debtTo !== 'bank') {
+        const creditorIndex = updatedPlayers.findIndex((p) => p.id === player.debtTo)
+        if (creditorIndex !== -1) {
+          updatedPlayers[creditorIndex] = {
+            ...updatedPlayers[creditorIndex],
+            balance: updatedPlayers[creditorIndex].balance + debtRepaid,
+          }
+          hasDebtRepaid = true
+        }
+      } else if (debtRepaid > 0 && player.debtTo === 'bank') {
+        hasDebtRepaid = true // Just so we return the updatedPlayers reference if debtTo was removed
+      }
+
+      // If we recovered fully, ensure the turn phase can move on if they are the current player
+      if (
+        player.balance >= 0 &&
+        i === newState.currentPlayerIndex &&
+        newState.turnPhase === 'ACTION'
+      ) {
+        // But only if we aren't doing another action that changes turn phase. Let's just update the player.
+        // Actually, let's not auto-change the phase here, they can click End Turn.
+      }
+    }
+  }
+
+  if (hasDebtRepaid || updatedPlayers.some((p, i) => p.debtTo !== newState.players[i].debtTo)) {
+    return { ...newState, players: updatedPlayers }
+  }
+
+  return newState
+}
+
 export const createInitialState = (): GameState => ({
   players: [],
   currentPlayerIndex: 0,
