@@ -88,7 +88,7 @@ export const BOARD_DATA: Tile[] = [
     housePrice: 50,
     color: '#8B4513',
   },
-  { id: 4, name: 'Income Tax', type: 'TAX', price: 200 },
+  { id: 4, name: 'Income Tax', type: 'TAX' },
   { id: 5, name: 'Ramses Station', type: 'AIRPORT', price: 200 },
   {
     id: 6,
@@ -299,7 +299,7 @@ export const BOARD_DATA: Tile[] = [
     housePrice: 200,
     color: '#00008B',
   },
-  { id: 38, name: 'Super Tax', type: 'TAX', price: 100 },
+  { id: 38, name: 'Super Tax', type: 'TAX' },
   {
     id: 39,
     name: 'New Capital',

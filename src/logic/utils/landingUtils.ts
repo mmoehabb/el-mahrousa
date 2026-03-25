@@ -18,7 +18,14 @@ export const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): numb
 export const handleTaxLanding = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[player.position]
-  const taxAmount = tile.price || 0
+
+  let taxAmount = tile.price || 0
+  if (tile.name === 'Income Tax') {
+    taxAmount = Math.floor(player.balance * 0.025 + player.balance * player.properties.length * 0.005)
+  } else if (tile.name === 'Super Tax') {
+    taxAmount = Math.floor(player.balance * 0.05 + player.balance * player.properties.length * 0.01)
+  }
+
   const newPlayers = [...state.players]
 
   newPlayers[state.currentPlayerIndex] = {

@@ -387,25 +387,38 @@ describe('applyLandingLogic', () => {
     return state
   }
 
-  test('deducts tax amount from player balance when landing on TAX', () => {
+  test('deducts dynamic Income Tax from player balance when landing on Income Tax', () => {
     const state = getBaseState()
 
-    // Find a TAX tile in BOARD_DATA
-    const taxTileIndex = state.tiles.findIndex((t) => t.type === 'TAX')
-    assert.notStrictEqual(taxTileIndex, -1, 'Board must have at least one TAX tile')
+    const taxTileIndex = state.tiles.findIndex((t) => t.name === 'Income Tax')
+    assert.notStrictEqual(taxTileIndex, -1, 'Board must have at least one Income Tax tile')
 
-    // Deep clone the tiles array to avoid polluting global state
-    state.tiles = state.tiles.map((t) => ({ ...t }))
-    const taxTile = state.tiles[taxTileIndex]
-
-    // Explicitly set price to 0 to test fallback logic
-    taxTile.price = undefined
-
+    state.players[0].balance = 1500
+    state.players[0].properties = []
     state.players[0].position = taxTileIndex
 
     const newState = applyLandingLogic(state)
 
-    assert.strictEqual(newState.players[0].balance, 1500) // Deducted 0
+    // Tax should be Math.floor(1500 * 0.025 + 0) = 37
+    assert.strictEqual(newState.players[0].balance, 1500 - 37)
+    assert.strictEqual(newState.turnPhase, 'END')
+    assert.ok(newState.logs.length > state.logs.length)
+  })
+
+  test('deducts dynamic Super Tax from player balance when landing on Super Tax', () => {
+    const state = getBaseState()
+
+    const taxTileIndex = state.tiles.findIndex((t) => t.name === 'Super Tax')
+    assert.notStrictEqual(taxTileIndex, -1, 'Board must have at least one Super Tax tile')
+
+    state.players[0].balance = 1500
+    state.players[0].properties = [1, 2] // 2 properties
+    state.players[0].position = taxTileIndex
+
+    const newState = applyLandingLogic(state)
+
+    // Tax should be Math.floor(1500 * 0.05 + 1500 * 2 * 0.01) = 75 + 30 = 105
+    assert.strictEqual(newState.players[0].balance, 1500 - 105)
     assert.strictEqual(newState.turnPhase, 'END')
     assert.ok(newState.logs.length > state.logs.length)
   })
@@ -475,15 +488,20 @@ describe('applyLandingLogic', () => {
     // Player 1 has 10 balance
     state.players[0].balance = 10
 
-    // Tax tile
-    const taxTileIndex = state.tiles.findIndex((t) => t.type === 'TAX')
+    // Find property tile
+    const propertyTileIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
 
     // Deep clone the tiles array to avoid polluting global state
     state.tiles = state.tiles.map((t) => ({ ...t }))
-    state.tiles[taxTileIndex].price = 200 // More than balance
-    // In case logic looks at tax:
+    const propertyTile = state.tiles[propertyTileIndex]
 
-    state.players[0].position = taxTileIndex
+    // Set high rent to cause debt
+    propertyTile.rent = [200, 200, 200, 200, 200, 200]
+
+    // Make player 2 own it
+    state.players[1].properties = [propertyTile.id]
+
+    state.players[0].position = propertyTileIndex
 
     const newState = applyLandingLogic(state)
 
