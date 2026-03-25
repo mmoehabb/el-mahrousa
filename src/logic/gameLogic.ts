@@ -169,7 +169,8 @@ export const applyLandingLogic = (state: GameState): GameState => {
     return handleTaxLanding(newState)
   } else if (tile.type === 'PROPERTY' || tile.type === 'AIRPORT' || tile.type === 'UTILITY') {
     return handlePropertyLanding(newState)
-  } else if (tile.name === 'Go To Prison') {
+    // TODO: these special tiles should be stored in an enum variable
+  } else if (tile.name.includes('Prison')) {
     return handlePrisonLanding(newState)
   }
 
