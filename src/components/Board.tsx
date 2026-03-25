@@ -39,7 +39,6 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
   const { gameState } = useGame()
   const tiles = gameState.tiles
 
-
   const isRolling = gameState.turnPhase === 'ROLLING'
   const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
 
