@@ -134,6 +134,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   const [showMobileLeft, setShowMobileLeft] = useState(false)
+  const [showMobileRight, setShowMobileRight] = useState(false)
   const [showDesktopLeft, setShowDesktopLeft] = useState(false)
   const [showDesktopRight, setShowDesktopRight] = useState(false)
 
@@ -287,6 +288,20 @@ const GameScreen: React.FC<GameScreenProps> = ({
           >
             <Info size={24} />
             <span className="text-[10px] font-bold">{t('game.infoLogs', 'Info/Logs')}</span>
+          </button>
+          <button
+            onClick={() => {
+              sounds.playClick()
+              setShowMobileRight(true)
+            }}
+            className="flex flex-col items-center gap-1 text-egyptian-gold dark:text-yellow-500 p-2 rounded-lg active:bg-slate-100 dark:active:bg-slate-800 transition-colors relative"
+            aria-label={t('game.controls', 'Controls')}
+          >
+            <Gamepad2 size={24} />
+            <span className="text-[10px] font-bold">{t('game.controls', 'Controls')}</span>
+            {isMyTurn && (
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse border-2 border-white dark:border-slate-900"></span>
+            )}
           </button>
           <button
             onClick={() => {
@@ -450,11 +465,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
           </TransformWrapper>
         </div>
 
-        {/* Right Panel (Controls & Chat) - Render below board on mobile only now */}
-        <div className="lg:hidden w-full shrink-0 flex justify-center mt-4 lg:mt-0">
-          {controlsContent}
-        </div>
-
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
           winner={gameState.players.find((p) => !p.isBankrupt)}
@@ -469,22 +479,52 @@ const GameScreen: React.FC<GameScreenProps> = ({
               initial={{ opacity: 0, x: -100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
-              className="fixed inset-0 z-50 flex bg-black/50"
+              className="fixed inset-0 z-50 flex bg-black/50 lg:hidden"
             >
               <div className="bg-sand dark:bg-slate-900 h-full w-80 shadow-2xl flex flex-col">
                 <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 bg-sand dark:bg-slate-900 z-10">
-                  <h2 className="text-xl font-bold">{t('game.infoLogs')}</h2>
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    <Info size={20} /> {t('game.infoLogs')}
+                  </h2>
                   <button
                     onClick={() => {
                       sounds.playClick()
                       setShowMobileLeft(false)
                     }}
-                    className="bg-white dark:bg-slate-800 dark:text-white rounded-full p-1"
+                    className="hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full p-1 transition-colors"
                   >
-                    <X size={20} />
+                    <X size={24} />
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4">{playerInfoContent}</div>
+              </div>
+            </motion.div>
+          )}
+          {showMobileRight && (
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              className="fixed inset-0 z-50 flex justify-end bg-black/50 lg:hidden"
+            >
+              <div className="bg-sand dark:bg-slate-900 h-full w-80 shadow-2xl flex flex-col">
+                <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 bg-sand dark:bg-slate-900 z-10">
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    <Gamepad2 size={20} /> {t('game.controls', 'Controls')}
+                  </h2>
+                  <button
+                    onClick={() => {
+                      sounds.playClick()
+                      setShowMobileRight(false)
+                    }}
+                    className="hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full p-1 transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 flex justify-center">
+                  {controlsContent}
+                </div>
               </div>
             </motion.div>
           )}
