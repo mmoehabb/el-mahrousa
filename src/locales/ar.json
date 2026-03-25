@@ -145,7 +145,10 @@
     "tradeRejected": "رفض {{name}} المبادلة من {{partner}}",
     "boughtHouse": "اشترى {{name}} منزلًا في {{property}} مقابل {{price}}",
     "soldHouse": "باع {{name}} منزلًا في {{property}} مقابل {{price}}",
-    "soldProperty": "باع {{name}} {{property}} مقابل {{price}}"
+    "soldProperty": "باع {{name}} {{property}} مقابل {{price}}",
+    "eventHazak": "{{name}} سحب بطاقة حظك: {{title}}",
+    "eventSodfa": "{{name}} سحب بطاقة صدفة وانتقل إلى {{property}}",
+    "paidTax": "{{name}} دفع {{amount}} لـ {{property}}"
   },
   "tiles": {
     "go": "الانطلاق",
