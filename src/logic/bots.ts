@@ -106,7 +106,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     }
 
     if (isDangerTrade) {
-      if (completesGroupForBot && isAttractiveCash) {
+      if (completesGroupForBot || isAttractiveCash) {
         // Accept the danger trade if conditions are met
         return { type: 'ACCEPT_TRADE', tradeId: pendingTrade.id! }
       } else {
