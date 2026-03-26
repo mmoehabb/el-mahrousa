@@ -78,7 +78,9 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center">
+    <div
+      className={`min-h-screen ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center`}
+    >
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       <Toast message={voiceError || null} onClose={() => setVoiceError?.(null)} />
       <Toast message={connectionError || null} onClose={() => setConnectionError?.(null)} />
