@@ -132,7 +132,23 @@
     "cancelOffer": "إلغاء العرض",
     "reject": "رفض",
     "acceptOffer": "قبول العرض",
-    "viewAllTrades": "عرض كل المبادلات"
+    "viewAllTrades": "عرض كل المبادلات",
+    "to": "إلى: {{name}}",
+    "from": "من: {{name}}",
+    "unknown": "غير معروف",
+    "status": {
+      "PENDING": "قيد الانتظار",
+      "ACCEPTED": "مقبول",
+      "REJECTED": "مرفوض",
+      "CANCELED": "ملغى"
+    },
+    "tabs": {
+      "PROPOSE": "اقتراح",
+      "PENDING": "قيد الانتظار",
+      "ACCEPTED": "مقبول",
+      "REJECTED": "مرفوض"
+    },
+    "noTradesFound": "لم يتم العثور على مبادلات {{status}}."
   },
   "logs": {
     "started": "بدأت اللعبة!",
