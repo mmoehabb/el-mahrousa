@@ -110,7 +110,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
     const isSender = trade.fromId === myId
     const otherId = isSender ? trade.toId : trade.fromId
     const otherPlayer = players.find((p) => p.id === otherId)
-    const otherName = otherPlayer ? otherPlayer.name : 'Unknown'
+    const otherName = otherPlayer ? otherPlayer.name : t('trade.unknown')
 
     return (
       <div
@@ -119,10 +119,10 @@ const TradeModal: React.FC<TradeModalProps> = ({
       >
         <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-2">
           <div className="font-bold text-egyptian-blue dark:text-egyptian-gold">
-            {isSender ? `To: ${otherName}` : `From: ${otherName}`}
+            {isSender ? t('trade.to', { name: otherName }) : t('trade.from', { name: otherName })}
           </div>
           <div className="text-xs uppercase px-2 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold">
-            {trade.status}
+            {t(`trade.status.${trade.status}`)}
           </div>
         </div>
 
@@ -134,7 +134,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
             </div>
             <div className="text-xs space-y-1">
               {(isSender ? trade.myProperties : trade.partnerProperties).map((pid) => (
-                <div key={pid}>• {allTiles[pid]?.name}</div>
+                <div key={pid}>
+                  • {t(`tiles.${allTiles[pid]?.name.toLowerCase().replace(/ /g, '-')}`)}
+                </div>
               ))}
               {(isSender ? trade.myProperties : trade.partnerProperties).length === 0 && (
                 <div className="italic text-slate-400">{t('trade.noProperties')}</div>
@@ -153,7 +155,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
             </div>
             <div className="text-xs space-y-1">
               {(isSender ? trade.partnerProperties : trade.myProperties).map((pid) => (
-                <div key={pid}>• {allTiles[pid]?.name}</div>
+                <div key={pid}>
+                  • {t(`tiles.${allTiles[pid]?.name.toLowerCase().replace(/ /g, '-')}`)}
+                </div>
               ))}
               {(isSender ? trade.partnerProperties : trade.myProperties).length === 0 && (
                 <div className="italic text-slate-400">{t('trade.noProperties')}</div>
@@ -198,7 +202,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
     if (list.length === 0) {
       return (
         <div className="p-8 text-center text-slate-500 dark:text-slate-400 italic">
-          No {status.toLowerCase()} trades found.
+          {t('trade.noTradesFound', { status: t(`trade.tabs.${status}`).toLowerCase() })}
         </div>
       )
     }
@@ -236,7 +240,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                   : 'hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              {tab}
+              {t(`trade.tabs.${tab}`)}
             </button>
           ))}
         </div>
@@ -283,7 +287,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                             htmlFor={`my-property-${pid}`}
                             className="text-[10px] cursor-pointer"
                           >
-                            {allTiles[pid].name}
+                            {t(`tiles.${allTiles[pid].name.toLowerCase().replace(/ /g, '-')}`)}
                           </label>
                         </div>
                       ))
@@ -350,7 +354,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                                 htmlFor={`partner-property-${pid}`}
                                 className="text-[10px] cursor-pointer"
                               >
-                                {allTiles[pid].name}
+                                {t(`tiles.${allTiles[pid].name.toLowerCase().replace(/ /g, '-')}`)}
                               </label>
                             </div>
                           ))

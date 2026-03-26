@@ -132,7 +132,23 @@
     "cancelOffer": "Cancel Offer",
     "reject": "Reject",
     "acceptOffer": "Accept Offer",
-    "viewAllTrades": "View All Trades"
+    "viewAllTrades": "View All Trades",
+    "to": "To: {{name}}",
+    "from": "From: {{name}}",
+    "unknown": "Unknown",
+    "status": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "CANCELED": "Canceled"
+    },
+    "tabs": {
+      "PROPOSE": "Propose",
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected"
+    },
+    "noTradesFound": "No {{status}} trades found."
   },
   "logs": {
     "started": "Game started!",
