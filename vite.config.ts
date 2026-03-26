@@ -5,7 +5,6 @@ import packageJson from './package.json'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/el-mahrousa/',
   plugins: [react()],
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),

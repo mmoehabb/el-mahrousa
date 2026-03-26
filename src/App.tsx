@@ -14,7 +14,7 @@ import Toast from './components/Toast'
 
 function App() {
   const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume } = useGame()
-  const [playBgm, { stop: stopBgm }] = useSound('/el-mahrousa/sounds/bgm.mp3', {
+  const [playBgm, { stop: stopBgm }] = useSound('/sounds/bgm.mp3', {
     loop: true,
     volume: bgmVolume,
   })

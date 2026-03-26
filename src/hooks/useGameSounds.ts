@@ -6,15 +6,15 @@ export const useGameSounds = () => {
   const { isSfxEnabled, sfxVolume } = useGame()
   const volume = sfxVolume
 
-  const [playRoll] = useSound('/el-mahrousa/sounds/roll.mp3', { volume })
-  const [playMove] = useSound('/el-mahrousa/sounds/move.mp3', { volume })
-  const [playBuy] = useSound('/el-mahrousa/sounds/buy.mp3', { volume })
-  const [playRent] = useSound('/el-mahrousa/sounds/rent.mp3', { volume })
-  const [playJail] = useSound('/el-mahrousa/sounds/jail.mp3', { volume })
-  const [playGo] = useSound('/el-mahrousa/sounds/go.mp3', { volume })
-  const [playWin] = useSound('/el-mahrousa/sounds/win.mp3', { volume })
-  const [playBankrupt] = useSound('/el-mahrousa/sounds/bankrupt.mp3', { volume })
-  const [playClick] = useSound('/el-mahrousa/sounds/click.mp3', { volume: volume * 0.4 })
+  const [playRoll] = useSound('/sounds/roll.mp3', { volume })
+  const [playMove] = useSound('/sounds/move.mp3', { volume })
+  const [playBuy] = useSound('/sounds/buy.mp3', { volume })
+  const [playRent] = useSound('/sounds/rent.mp3', { volume })
+  const [playJail] = useSound('/sounds/jail.mp3', { volume })
+  const [playGo] = useSound('/sounds/go.mp3', { volume })
+  const [playWin] = useSound('/sounds/win.mp3', { volume })
+  const [playBankrupt] = useSound('/sounds/bankrupt.mp3', { volume })
+  const [playClick] = useSound('/sounds/click.mp3', { volume: volume * 0.4 })
 
   return useMemo(() => {
     const playSound = (soundFn: () => void) => {
