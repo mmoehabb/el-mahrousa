@@ -443,9 +443,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             limitToBounds={false}
             centerOnInit={true}
           >
-            <TransformComponent
-              wrapperStyle={{ width: '100%', height: '100%' }}
-            >
+            <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
               <Board
                 handleRoll={handleRoll}
                 isMyTurn={isMyTurn}
