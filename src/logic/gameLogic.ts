@@ -288,7 +288,7 @@ export const buyHouse = (state: GameState, tileId: number): GameState => {
 }
 
 export const sellHouse = (state: GameState, tileId: number): GameState => {
-  if (state.turnPhase !== 'ROLL') return state
+  if (state.turnPhase !== 'ROLL' && state.turnPhase !== 'ACTION') return state
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[tileId]
 
@@ -324,7 +324,7 @@ export const sellHouse = (state: GameState, tileId: number): GameState => {
 }
 
 export const sellProperty = (state: GameState, tileId: number): GameState => {
-  if (state.turnPhase !== 'ROLL') return state
+  if (state.turnPhase !== 'ROLL' && state.turnPhase !== 'ACTION') return state
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[tileId]
 
