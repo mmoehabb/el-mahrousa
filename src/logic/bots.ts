@@ -73,8 +73,12 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
   )
   if (pendingTrade) {
     // Evaluate if the trade is beneficial
+    // The bot is the recipient (partner) of the trade offer.
+    // The offer creator ('my') is giving myCash and myProperties to the bot.
+    // The bot ('partner') is giving partnerCash and partnerProperties to the creator.
+
     // 1. DANGER: Does it give the other player a town that completes a color group?
-    for (const propId of pendingTrade.myProperties) {
+    for (const propId of pendingTrade.partnerProperties) {
       // properties the bot is giving away
       if (completesColorGroup(gameState, pendingTrade.fromId!, propId)) {
         return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
@@ -82,7 +86,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     }
 
     // 2. NAIVE: Does it make the bot lose a complete color group?
-    for (const propId of pendingTrade.myProperties) {
+    for (const propId of pendingTrade.partnerProperties) {
       if (breaksColorGroup(gameState, currentPlayer.id, propId)) {
         return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
       }
@@ -90,16 +94,16 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
     // Calculate net value
     const botGetsValue =
-      pendingTrade.partnerCash +
-      pendingTrade.partnerProperties.reduce((acc, id) => acc + (gameState.tiles[id].price || 0), 0)
-
-    const botGivesValue =
       pendingTrade.myCash +
       pendingTrade.myProperties.reduce((acc, id) => acc + (gameState.tiles[id].price || 0), 0)
 
+    const botGivesValue =
+      pendingTrade.partnerCash +
+      pendingTrade.partnerProperties.reduce((acc, id) => acc + (gameState.tiles[id].price || 0), 0)
+
     // Highly value properties that complete a color group for the bot
     let completesGroupForBot = false
-    for (const propId of pendingTrade.partnerProperties) {
+    for (const propId of pendingTrade.myProperties) {
       if (completesColorGroup(gameState, currentPlayer.id, propId)) {
         completesGroupForBot = true
       }
