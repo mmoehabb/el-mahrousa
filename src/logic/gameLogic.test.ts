@@ -1135,11 +1135,24 @@ describe('sellProperty', () => {
     assert.strictEqual(log.key, 'soldProperty')
   })
 
-  test('should not allow selling property if turnPhase is not ROLL', () => {
+  test('should allow selling property if turnPhase is ACTION', () => {
     const player = createMockPlayer({ balance: 1000, properties: [1] })
     const tile = createMockTile({ id: 1, price: 200 })
     const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
       turnPhase: 'ACTION',
+    })
+
+    const newState = sellProperty(state, 1)
+
+    assert.notStrictEqual(newState, state)
+    assert.strictEqual(newState.players[0].balance, 1100) // 1000 + 100
+  })
+
+  test('should not allow selling property if turnPhase is not ROLL or ACTION', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
+    const tile = createMockTile({ id: 1, price: 200 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
+      turnPhase: 'MOVING',
     })
 
     const newState = sellProperty(state, 1)
@@ -1209,11 +1222,24 @@ describe('sellHouse', () => {
     assert.strictEqual(newState.players[0].balance, 600)
   })
 
-  test('should return original state if turnPhase is not ROLL', () => {
-    const player = createMockPlayer({ properties: [1] })
+  test('should allow selling house if turnPhase is ACTION', () => {
+    const player = createMockPlayer({ balance: 1000, properties: [1] })
     const tile = createMockTile({ id: 1, housePrice: 50, houses: 1 })
     const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
       turnPhase: 'ACTION',
+    })
+
+    const newState = sellHouse(state, 1)
+
+    assert.notStrictEqual(newState, state)
+    assert.strictEqual(newState.players[0].balance, 1025)
+  })
+
+  test('should return original state if turnPhase is not ROLL or ACTION', () => {
+    const player = createMockPlayer({ properties: [1] })
+    const tile = createMockTile({ id: 1, housePrice: 50, houses: 1 })
+    const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
+      turnPhase: 'MOVING',
     })
 
     const newState = sellHouse(state, 1)
@@ -1237,11 +1263,11 @@ describe('sellHouse', () => {
     assert.strictEqual(stateAfterSecondSale.tiles[1].houses, 0)
   })
 
-  test('should not allow selling house if turnPhase is not ROLL', () => {
+  test('should not allow selling house if turnPhase is not ROLL or ACTION', () => {
     const player = createMockPlayer({ properties: [1] })
     const tile = createMockTile({ id: 1, houses: 1 })
     const state = createMockState([player], [createMockTile({ id: 0 }), tile], {
-      turnPhase: 'ACTION',
+      turnPhase: 'MOVING',
     })
 
     const newState = sellHouse(state, 1)

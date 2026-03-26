@@ -10,7 +10,10 @@ export const validateTrade = (
   }
 
   // Validate cash
-  if (p1.balance < trade.myCash || p2.balance < trade.partnerCash) {
+  if (
+    (trade.myCash > 0 && p1.balance < trade.myCash) ||
+    (trade.partnerCash > 0 && p2.balance < trade.partnerCash)
+  ) {
     return { valid: false, error: 'Trade failed: Insufficient funds.' }
   }
 
