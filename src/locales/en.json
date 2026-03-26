@@ -20,7 +20,12 @@
       "soundEffects": "Sound Effects",
       "backgroundMusic": "Background Music",
       "remove": "Remove",
-      "currentServers": "Current Servers"
+      "currentServers": "Current Servers",
+      "about": "About",
+      "version": "Version",
+      "developer": "Developer",
+      "sourceCode": "Source Code",
+      "viewSource": "View on GitHub"
     }
   },
   "lobby": {
