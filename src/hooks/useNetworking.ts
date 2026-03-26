@@ -396,21 +396,6 @@ export const useNetworking = () => {
 
     const currentPlayer = gameState.players[gameState.currentPlayerIndex]
 
-    // Check if current player is a bot
-    if (currentPlayer && currentPlayer.isBot && !currentPlayer.isBankrupt) {
-      // Small delay to simulate thinking/allow UI updates.
-      // Make moving faster so it doesn't take forever, but keep other actions slightly delayed
-      const delay = gameState.turnPhase === 'MOVING' ? 250 : 400
-      const timer = setTimeout(() => {
-        const action = getBotAction(gameState)
-        if (action) {
-          handleActionRef.current(action, currentPlayer.id)
-        }
-      }, delay)
-
-      return () => clearTimeout(timer)
-    }
-
     // Check for pending trades involving bots even if it's not their turn
     // We only process one trade per tick to avoid conflicts
     const pendingTrade = gameState.trades.find((t) => {
@@ -439,6 +424,21 @@ export const useNetworking = () => {
           }
         }
       }, 1000)
+      return () => clearTimeout(timer)
+    }
+
+    // Check if current player is a bot
+    if (currentPlayer && currentPlayer.isBot && !currentPlayer.isBankrupt) {
+      // Small delay to simulate thinking/allow UI updates.
+      // Make moving faster so it doesn't take forever, but keep other actions slightly delayed
+      const delay = gameState.turnPhase === 'MOVING' ? 250 : 400
+      const timer = setTimeout(() => {
+        const action = getBotAction(gameState)
+        if (action) {
+          handleActionRef.current(action, currentPlayer.id)
+        }
+      }, delay)
+
       return () => clearTimeout(timer)
     }
   }, [gameState])
