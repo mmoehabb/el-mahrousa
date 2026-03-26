@@ -20,7 +20,12 @@
       "soundEffects": "مؤثرات صوتية",
       "backgroundMusic": "موسيقى خلفية",
       "remove": "إزالة",
-      "currentServers": "الخوادم الحالية"
+      "currentServers": "الخوادم الحالية",
+      "about": "حول",
+      "version": "الإصدار",
+      "developer": "المطور",
+      "sourceCode": "كود المصدر",
+      "viewSource": "عرض على GitHub"
     }
   },
   "lobby": {

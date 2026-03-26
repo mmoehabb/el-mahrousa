@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Settings, Server, Volume2, Music, Trash2 } from 'lucide-react'
+import { X, Settings, Server, Volume2, Music, Trash2, Info, Github, Mail } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 
 interface SettingsModalProps {
@@ -8,7 +8,7 @@ interface SettingsModalProps {
   onClose: () => void
 }
 
-type Tab = 'general' | 'servers'
+type Tab = 'general' | 'servers' | 'about'
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { t, i18n } = useTranslation()
@@ -107,6 +107,18 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           >
             <Server size={20} />
             {t('common.settings.servers')}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('about')}
+            className={`flex-1 md:flex-none md:w-full flex justify-center md:justify-start items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold transition-colors whitespace-nowrap ${
+              activeTab === 'about'
+                ? 'bg-egyptian-blue text-white dark:bg-egyptian-gold dark:text-slate-900'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            <Info size={20} />
+            {t('common.settings.about', 'About')}
           </button>
         </nav>
       </div>
@@ -318,6 +330,61 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       </div>
                     </div>
                   )}
+                </section>
+              </div>
+            )}
+
+            {activeTab === 'about' && (
+              <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-6 flex items-center gap-2">
+                    <Info size={24} />
+                    {t('common.settings.about', 'About')}
+                  </h3>
+
+                  <div className="space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                      <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
+                        <Info size={20} className="text-egyptian-blue dark:text-egyptian-gold" />
+                        <span className="font-bold">{t('common.settings.version', 'Version')}</span>
+                      </div>
+                      <span className="font-mono bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-600">
+                        v{__APP_VERSION__}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                      <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
+                        <Mail size={20} className="text-egyptian-blue dark:text-egyptian-gold" />
+                        <span className="font-bold">
+                          {t('common.settings.developer', 'Developer')}
+                        </span>
+                      </div>
+                      <a
+                        href="mailto:mo.ehab.abdelsalam@gmail.com"
+                        className="text-egyptian-blue dark:text-egyptian-gold hover:underline font-medium break-all"
+                      >
+                        mo.ehab.abdelsalam@gmail.com
+                      </a>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                      <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
+                        <Github size={20} className="text-egyptian-blue dark:text-egyptian-gold" />
+                        <span className="font-bold">
+                          {t('common.settings.sourceCode', 'Source Code')}
+                        </span>
+                      </div>
+                      <a
+                        href="https://github.com/mmoehabb/el-mahrousa"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-white bg-slate-800 hover:bg-slate-700 dark:bg-slate-600 dark:hover:bg-slate-500 px-4 py-2 rounded-lg font-bold transition-colors"
+                      >
+                        {t('common.settings.viewSource', 'View on GitHub')}
+                      </a>
+                    </div>
+                  </div>
                 </section>
               </div>
             )}
