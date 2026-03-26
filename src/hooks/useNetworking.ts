@@ -419,12 +419,25 @@ export const useNetworking = () => {
     })
     if (pendingTrade && pendingTrade.id && pendingTrade.toId) {
       const timer = setTimeout(() => {
-        // Bots automatically reject trades for now as handled by getBotAction,
-        // but since getBotAction uses currentPlayer we need a direct reject here
-        handleActionRef.current(
-          { type: 'REJECT_TRADE', tradeId: pendingTrade.id! },
-          pendingTrade.toId!,
-        )
+        // Bots now use getBotAction to evaluate trades if it's their turn.
+        // If it's not their turn, we can still call getBotAction by faking the state
+        // just to get the trade evaluation, or we can just rely on the active turn.
+        // Actually, the bot should be able to answer trades on other players' turns.
+        // We can temporarily set the currentPlayerIndex to the bot's index to get the trade response.
+        const botIndex = gameState.players.findIndex((p) => p.id === pendingTrade.toId)
+        if (botIndex !== -1) {
+          const fakeState = { ...gameState, currentPlayerIndex: botIndex }
+          const action = getBotAction(fakeState)
+          if (action && (action.type === 'ACCEPT_TRADE' || action.type === 'REJECT_TRADE')) {
+            handleActionRef.current(action, pendingTrade.toId!)
+          } else {
+            // Default to reject if logic fails
+            handleActionRef.current(
+              { type: 'REJECT_TRADE', tradeId: pendingTrade.id! },
+              pendingTrade.toId!,
+            )
+          }
+        }
       }, 1000)
       return () => clearTimeout(timer)
     }

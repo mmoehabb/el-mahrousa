@@ -1,5 +1,60 @@
 import type { GameState, GameAction, Player } from '../types/game.ts'
 
+// Module-level state to track bot trades (recently rejected trades, trades per turn, etc.)
+const botMemory: Record<
+  string,
+  {
+    tradesThisTurn: number
+    lastTurnIndex: number
+    rejectedOffers: { toId: string; propertyId: number }[]
+  }
+> = {}
+
+/**
+ * Helper to initialize or retrieve bot memory
+ */
+const getBotMemory = (botId: string, currentTurnIndex: number) => {
+  if (!botMemory[botId] || botMemory[botId].lastTurnIndex !== currentTurnIndex) {
+    // Reset if it's a new turn for this bot
+    botMemory[botId] = {
+      tradesThisTurn: 0,
+      lastTurnIndex: currentTurnIndex,
+      // Keep rejected offers across turns, or just for recent history?
+      // Let's reset rejected offers each turn to keep it simple,
+      // or keep them so it doesn't spam the same player across multiple turns.
+      // We'll keep them across turns but reset if the bot needs a property again.
+      rejectedOffers: botMemory[botId]?.rejectedOffers || [],
+    }
+  }
+  return botMemory[botId]
+}
+
+/**
+ * Check if acquiring a specific property completes a color group for a player
+ */
+const completesColorGroup = (gameState: GameState, playerId: string, tileId: number): boolean => {
+  const tile = gameState.tiles[tileId]
+  if (!tile.group) return false
+  const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
+  const playerProps = gameState.players.find((p) => p.id === playerId)?.properties || []
+
+  // They complete the group if they own all other tiles in the group
+  return groupTiles.every((t) => t.id === tileId || playerProps.includes(t.id))
+}
+
+/**
+ * Check if losing a specific property breaks a complete color group for a player
+ */
+const breaksColorGroup = (gameState: GameState, playerId: string, tileId: number): boolean => {
+  const tile = gameState.tiles[tileId]
+  if (!tile.group) return false
+  const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
+  const playerProps = gameState.players.find((p) => p.id === playerId)?.properties || []
+
+  // They break the group if they currently own all tiles in the group
+  return groupTiles.every((t) => playerProps.includes(t.id))
+}
+
 /**
  * Evaluates the current game state for the active bot player and returns the next action to perform.
  * If no action is needed or possible, it returns null.
@@ -10,16 +65,51 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     return null
   }
 
+  const memory = getBotMemory(currentPlayer.id, gameState.currentPlayerIndex)
+
   // Handle pending trades where the bot is the recipient
   const pendingTrade = gameState.trades.find(
     (t) => t.toId === currentPlayer.id && t.status === 'PENDING',
   )
   if (pendingTrade) {
-    // Basic logic: Reject all trades for now, or randomly accept
-    // Let's implement a safe heuristic: if it gives the bot more cash and equal/more properties, accept, else reject.
-    // Actually, simple is better: Reject all trades to prevent exploitation by human players.
-    // We can evaluate if buying property is worth it later.
-    return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
+    // Evaluate if the trade is beneficial
+    // 1. DANGER: Does it give the other player a town that completes a color group?
+    for (const propId of pendingTrade.myProperties) {
+      // properties the bot is giving away
+      if (completesColorGroup(gameState, pendingTrade.fromId!, propId)) {
+        return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
+      }
+    }
+
+    // 2. NAIVE: Does it make the bot lose a complete color group?
+    for (const propId of pendingTrade.myProperties) {
+      if (breaksColorGroup(gameState, currentPlayer.id, propId)) {
+        return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
+      }
+    }
+
+    // Calculate net value
+    const botGetsValue =
+      pendingTrade.partnerCash +
+      pendingTrade.partnerProperties.reduce((acc, id) => acc + (gameState.tiles[id].price || 0), 0)
+
+    const botGivesValue =
+      pendingTrade.myCash +
+      pendingTrade.myProperties.reduce((acc, id) => acc + (gameState.tiles[id].price || 0), 0)
+
+    // Highly value properties that complete a color group for the bot
+    let completesGroupForBot = false
+    for (const propId of pendingTrade.partnerProperties) {
+      if (completesColorGroup(gameState, currentPlayer.id, propId)) {
+        completesGroupForBot = true
+      }
+    }
+
+    if (completesGroupForBot || botGetsValue > botGivesValue) {
+      return { type: 'ACCEPT_TRADE', tradeId: pendingTrade.id! }
+    } else {
+      return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
+    }
   }
 
   // Handle Turn Phases
@@ -40,8 +130,52 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
       return { type: 'MOVE_STEP' }
 
     case 'ACTION': {
-      // If balance is negative, we MUST sell or bankrupt
+      // If balance is negative, we MUST sell, trade, or bankrupt
       if (currentPlayer.balance < 0) {
+        // First try to sell properties to other players before the bank
+        const sellableProperties = getSellableProperties(gameState, currentPlayer)
+        if (sellableProperties.length > 0) {
+          for (const propId of sellableProperties) {
+            // Find players who might want it (e.g., they own other properties in the group)
+            const tile = gameState.tiles[propId]
+            const potentialBuyers = gameState.players.filter((p) => {
+              if (p.id === currentPlayer.id || p.isBot) return false
+              return p.properties.some((pid) => gameState.tiles[pid].group === tile.group)
+            })
+
+            for (const buyer of potentialBuyers) {
+              // Check if we already tried this
+              if (
+                memory.rejectedOffers.some((ro) => ro.toId === buyer.id && ro.propertyId === propId)
+              ) {
+                continue
+              }
+
+              // Ask for enough cash to clear debt + 100
+              const askingPrice = Math.abs(currentPlayer.balance) + 100
+              if (buyer.balance >= askingPrice) {
+                // We must check if there is an active trade involving this bot already to avoid spamming
+                const activeTrade = gameState.trades.find(
+                  (t) => t.fromId === currentPlayer.id && t.status === 'PENDING',
+                )
+                if (activeTrade) return null // Wait for the trade to be accepted or rejected
+
+                memory.rejectedOffers.push({ toId: buyer.id, propertyId: propId })
+                return {
+                  type: 'PROPOSE_TRADE',
+                  partnerId: buyer.id,
+                  offer: {
+                    myCash: 0,
+                    partnerCash: askingPrice,
+                    myProperties: [propId],
+                    partnerProperties: [],
+                  },
+                }
+              }
+            }
+          }
+        }
+
         // Try selling houses first
         const houseToSell = getHouseToSell(gameState, currentPlayer)
         if (houseToSell !== null) {
@@ -62,6 +196,59 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
         // Simple heuristic: buy if we have enough money, leaving a buffer of 200 EGP
         if (currentPlayer.balance >= currentTile.price + 200) {
           return { type: 'BUY' }
+        }
+      }
+
+      // If nothing else to do, consider proposing trades for needed properties
+      if (memory.tradesThisTurn < 3) {
+        const activeTrade = gameState.trades.find(
+          (t) => t.fromId === currentPlayer.id && t.status === 'PENDING',
+        )
+        if (!activeTrade) {
+          // Don't propose if one is pending
+          // Find properties we need to complete a town
+          const neededProperties = getNeededProperties(gameState, currentPlayer)
+          for (const { tileId, ownerId } of neededProperties) {
+            if (
+              memory.rejectedOffers.some((ro) => ro.toId === ownerId && ro.propertyId === tileId)
+            ) {
+              continue
+            }
+
+            const tile = gameState.tiles[tileId]
+            const owner = gameState.players.find((p) => p.id === ownerId)
+            if (!owner || !tile.price) continue
+
+            // Determine if we can make a very attractive offer (2x base price + half bot balance)
+            const veryAttractiveOffer = tile.price * 2 + Math.floor(currentPlayer.balance / 2)
+            const attractiveOffer = tile.price * 2
+
+            let offerAmount = 0
+            if (currentPlayer.balance >= veryAttractiveOffer) {
+              offerAmount = veryAttractiveOffer
+            } else if (currentPlayer.balance >= attractiveOffer) {
+              offerAmount = attractiveOffer
+            }
+
+            if (offerAmount > 0) {
+              memory.tradesThisTurn++
+              memory.rejectedOffers.push({ toId: ownerId, propertyId: tileId })
+
+              return {
+                type: 'PROPOSE_TRADE',
+                partnerId: ownerId,
+                offer: {
+                  myCash: offerAmount,
+                  partnerCash: 0,
+                  myProperties: [],
+                  partnerProperties: [tileId],
+                },
+              }
+            }
+          }
+        } else {
+          // We have a pending trade, wait for it
+          return null
         }
       }
 
@@ -136,11 +323,7 @@ const getHouseToSell = (gameState: GameState, player: Player): number | null => 
 
 // Helper: Determine which property to sell when in debt
 const getPropertyToSell = (gameState: GameState, player: Player): number | null => {
-  // Find properties with 0 houses
-  const sellableProperties = player.properties.filter((tileId) => {
-    const tile = gameState.tiles[tileId]
-    return (tile.houses || 0) === 0
-  })
+  const sellableProperties = getSellableProperties(gameState, player)
 
   if (sellableProperties.length > 0) {
     // Sort by price ascending to sell cheapest first
@@ -153,4 +336,45 @@ const getPropertyToSell = (gameState: GameState, player: Player): number | null 
   }
 
   return null
+}
+
+const getSellableProperties = (gameState: GameState, player: Player): number[] => {
+  return player.properties.filter((tileId) => {
+    const tile = gameState.tiles[tileId]
+    return (tile.houses || 0) === 0
+  })
+}
+
+// Helper: Get properties needed to complete a color group
+const getNeededProperties = (
+  gameState: GameState,
+  player: Player,
+): { tileId: number; ownerId: string }[] => {
+  const needed: { tileId: number; ownerId: string }[] = []
+
+  // Iterate over properties we own
+  for (const propId of player.properties) {
+    const tile = gameState.tiles[propId]
+    if (!tile.group) continue
+
+    const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
+    const missingTiles = groupTiles.filter((t) => !player.properties.includes(t.id))
+
+    // If we only need 1 or 2 tiles to complete the town
+    if (missingTiles.length > 0 && missingTiles.length <= 2) {
+      for (const missing of missingTiles) {
+        // Find owner
+        const owner = gameState.players.find((p) => p.properties.includes(missing.id))
+        // If owned by someone else (not the bank) and they are not a bot
+        if (owner && owner.id !== player.id) {
+          // Avoid duplicate requests for the same tile
+          if (!needed.some((n) => n.tileId === missing.id)) {
+            needed.push({ tileId: missing.id, ownerId: owner.id })
+          }
+        }
+      }
+    }
+  }
+
+  return needed
 }
