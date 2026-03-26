@@ -1,0 +1,14 @@
+--- GameScreen.tsx
++++ GameScreen.tsx
+@@ -446,11 +446,6 @@
+           >
+             <TransformComponent
+               wrapperStyle={{ width: '100%', height: '100%' }}
+-              contentStyle={{
+-                display: 'flex',
+-                justifyContent: 'center',
+-                alignItems: 'center',
+-              }}
+             >
+               <Board
+                 gameState={gameState}
