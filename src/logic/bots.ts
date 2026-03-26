@@ -77,10 +77,39 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     // The offer creator ('my') is giving myCash and myProperties to the bot.
     // The bot ('partner') is giving partnerCash and partnerProperties to the creator.
 
+    // Check if the trade completes a color group for the bot
+    let completesGroupForBot = false
+    for (const propId of pendingTrade.myProperties) {
+      if (completesColorGroup(gameState, currentPlayer.id, propId)) {
+        completesGroupForBot = true
+      }
+    }
+
+    // Determine if the cash offered is "attractive"
+    let isAttractiveCash = false
+    if (currentPlayer.balance >= 1000) {
+      isAttractiveCash = pendingTrade.myCash >= currentPlayer.balance * 2
+    } else if (currentPlayer.balance >= 200) {
+      isAttractiveCash = pendingTrade.myCash >= currentPlayer.balance * 3
+    } else {
+      isAttractiveCash = pendingTrade.myCash >= 700
+    }
+
     // 1. DANGER: Does it give the other player a town that completes a color group?
+    let isDangerTrade = false
     for (const propId of pendingTrade.partnerProperties) {
       // properties the bot is giving away
       if (completesColorGroup(gameState, pendingTrade.fromId!, propId)) {
+        isDangerTrade = true
+        break
+      }
+    }
+
+    if (isDangerTrade) {
+      if (completesGroupForBot && isAttractiveCash) {
+        // Accept the danger trade if conditions are met
+        return { type: 'ACCEPT_TRADE', tradeId: pendingTrade.id! }
+      } else {
         return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
       }
     }
@@ -100,14 +129,6 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     const botGivesValue =
       pendingTrade.partnerCash +
       pendingTrade.partnerProperties.reduce((acc, id) => acc + (gameState.tiles[id].price || 0), 0)
-
-    // Highly value properties that complete a color group for the bot
-    let completesGroupForBot = false
-    for (const propId of pendingTrade.myProperties) {
-      if (completesColorGroup(gameState, currentPlayer.id, propId)) {
-        completesGroupForBot = true
-      }
-    }
 
     if (completesGroupForBot || botGetsValue > botGivesValue) {
       return { type: 'ACCEPT_TRADE', tradeId: pendingTrade.id! }
