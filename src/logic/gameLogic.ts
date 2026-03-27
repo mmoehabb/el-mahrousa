@@ -426,6 +426,15 @@ export const endTurn = (state: GameState): GameState => {
 }
 
 export const handleBankrupt = (state: GameState, playerId: string): GameState => {
+  const bankruptPlayer = state.players.find((p) => p.id === playerId)
+
+  const newTiles = state.tiles.map((tile) => {
+    if (bankruptPlayer && bankruptPlayer.properties.includes(tile.id) && tile.houses) {
+      return { ...tile, houses: 0 }
+    }
+    return tile
+  })
+
   const newPlayers = state.players.map((p) => {
     if (p.id === playerId) {
       return { ...p, isBankrupt: true, balance: 0, properties: [] }
@@ -433,7 +442,7 @@ export const handleBankrupt = (state: GameState, playerId: string): GameState =>
     return p
   })
 
-  return { ...state, players: newPlayers }
+  return { ...state, players: newPlayers, tiles: newTiles }
 }
 
 export const proposeTrade = (
