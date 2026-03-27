@@ -28,12 +28,12 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
           style={{ backgroundColor: tile.color }}
         />
       )}
-      <div className="mt-3 md:mt-5 font-bold uppercase tracking-tighter text-[10px] sm:text-[12px] md:text-[14px] font-arabic-pixel leading-tight">
+      <div className="mt-5 font-bold uppercase tracking-tighter text-[14px] font-arabic-pixel leading-tight">
         {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
       </div>
 
       {tile.price && (
-        <div className="text-[6px] sm:text-[7px] md:text-[8px] text-slate-600 dark:text-slate-300 font-english-pixel mt-auto mb-0.5 md:mb-1">
+        <div className="text-[8px] text-slate-600 dark:text-slate-300 font-english-pixel mt-auto mb-1">
           {tile.price} {GAME_CONFIG.CURRENCY}
         </div>
       )}
@@ -42,22 +42,20 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
       {tile.houses ? (
         <div className="absolute top-0.5 right-0.5 flex gap-0.5 z-30">
           <div className="bg-white/80 dark:bg-slate-800/80 rounded px-0.5 flex items-center shadow-sm text-egyptian-blue dark:text-egyptian-gold">
-            <Home className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4" />
-            <span className="text-[8px] sm:text-[10px] md:text-xs font-bold font-english-pixel ml-0.5">
-              {tile.houses}
-            </span>
+            <Home className="w-4 h-4" />
+            <span className="text-xs font-bold font-english-pixel ml-0.5">{tile.houses}</span>
           </div>
         </div>
       ) : null}
 
       {/* Container for players, absolutely positioned near the center to avoid shifting layout */}
-      <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-1 md:gap-1.5 z-20 pointer-events-none p-1 pt-6">
+      <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-1.5 z-20 pointer-events-none p-1 pt-6">
         {tilePlayers.map((p) => (
           <motion.div
             key={p.id}
             layoutId={`player-${p.id}`}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-2 md:border-3 shadow-md overflow-hidden bg-white ${
+            className={`w-10 h-10 rounded-full border-[3px] shadow-md overflow-hidden bg-white ${
               p.isBankrupt ? 'border-slate-400 opacity-60 grayscale' : ''
             }`}
             style={{ borderColor: p.isBankrupt ? '#94a3b8' : p.color }}
