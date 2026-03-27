@@ -333,7 +333,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       })
     })
     return ownerMap
-  }, [gameState.players])
+  }, [gameState])
 
   return (
     <>
