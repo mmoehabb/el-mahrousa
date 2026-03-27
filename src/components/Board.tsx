@@ -107,10 +107,28 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
     onTileClick(tile)
   }
 
+  // Get grid coordinates for a tile index (0 to 39) to place the floating dice
+  const getGridCoordinates = (tileIndex: number) => {
+    if (tileIndex >= 0 && tileIndex <= 10) {
+      // Bottom Row: 0 to 10
+      return { col: 11 - tileIndex, row: 11 }
+    } else if (tileIndex >= 11 && tileIndex <= 19) {
+      // Left Col: 11 to 19
+      return { col: 1, row: 11 - (tileIndex - 10) }
+    } else if (tileIndex >= 20 && tileIndex <= 30) {
+      // Top Row: 20 to 30
+      return { col: tileIndex - 19, row: 1 }
+    } else if (tileIndex >= 31 && tileIndex <= 39) {
+      // Right Col: 31 to 39
+      return { col: 11, row: tileIndex - 29 }
+    }
+    return { col: 1, row: 11 } // Default to Go
+  }
+
   return (
     <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold w-[1200px] h-[1200px] min-w-[1200px] min-h-[1200px] max-w-none overflow-hidden">
       <div
-        className="grid gap-0.5 sm:gap-1 w-full h-full"
+        className="grid gap-0.5 sm:gap-1 w-full h-full relative"
         style={{
           gridTemplateColumns: '1.4fr repeat(9, 1fr) 1.4fr',
           gridTemplateRows: '1.4fr repeat(9, 1fr) 1.4fr',
@@ -131,6 +149,61 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             />
           </div>
         ))}
+
+        {/* Floating Dice CTA for Mobile - Rendered over the active player's tile */}
+        {isMyTurn &&
+          (gameState.turnPhase === 'ROLL' || gameState.turnPhase === 'ROLLING') &&
+          currentPlayer && (
+            <div
+              className="lg:hidden pointer-events-none relative w-full h-full flex items-center justify-center"
+              style={{
+                gridColumnStart: getGridCoordinates(currentPlayer.position).col,
+                gridRowStart: getGridCoordinates(currentPlayer.position).row,
+                zIndex: 60,
+              }}
+            >
+              {/* The actual button is offset slightly to appear "floating above" the tile, or below if on the top edge */}
+              <div
+                className={`absolute flex flex-col items-center gap-1 pointer-events-auto ${getGridCoordinates(currentPlayer.position).row <= 2 ? '-bottom-24 flex-col-reverse' : '-top-20'}`}
+              >
+                <div className="text-[10px] font-bold text-egyptian-blue dark:text-blue-400 bg-white/90 dark:bg-slate-900/90 px-2 py-0.5 rounded-full shadow-md backdrop-blur uppercase whitespace-nowrap">
+                  {t('game.rollDiceBtn')}
+                </div>
+                <button
+                  onClick={handleRoll}
+                  disabled={gameState.turnPhase === 'ROLLING'}
+                  className="flex gap-2 bg-white/90 dark:bg-slate-800/90 p-2 rounded-2xl backdrop-blur-md border border-egyptian-blue shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-transform"
+                >
+                  <motion.div
+                    animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
+                    transition={{
+                      repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                      duration: 0.5,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <DiceFace
+                      value={effectiveDisplayDice[0]}
+                      aria-label={`First die showing ${effectiveDisplayDice[0]}`}
+                    />
+                  </motion.div>
+                  <motion.div
+                    animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
+                    transition={{
+                      repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                      duration: 0.5,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <DiceFace
+                      value={effectiveDisplayDice[1]}
+                      aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
+                    />
+                  </motion.div>
+                </button>
+              </div>
+            </div>
+          )}
 
         {/* Left Column */}
         {leftCol.map((tile, i) => (
@@ -182,7 +255,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
 
         {/* Center */}
         <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-4 md:m-8 lg:m-12 border-2 md:border-4 border-egyptian-gold/40 rounded-lg relative p-4 sm:p-8 space-y-4 sm:space-y-6">
-          <div className="flex gap-4 sm:gap-6 md:gap-8 bg-white/50 dark:bg-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-100 sm:scale-125 md:scale-150">
+          <div className="hidden lg:flex gap-4 sm:gap-6 md:gap-8 bg-white/50 dark:bg-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-150">
             <motion.div
               animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
               transition={{
@@ -211,7 +284,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             </motion.div>
           </div>
 
-          <div className="w-full max-w-[250px] sm:max-w-sm md:max-w-md space-y-2 sm:space-y-4 md:mt-6">
+          <div className="w-full max-w-[250px] sm:max-w-sm md:max-w-md space-y-2 sm:space-y-4 md:mt-6 hidden lg:block">
             {isMyTurn && gameState.turnPhase === 'ROLL' && (
               <button
                 onClick={handleRoll}
@@ -254,9 +327,11 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
                 {t('game.endTurnBtn')}
               </button>
             )}
+          </div>
 
+          <div className="w-full max-w-sm md:max-w-md space-y-4 mt-4 md:mt-6">
             {/* Game Logs placed right below actions */}
-            <div className="w-full mt-4 p-2 sm:p-4 bg-white/40 dark:bg-slate-800/60 rounded-xl backdrop-blur-sm border border-white/30 dark:border-slate-600/30 text-start font-bold flex flex-col items-start overflow-y-auto max-h-32 sm:max-h-48 md:max-h-56 hide-scrollbar shadow-inner">
+            <div className="w-full mt-4 p-4 bg-white/40 dark:bg-slate-800/60 rounded-xl backdrop-blur-sm border border-white/30 dark:border-slate-600/30 text-start font-bold flex flex-col items-start overflow-y-auto max-h-48 md:max-h-56 hide-scrollbar shadow-inner scale-125 origin-top md:scale-150">
               {recentLogs.length > 0 ? (
                 recentLogs.map((log, i) => {
                   const scale = 1 - (i / 6) * 0.35 // 100% to 65%
@@ -264,7 +339,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
                   return (
                     <div
                       key={i}
-                      className="text-[10px] sm:text-xs md:text-sm text-slate-800 dark:text-slate-100 leading-tight w-full origin-top-left rtl:origin-top-right py-0.5"
+                      className="text-xs md:text-sm text-slate-800 dark:text-slate-100 leading-tight w-full origin-top-left rtl:origin-top-right py-0.5"
                       style={{
                         transform: `scale(${scale})`,
                         opacity: opacity,
@@ -276,7 +351,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
                   )
                 })
               ) : (
-                <div className="text-[10px] sm:text-xs md:text-sm text-slate-700 dark:text-slate-200 leading-tight w-full">
+                <div className="text-xs md:text-sm text-slate-700 dark:text-slate-200 leading-tight w-full">
                   {t('game.gameLogs')}
                 </div>
               )}
