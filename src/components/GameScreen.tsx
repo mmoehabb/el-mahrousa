@@ -458,7 +458,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
         </AnimatePresence>
 
         {/* Center: Board */}
-        <div className="w-full h-full flex-1 max-w-full overflow-hidden flex justify-center relative z-10 sm:scale-100 origin-top">
+        <div
+          dir="ltr"
+          className="w-full h-full flex-1 max-w-full overflow-hidden flex justify-center relative z-10 sm:scale-100 origin-top"
+        >
           {/* Top-Middle Floating Button for Camera Follow */}
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
             <button
