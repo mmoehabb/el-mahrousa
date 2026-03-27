@@ -84,7 +84,9 @@ function App() {
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       <Toast message={voiceError || null} onClose={() => setVoiceError?.(null)} />
       <Toast message={connectionError || null} onClose={() => setConnectionError?.(null)} />
-      <div className="hidden lg:block fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]">
+      <div
+        className={`${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? 'hidden lg:block ' : ''}fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]`}
+      >
         <button
           id="global-settings-btn"
           onClick={() => setIsSettingsOpen(!isSettingsOpen)}
