@@ -432,27 +432,27 @@ const GameScreen: React.FC<GameScreenProps> = ({
         </AnimatePresence>
 
         {/* Center: Board */}
-        <TransformWrapper
-          initialScale={0.7}
-          minScale={0.2}
-          maxScale={3}
-          pinch={{ step: 5 }}
-          doubleClick={{ disabled: true }}
-          panning={{ disabled: false }}
-          limitToBounds={false}
-          centerOnInit={true}
-        >
-          <TransformComponent
-            wrapperStyle={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        <div className="w-full h-full flex-1 max-w-full overflow-hidden flex justify-center relative z-10 sm:scale-100 origin-top">
+          <TransformWrapper
+            initialScale={0.7}
+            minScale={0.2}
+            maxScale={3}
+            pinch={{ step: 5 }}
+            doubleClick={{ disabled: true }}
+            panning={{ disabled: false }}
+            limitToBounds={false}
+            centerOnInit={true}
           >
-            <Board
-              handleRoll={handleRoll}
-              isMyTurn={isMyTurn}
-              sendAction={sendAction}
-              onTileClick={setSelectedTile}
-            />
-          </TransformComponent>
-        </TransformWrapper>
+            <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
+              <Board
+                handleRoll={handleRoll}
+                isMyTurn={isMyTurn}
+                sendAction={sendAction}
+                onTileClick={setSelectedTile}
+              />
+            </TransformComponent>
+          </TransformWrapper>
+        </div>
 
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
