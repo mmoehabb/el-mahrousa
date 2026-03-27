@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Peer, { type DataConnection, type MediaConnection } from 'peerjs'
 import { useGame } from '../context/GameContext'
-import { useTranslation } from 'react-i18next'
 import type { GameState, Player } from '../types/game'
 import {
   rollDice,
@@ -32,7 +31,6 @@ const sanitizeName = (name: unknown, defaultName: string): string => {
 }
 
 export const useNetworking = () => {
-  const { t } = useTranslation()
   const { gameState, setGameState, isHost, setIsHost, myId, playerName, avatarName, iceServers } =
     useGame()
   const [peer, setPeer] = useState<Peer | null>(null)
@@ -59,7 +57,7 @@ export const useNetworking = () => {
     (action: any, from: string) => {
       if (!isHost) return
       if (!isValidGameAction(action)) {
-        setConnectionError(t('errors.invalidAction'))
+        setConnectionError('errors.invalidAction')
         return
       }
 
@@ -354,7 +352,7 @@ export const useNetworking = () => {
         return processDebtRepayment(prev, nextState)
       })
     },
-    [isHost, setGameState, lobbyId, myId, t],
+    [isHost, setGameState, lobbyId, myId],
   )
 
   const sendAction = useCallback(
@@ -464,7 +462,7 @@ export const useNetworking = () => {
       })
 
       call.on('error', () => {
-        setVoiceError(t('errors.callError'))
+        setVoiceError('errors.callError')
       })
 
       mediaConnections.current[call.peer] = call
@@ -474,7 +472,7 @@ export const useNetworking = () => {
     return () => {
       peer.off('call', handleCall)
     }
-  }, [peer, myStream, hasJoinedVoice, t])
+  }, [peer, myStream, hasJoinedVoice])
 
   useEffect(() => {
     const config =
@@ -488,15 +486,15 @@ export const useNetworking = () => {
     })
 
     newPeer.on('error', (err) => {
-      setConnectionError(t('errors.peerConnectionError'))
+      setConnectionError('errors.peerConnectionError')
       if (err.type === 'peer-unavailable') {
-        setConnectionError(t('errors.lobbyNotFound'))
+        setConnectionError('errors.lobbyNotFound')
       } else if (err.type === 'network' || err.type === 'server-error') {
-        setConnectionError(t('errors.networkError'))
+        setConnectionError('errors.networkError')
       } else if (err.type === 'unavailable-id') {
-        setConnectionError(t('errors.unavailableId'))
+        setConnectionError('errors.unavailableId')
       } else {
-        setConnectionError(t('errors.connectionError'))
+        setConnectionError('errors.connectionError')
       }
     })
 
@@ -506,7 +504,7 @@ export const useNetworking = () => {
       })
 
       conn.on('error', () => {
-        setConnectionError(t('errors.failedToConnect'))
+        setConnectionError('errors.failedToConnect')
       })
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -515,7 +513,7 @@ export const useNetworking = () => {
           if (conn.peer === lobbyIdRef.current && isValidGameState(data.state)) {
             setGameState(data.state)
           } else {
-            setConnectionError(t('errors.invalidSync'))
+            setConnectionError('errors.invalidSync')
           }
         } else if (data.type === 'ACTION' && isHostRef.current) {
           handleActionRef.current(data.action, conn.peer)
@@ -533,7 +531,7 @@ export const useNetworking = () => {
     return () => {
       newPeer.destroy()
     }
-  }, [myId, setGameState, iceServers, t])
+  }, [myId, setGameState, iceServers])
 
   useEffect(() => {
     if (isHost) {
@@ -566,7 +564,7 @@ export const useNetworking = () => {
   const joinLobby = useCallback(
     (id: string) => {
       if (!peer) {
-        setConnectionError(t('errors.notConnectedYet'))
+        setConnectionError('errors.notConnectedYet')
         return
       }
       setIsConnecting(true)
@@ -574,7 +572,7 @@ export const useNetworking = () => {
       const conn = peer.connect(id, { reliable: true })
 
       const timeout = setTimeout(() => {
-        setConnectionError(t('errors.connectionTimedOut'))
+        setConnectionError('errors.connectionTimedOut')
         setIsConnecting(false)
         conn.close()
       }, 10000)
@@ -595,7 +593,7 @@ export const useNetworking = () => {
       conn.on('error', () => {
         clearTimeout(timeout)
         setIsConnecting(false)
-        setConnectionError(t('errors.joinLobbyFailed'))
+        setConnectionError('errors.joinLobbyFailed')
       })
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -604,7 +602,7 @@ export const useNetworking = () => {
           if (conn.peer === id && isValidGameState(data.state)) {
             setGameState(data.state)
           } else {
-            setConnectionError(t('errors.invalidSync'))
+            setConnectionError('errors.invalidSync')
           }
         }
       })
@@ -612,11 +610,11 @@ export const useNetworking = () => {
       conn.on('close', () => {
         clearTimeout(timeout)
         setIsConnecting(false)
-        setConnectionError(t('errors.connectionClosedByHost'))
+        setConnectionError('errors.connectionClosedByHost')
         setGameState((prev) => ({ ...prev, status: 'LOBBY' }))
       })
     },
-    [peer, setGameState, setIsHost, playerName, avatarName, t],
+    [peer, setGameState, setIsHost, playerName, avatarName],
   )
 
   // When other players join voice, call them if we have joined voice
@@ -632,13 +630,13 @@ export const useNetworking = () => {
             setRemoteStreams((prev) => ({ ...prev, [p.id]: remoteStream }))
           })
           call.on('error', () => {
-            setVoiceError(t('errors.callOutError'))
+            setVoiceError('errors.callOutError')
           })
           mediaConnections.current[p.id] = call
         }
       }
     })
-  }, [gameState.players, peer, myId, myStream, t])
+  }, [gameState.players, peer, myId, myStream])
 
   const toggleVoiceChat = async () => {
     try {
@@ -660,7 +658,7 @@ export const useNetworking = () => {
                   setRemoteStreams((prev) => ({ ...prev, [p.id]: remoteStream }))
                 })
                 call.on('error', () => {
-                  setVoiceError(t('errors.callOutError'))
+                  setVoiceError('errors.callOutError')
                 })
                 mediaConnections.current[p.id] = call
               }
@@ -676,7 +674,7 @@ export const useNetworking = () => {
         }
       }
     } catch {
-      setVoiceError(t('errors.micPermissionDenied'))
+      setVoiceError('errors.micPermissionDenied')
     }
   }
 
