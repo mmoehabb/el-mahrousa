@@ -1,6 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, Info, Settings2, X, UserMinus, Mic, MicOff, Menu, Gamepad2 } from 'lucide-react'
+import {
+  Users,
+  Info,
+  Settings2,
+  X,
+  UserMinus,
+  Mic,
+  MicOff,
+  Menu,
+  Gamepad2,
+  Camera,
+} from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import Board from './Board'
 import PropertyModal from './PropertyModal'
@@ -13,6 +24,7 @@ import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
+import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 
 interface GameScreenProps {
   lobbyId: string | null
@@ -44,6 +56,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const prevPhaseRef = useRef(gameState.turnPhase)
   const prevLogsLengthRef = useRef(gameState.logs.length)
   const prevActiveEventRef = useRef(gameState.activeEvent)
+  const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null)
+
+  const [isFollowCameraOn, setIsFollowCameraOn] = useState(true)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const isMyTurn = currentPlayer?.id === myId
@@ -93,6 +108,17 @@ const GameScreen: React.FC<GameScreenProps> = ({
       prevLogsLengthRef.current = gameState.logs.length
     }
   }, [gameState.turnPhase, gameState.logs, sounds])
+
+  // Handle camera follow logic
+  useEffect(() => {
+    if (isFollowCameraOn && currentPlayer) {
+      const tileId = `tile-${currentPlayer.position}`
+      if (transformComponentRef.current) {
+        const scale = transformComponentRef.current.instance.transformState.scale
+        transformComponentRef.current.zoomToElement(tileId, scale, 500, 'easeInOutQuad')
+      }
+    }
+  }, [currentPlayer?.position, isFollowCameraOn])
 
   // Handle auto-advance for dice roll and movement animations
   useEffect(() => {
@@ -433,7 +459,23 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* Center: Board */}
         <div className="w-full h-full flex-1 max-w-full overflow-hidden flex justify-center relative z-10 sm:scale-100 origin-top">
+          {/* Top-Middle Floating Button for Camera Follow */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
+            <button
+              onClick={() => setIsFollowCameraOn(!isFollowCameraOn)}
+              className={`p-2 rounded-full shadow-lg border-2 transition-colors ${
+                isFollowCameraOn
+                  ? 'bg-egyptian-blue text-white border-egyptian-blue'
+                  : 'bg-white/90 text-slate-500 border-slate-300 dark:bg-slate-800/90 dark:text-slate-400 dark:border-slate-600'
+              }`}
+              title={isFollowCameraOn ? 'Follow Camera: ON' : 'Follow Camera: OFF'}
+            >
+              <Camera size={20} />
+            </button>
+          </div>
+
           <TransformWrapper
+            ref={transformComponentRef}
             initialScale={0.7}
             minScale={0.2}
             maxScale={3}
@@ -442,6 +484,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
             panning={{ disabled: false }}
             limitToBounds={false}
             centerOnInit={true}
+            onPanningStart={() => setIsFollowCameraOn(false)}
+            onWheelStart={() => setIsFollowCameraOn(false)}
           >
             <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
               <Board
