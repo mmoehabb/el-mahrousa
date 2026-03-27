@@ -25,9 +25,9 @@ export default function Toast({ message, onClose, duration = 3000 }: ToastProps)
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -50 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 bg-red-600 text-white px-4 py-3 rounded-lg shadow-xl border border-red-700 font-bold"
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-between gap-3 w-[calc(100%-2rem)] md:w-auto md:min-w-[300px] bg-red-600 text-white px-4 py-3 rounded-lg shadow-xl border border-red-700 font-bold"
         >
-          <span>{message}</span>
+          <span className="break-words">{message}</span>
           <button onClick={onClose} className="p-1 hover:bg-red-700 rounded-full transition-colors">
             <X size={16} />
           </button>
