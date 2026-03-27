@@ -184,58 +184,65 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             </div>
 
             {/* Actions */}
-            {canAct && tile.type === 'PROPERTY' && (
-              <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-700">
-                <button
-                  onClick={handleBuyHouse}
-                  disabled={currentHouses >= maxHouses || myBalance < buyCost || !ownsAllInGroup}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
-                >
-                  <span>{t('game.buyHouseBtn')}</span>
-                  {currentHouses < maxHouses && (
-                    <span>
-                      {buyCost} {GAME_CONFIG.CURRENCY}
-                    </span>
-                  )}
-                </button>
-                {!ownsAllInGroup && currentHouses < maxHouses && (
-                  <div className="text-xs text-center text-red-500 mt-1">
-                    {t('game.mustOwnAllInGroup')}
-                  </div>
-                )}
+            {canAct &&
+              (tile.type === 'PROPERTY' || tile.type === 'AIRPORT' || tile.type === 'UTILITY') && (
+                <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-700">
+                  {tile.type === 'PROPERTY' && (
+                    <>
+                      <button
+                        onClick={handleBuyHouse}
+                        disabled={
+                          currentHouses >= maxHouses || myBalance < buyCost || !ownsAllInGroup
+                        }
+                        className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
+                      >
+                        <span>{t('game.buyHouseBtn')}</span>
+                        {currentHouses < maxHouses && (
+                          <span>
+                            {buyCost} {GAME_CONFIG.CURRENCY}
+                          </span>
+                        )}
+                      </button>
+                      {!ownsAllInGroup && currentHouses < maxHouses && (
+                        <div className="text-xs text-center text-red-500 mt-1">
+                          {t('game.mustOwnAllInGroup')}
+                        </div>
+                      )}
 
-                <button
-                  onClick={handleSellHouse}
-                  disabled={currentHouses === 0}
-                  className="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
-                >
-                  <span>{t('game.sellHouseBtn')}</span>
+                      <button
+                        onClick={handleSellHouse}
+                        disabled={currentHouses === 0}
+                        className="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
+                      >
+                        <span>{t('game.sellHouseBtn')}</span>
+                        {currentHouses > 0 && (
+                          <span>
+                            +{sellHouseRefund} {GAME_CONFIG.CURRENCY}
+                          </span>
+                        )}
+                      </button>
+                    </>
+                  )}
+
+                  <button
+                    onClick={handleSellProperty}
+                    disabled={currentHouses > 0}
+                    className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
+                  >
+                    <span>{t('game.sellPropertyBtn')}</span>
+                    {currentHouses === 0 && (
+                      <span>
+                        +{sellPropertyRefund} {GAME_CONFIG.CURRENCY}
+                      </span>
+                    )}
+                  </button>
                   {currentHouses > 0 && (
-                    <span>
-                      +{sellHouseRefund} {GAME_CONFIG.CURRENCY}
-                    </span>
+                    <div className="text-xs text-center text-red-500 mt-1">
+                      {t('game.mustSellHousesFirst')}
+                    </div>
                   )}
-                </button>
-
-                <button
-                  onClick={handleSellProperty}
-                  disabled={currentHouses > 0}
-                  className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
-                >
-                  <span>{t('game.sellPropertyBtn')}</span>
-                  {currentHouses === 0 && (
-                    <span>
-                      +{sellPropertyRefund} {GAME_CONFIG.CURRENCY}
-                    </span>
-                  )}
-                </button>
-                {currentHouses > 0 && (
-                  <div className="text-xs text-center text-red-500 mt-1">
-                    {t('game.mustSellHousesFirst')}
-                  </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
           </div>
         </motion.div>
       </motion.div>
