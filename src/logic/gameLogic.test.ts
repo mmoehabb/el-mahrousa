@@ -1058,6 +1058,9 @@ describe('handleBankrupt', () => {
       isBankrupt: false,
     }
     initialState.players = [player1, player2]
+    initialState.tiles[1] = { ...initialState.tiles[1], houses: 2 }
+    initialState.tiles[3] = { ...initialState.tiles[3], houses: 1 }
+    initialState.tiles[2] = { ...initialState.tiles[2], houses: 3 } // another player's or unowned property
     initialState.currentPlayerIndex = 0
 
     const nextState = handleBankrupt(initialState, 'p1')
@@ -1075,6 +1078,13 @@ describe('handleBankrupt', () => {
       nextState.players.some((p) => p.properties.includes(3)),
       false,
     )
+
+    // Test that houses on owned properties are removed
+    assert.strictEqual(nextState.tiles[1].houses, 0)
+    assert.strictEqual(nextState.tiles[3].houses, 0)
+
+    // Test that houses on unowned/other properties are NOT removed
+    assert.strictEqual(nextState.tiles[2].houses, 3)
   })
 })
 
