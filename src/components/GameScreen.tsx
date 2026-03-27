@@ -25,6 +25,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
+import { Dice5, Home } from 'lucide-react'
+import Toast from './Toast'
 
 interface GameScreenProps {
   lobbyId: string | null
@@ -118,7 +120,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         transformComponentRef.current.zoomToElement(tileId, scale, 500, 'easeInOutQuad')
       }
     }
-  }, [currentPlayer?.position, isFollowCameraOn])
+  }, [currentPlayer, isFollowCameraOn])
 
   // Handle auto-advance for dice roll and movement animations
   useEffect(() => {
@@ -154,9 +156,48 @@ const GameScreen: React.FC<GameScreenProps> = ({
     sounds.playClick()
     sendAction({ type: 'BUY' })
   }
-  const handleEndTurn = () => {
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  // Track previous trades to show a toast for new incoming trades
+  const prevTradesLengthRef = useRef(gameState.trades?.length || 0)
+
+  useEffect(() => {
+    const currentTrades = gameState.trades || []
+    if (currentTrades.length > prevTradesLengthRef.current) {
+      // Find new trades
+      const newTrades = currentTrades.slice(prevTradesLengthRef.current)
+
+      // Check if any of the new trades are incoming to the current user
+      const incomingTrade = newTrades.find((t) => t.toId === myId && t.status === 'PENDING')
+
+      if (incomingTrade) {
+        const sender =
+          gameState.players.find((p) => p.id === incomingTrade.fromId)?.name || 'Unknown'
+        // Using setTimeout avoids the 'calling setState synchronously within an effect' warning
+        // since we are showing a non-critical UI notification
+        setTimeout(() => {
+          setToastMessage(
+            t('trade.incomingTradeFrom', {
+              name: sender,
+              defaultValue: `New trade offer from ${sender}!`,
+            }),
+          )
+          sounds.playClick() // Or a specific notification sound if one exists
+        }, 0)
+      }
+    }
+    prevTradesLengthRef.current = currentTrades.length
+  }, [gameState.trades, myId, gameState.players, t, sounds])
+
+  const handleEndTurnClick = () => {
     sounds.playClick()
-    sendAction({ type: 'END_TURN' })
+    if (currentPlayer && currentPlayer.balance < 0) {
+      setToastMessage(t('game.mustPayDebts'))
+      sounds.playBankrupt()
+    } else {
+      sendAction({ type: 'END_TURN' })
+    }
   }
 
   const [showMobileLeft, setShowMobileLeft] = useState(false)
@@ -275,7 +316,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       isMyTurn={isMyTurn}
       handleRoll={handleRoll}
       handleBuy={handleBuy}
-      handleEndTurn={handleEndTurn}
+      handleEndTurn={handleEndTurnClick}
       setIsTradeOpen={setIsTradeOpen}
       sendAction={sendAction}
       toggleVoiceChat={toggleVoiceChat}
@@ -284,8 +325,19 @@ const GameScreen: React.FC<GameScreenProps> = ({
     />
   )
 
+  const ownerByTile = React.useMemo(() => {
+    const ownerMap: Record<number, (typeof gameState.players)[0]> = {}
+    gameState.players.forEach((p) => {
+      p.properties.forEach((propId) => {
+        ownerMap[propId] = p
+      })
+    })
+    return ownerMap
+  }, [gameState.players])
+
   return (
     <>
+      <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
       <div className="game-screen-container flex flex-col w-full max-w-full justify-start items-center relative pb-16 lg:pb-0 fixed inset-0 h-screen w-screen overflow-hidden">
         <PropertyModal
           isOpen={!!selectedTile}
@@ -507,6 +559,55 @@ const GameScreen: React.FC<GameScreenProps> = ({
           isHost={isHost}
           onRematch={() => sendAction({ type: 'REMATCH' })}
         />
+
+        {/* Mobile Floating CTA */}
+        {isMyTurn && (
+          <div className="lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm flex flex-col gap-2">
+            {gameState.turnPhase === 'ROLL' && (
+              <button
+                onClick={handleRoll}
+                className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 shadow-2xl shadow-blue-900/50"
+              >
+                <Dice5 className="w-6 h-6" /> {t('game.rollDiceBtn')}
+              </button>
+            )}
+
+            {gameState.turnPhase === 'ACTION' && (
+              <div className="flex gap-2 w-full">
+                {gameState.tiles[currentPlayer.position]?.price &&
+                  !ownerByTile[currentPlayer.position] && (
+                    <button
+                      onClick={handleBuy}
+                      disabled={
+                        currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
+                      }
+                      className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold shadow-xl flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <Home size={18} />
+                      {t('game.buyForBtn', {
+                        price: gameState.tiles[currentPlayer.position].price,
+                      })}
+                    </button>
+                  )}
+                <button
+                  onClick={handleEndTurnClick}
+                  className="flex-1 bg-slate-600 text-white py-3 rounded-xl font-bold shadow-xl"
+                >
+                  {t('game.skipEndTurnBtn')}
+                </button>
+              </div>
+            )}
+
+            {gameState.turnPhase === 'END' && (
+              <button
+                onClick={handleEndTurnClick}
+                className="w-full bg-egyptian-blue text-white py-3 rounded-xl font-bold shadow-xl"
+              >
+                {t('game.endTurnBtn')}
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Mobile Modals */}
         <AnimatePresence>

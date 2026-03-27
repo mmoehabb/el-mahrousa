@@ -123,6 +123,7 @@
     "cancel": "إلغاء",
     "proposeBtn": "اقتراح المقايضة",
     "incomingTrade": "مقايضة واردة",
+    "incomingTradeFrom": "عرض مبادلة جديد من {{name}}!",
     "from": "من {{name}}",
     "theyOffer": "هم يعرضون",
     "theyWant": "هم يريدون",
@@ -139,7 +140,7 @@
     "acceptOffer": "قبول العرض",
     "viewAllTrades": "عرض كل المبادلات",
     "to": "إلى: {{name}}",
-    "from": "من: {{name}}",
+    "fromLabel": "من: {{name}}",
     "unknown": "غير معروف",
     "status": {
       "PENDING": "قيد الانتظار",

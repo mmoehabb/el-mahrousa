@@ -123,6 +123,7 @@
     "cancel": "Cancel",
     "proposeBtn": "PROPOSE TRADE",
     "incomingTrade": "INCOMING TRADE",
+    "incomingTradeFrom": "New trade offer from {{name}}!",
     "from": "From {{name}}",
     "theyOffer": "They Offer",
     "theyWant": "They Want",
@@ -139,7 +140,7 @@
     "acceptOffer": "Accept Offer",
     "viewAllTrades": "View All Trades",
     "to": "To: {{name}}",
-    "from": "From: {{name}}",
+    "fromLabel": "From: {{name}}",
     "unknown": "Unknown",
     "status": {
       "PENDING": "Pending",
