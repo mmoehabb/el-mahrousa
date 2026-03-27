@@ -55,7 +55,7 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
             key={p.id}
             layoutId={`player-${p.id}`}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className={`w-8 h-8 rounded-full border-[3px] shadow-md overflow-hidden bg-white ${
+            className={`w-10 h-10 rounded-full border-[3px] shadow-md overflow-hidden bg-white ${
               p.isBankrupt ? 'border-slate-400 opacity-60 grayscale' : ''
             }`}
             style={{ borderColor: p.isBankrupt ? '#94a3b8' : p.color }}
