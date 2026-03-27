@@ -155,7 +155,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
           (gameState.turnPhase === 'ROLL' || gameState.turnPhase === 'ROLLING') &&
           currentPlayer && (
             <div
-              className="lg:hidden pointer-events-none absolute w-full h-full"
+              className="lg:hidden pointer-events-none relative w-full h-full flex items-center justify-center"
               style={{
                 gridColumnStart: getGridCoordinates(currentPlayer.position).col,
                 gridRowStart: getGridCoordinates(currentPlayer.position).row,
@@ -163,7 +163,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
               }}
             >
               {/* The actual button is offset slightly to appear "floating above" the tile */}
-              <div className="absolute -top-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-auto">
+              <div className="absolute -top-20 flex flex-col items-center gap-1 pointer-events-auto">
                 <div className="text-[10px] font-bold text-egyptian-blue dark:text-blue-400 bg-white/90 dark:bg-slate-900/90 px-2 py-0.5 rounded-full shadow-md backdrop-blur uppercase whitespace-nowrap">
                   {t('game.rollDiceBtn')}
                 </div>
