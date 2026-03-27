@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useGame } from '../context/GameContext'
 import type { Tile, Player, GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
+import { getContrastColor } from '../logic/utils/colorUtils'
 
 interface PropertyModalProps {
   isOpen: boolean
@@ -53,6 +54,9 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
       : 0
   const sellPropertyRefund = tile.price ? tile.price / 2 : 0
 
+  const headerBgColor = tile.color || '#ffffff'
+  const headerTextColor = getContrastColor(headerBgColor)
+
   const handleBuyHouse = () => {
     sendAction({ type: 'BUY_HOUSE', tileId: tile.id })
     onClose()
@@ -87,15 +91,18 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
           {/* Header */}
           <div
             className="p-4 text-center relative border-b-4 border-slate-800 dark:border-slate-900"
-            style={{ backgroundColor: tile.color || '#fff', color: tile.color ? '#fff' : '#000' }}
+            style={{ backgroundColor: headerBgColor, color: headerTextColor }}
           >
             <button
               onClick={onClose}
               className="absolute z-10 top-2 right-2 rtl:left-2 rtl:right-auto bg-black/20 hover:bg-black/40 rounded-full p-1 transition-colors"
             >
-              <X size={20} className="text-white" />
+              <X size={20} style={{ color: headerTextColor }} />
             </button>
-            <h2 className="text-xl font-black uppercase tracking-wider drop-shadow-md text-white relative z-0 px-8">
+            <h2
+              className="text-xl font-black uppercase tracking-wider drop-shadow-md relative z-0 px-8"
+              style={{ color: headerTextColor }}
+            >
               {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
             </h2>
           </div>
