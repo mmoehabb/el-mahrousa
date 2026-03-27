@@ -443,18 +443,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             limitToBounds={false}
             centerOnInit={true}
           >
-            <TransformComponent
-              wrapperStyle={{ width: '100%', height: '100%' }}
-              contentStyle={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              wrapperClass="!w-full !h-full"
-              contentClass="!w-full !h-full flex justify-center items-center"
-            >
+            <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
               <Board
                 handleRoll={handleRoll}
                 isMyTurn={isMyTurn}
