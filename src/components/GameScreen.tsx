@@ -484,8 +484,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
             panning={{ disabled: false }}
             limitToBounds={false}
             centerOnInit={true}
-            onPanningStart={() => setIsFollowCameraOn(false)}
-            onWheelStart={() => setIsFollowCameraOn(false)}
+            onPanning={() => setIsFollowCameraOn(false)}
+            onWheel={() => setIsFollowCameraOn(false)}
           >
             <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
               <Board
