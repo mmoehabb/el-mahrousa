@@ -25,7 +25,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
-import { Dice5, Home } from 'lucide-react'
+import { Home } from 'lucide-react'
 import Toast from './Toast'
 
 interface GameScreenProps {
@@ -563,15 +563,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {/* Mobile Floating CTA */}
         {isMyTurn && (
           <div className="lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm flex flex-col gap-2">
-            {gameState.turnPhase === 'ROLL' && (
-              <button
-                onClick={handleRoll}
-                className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 shadow-2xl shadow-blue-900/50"
-              >
-                <Dice5 className="w-6 h-6" /> {t('game.rollDiceBtn')}
-              </button>
-            )}
-
             {gameState.turnPhase === 'ACTION' && (
               <div className="flex gap-2 w-full">
                 {gameState.tiles[currentPlayer.position]?.price &&
