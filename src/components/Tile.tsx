@@ -18,6 +18,7 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
 
   return (
     <div
+      id={`tile-${tile.id}`}
       className={`board-tile bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 ${onClick ? 'cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition-colors' : ''}`}
       onClick={onClick}
     >
