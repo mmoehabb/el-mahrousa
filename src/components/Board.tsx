@@ -107,10 +107,28 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
     onTileClick(tile)
   }
 
+  // Get grid coordinates for a tile index (0 to 39) to place the floating dice
+  const getGridCoordinates = (tileIndex: number) => {
+    if (tileIndex >= 0 && tileIndex <= 10) {
+      // Bottom Row: 0 to 10
+      return { col: 11 - tileIndex, row: 11 }
+    } else if (tileIndex >= 11 && tileIndex <= 19) {
+      // Left Col: 11 to 19
+      return { col: 1, row: 11 - (tileIndex - 10) }
+    } else if (tileIndex >= 20 && tileIndex <= 30) {
+      // Top Row: 20 to 30
+      return { col: tileIndex - 19, row: 1 }
+    } else if (tileIndex >= 31 && tileIndex <= 39) {
+      // Right Col: 31 to 39
+      return { col: 11, row: tileIndex - 29 }
+    }
+    return { col: 1, row: 11 } // Default to Go
+  }
+
   return (
     <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold w-[1200px] h-[1200px] min-w-[1200px] min-h-[1200px] max-w-none overflow-hidden">
       <div
-        className="grid gap-0.5 sm:gap-1 w-full h-full"
+        className="grid gap-0.5 sm:gap-1 w-full h-full relative"
         style={{
           gridTemplateColumns: '1.4fr repeat(9, 1fr) 1.4fr',
           gridTemplateRows: '1.4fr repeat(9, 1fr) 1.4fr',
@@ -131,6 +149,59 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             />
           </div>
         ))}
+
+        {/* Floating Dice CTA for Mobile - Rendered over the active player's tile */}
+        {isMyTurn &&
+          (gameState.turnPhase === 'ROLL' || gameState.turnPhase === 'ROLLING') &&
+          currentPlayer && (
+            <div
+              className="lg:hidden pointer-events-none absolute w-full h-full"
+              style={{
+                gridColumnStart: getGridCoordinates(currentPlayer.position).col,
+                gridRowStart: getGridCoordinates(currentPlayer.position).row,
+                zIndex: 60,
+              }}
+            >
+              {/* The actual button is offset slightly to appear "floating above" the tile */}
+              <div className="absolute -top-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-auto">
+                <div className="text-[10px] font-bold text-egyptian-blue dark:text-blue-400 bg-white/90 dark:bg-slate-900/90 px-2 py-0.5 rounded-full shadow-md backdrop-blur uppercase whitespace-nowrap">
+                  {t('game.rollDiceBtn')}
+                </div>
+                <button
+                  onClick={handleRoll}
+                  disabled={gameState.turnPhase === 'ROLLING'}
+                  className="flex gap-2 bg-white/90 dark:bg-slate-800/90 p-2 rounded-2xl backdrop-blur-md border border-egyptian-blue shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-transform"
+                >
+                  <motion.div
+                    animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
+                    transition={{
+                      repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                      duration: 0.5,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <DiceFace
+                      value={effectiveDisplayDice[0]}
+                      aria-label={`First die showing ${effectiveDisplayDice[0]}`}
+                    />
+                  </motion.div>
+                  <motion.div
+                    animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
+                    transition={{
+                      repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                      duration: 0.5,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <DiceFace
+                      value={effectiveDisplayDice[1]}
+                      aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
+                    />
+                  </motion.div>
+                </button>
+              </div>
+            </div>
+          )}
 
         {/* Left Column */}
         {leftCol.map((tile, i) => (
@@ -179,47 +250,6 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             />
           </div>
         ))}
-
-        {/* Floating Dice CTA for Mobile */}
-        {isMyTurn && (gameState.turnPhase === 'ROLL' || gameState.turnPhase === 'ROLLING') && (
-          <div className="lg:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2">
-            <div className="text-xs font-bold text-egyptian-blue dark:text-blue-400 bg-white/80 dark:bg-slate-900/80 px-3 py-1 rounded-full shadow backdrop-blur uppercase">
-              {t('game.rollDiceBtn')}
-            </div>
-            <button
-              onClick={handleRoll}
-              disabled={gameState.turnPhase === 'ROLLING'}
-              className="flex gap-4 bg-white/90 dark:bg-slate-800/90 p-4 rounded-3xl backdrop-blur-md border-2 border-egyptian-blue shadow-2xl shadow-blue-900/50 hover:scale-105 active:scale-95 transition-transform"
-            >
-              <motion.div
-                animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
-                transition={{
-                  repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
-                  duration: 0.5,
-                  ease: 'easeInOut',
-                }}
-              >
-                <DiceFace
-                  value={effectiveDisplayDice[0]}
-                  aria-label={`First die showing ${effectiveDisplayDice[0]}`}
-                />
-              </motion.div>
-              <motion.div
-                animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
-                transition={{
-                  repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
-                  duration: 0.5,
-                  ease: 'easeInOut',
-                }}
-              >
-                <DiceFace
-                  value={effectiveDisplayDice[1]}
-                  aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
-                />
-              </motion.div>
-            </button>
-          </div>
-        )}
 
         {/* Center */}
         <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-4 md:m-8 lg:m-12 border-2 md:border-4 border-egyptian-gold/40 rounded-lg relative p-4 sm:p-8 space-y-4 sm:space-y-6">
