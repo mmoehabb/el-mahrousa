@@ -159,35 +159,44 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-  // Track previous trades to show a toast for new incoming trades
-  const prevTradesLengthRef = useRef(gameState.trades?.length || 0)
+  // Track previously notified trades to show a toast for new incoming trades
+  const notifiedTradeIdsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     const currentTrades = gameState.trades || []
-    if (currentTrades.length > prevTradesLengthRef.current) {
-      // Find new trades
-      const newTrades = currentTrades.slice(prevTradesLengthRef.current)
 
-      // Check if any of the new trades are incoming to the current user
-      const incomingTrade = newTrades.find((t) => t.toId === myId && t.status === 'PENDING')
+    // Find any new pending trade targeted at the current user that we haven't notified about yet
+    const newIncomingTrade = currentTrades.find(
+      (t) =>
+        t.toId === myId && t.status === 'PENDING' && t.id && !notifiedTradeIdsRef.current.has(t.id),
+    )
 
-      if (incomingTrade) {
-        const sender =
-          gameState.players.find((p) => p.id === incomingTrade.fromId)?.name || 'Unknown'
-        // Using setTimeout avoids the 'calling setState synchronously within an effect' warning
-        // since we are showing a non-critical UI notification
-        setTimeout(() => {
-          setToastMessage(
-            t('trade.incomingTradeFrom', {
-              name: sender,
-              defaultValue: `New trade offer from ${sender}!`,
-            }),
-          )
-          sounds.playClick() // Or a specific notification sound if one exists
-        }, 0)
-      }
+    if (newIncomingTrade && newIncomingTrade.id) {
+      notifiedTradeIdsRef.current.add(newIncomingTrade.id)
+
+      const sender =
+        gameState.players.find((p) => p.id === newIncomingTrade.fromId)?.name || 'Unknown'
+
+      // Using setTimeout avoids the 'calling setState synchronously within an effect' warning
+      // since we are showing a non-critical UI notification
+      setTimeout(() => {
+        setToastMessage(
+          t('trade.incomingTradeFrom', {
+            name: sender,
+            defaultValue: `New trade offer from ${sender}!`,
+          }),
+        )
+        sounds.playClick() // Or a specific notification sound if one exists
+      }, 0)
     }
-    prevTradesLengthRef.current = currentTrades.length
+
+    // Also add any other new incoming pending trades to the notified set so we don't spam toasts
+    // if multiple are received at once
+    currentTrades.forEach((t) => {
+      if (t.toId === myId && t.status === 'PENDING' && t.id) {
+        notifiedTradeIdsRef.current.add(t.id)
+      }
+    })
   }, [gameState.trades, myId, gameState.players, t, sounds])
 
   const handleEndTurnClick = () => {
