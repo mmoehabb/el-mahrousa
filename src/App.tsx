@@ -82,12 +82,15 @@ function App() {
       className={`min-h-screen ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center`}
     >
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
       <Toast message={voiceError ? t(voiceError) : null} onClose={() => setVoiceError?.(null)} />
       <Toast
         message={connectionError ? t(connectionError) : null}
         onClose={() => setConnectionError?.(null)}
       />
-      <div className="hidden lg:block fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]">
+      <div
+        className={`${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? 'hidden lg:block ' : ''}fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]`}
+      >
         <button
           id="global-settings-btn"
           onClick={() => setIsSettingsOpen(!isSettingsOpen)}
