@@ -66,7 +66,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const isMyTurn = currentPlayer?.id === myId
 
   useEffect(() => {
-    if (gameState.activeEvent && gameState.activeEvent !== prevActiveEventRef.current) {
+    const activeEventString = JSON.stringify(gameState.activeEvent)
+    const prevActiveEventString = JSON.stringify(prevActiveEventRef.current)
+
+    if (gameState.activeEvent && activeEventString !== prevActiveEventString) {
       const type = gameState.activeEvent.type
       if (type === 'gain') sounds.playGo()
       if (type === 'loss') sounds.playRent()
