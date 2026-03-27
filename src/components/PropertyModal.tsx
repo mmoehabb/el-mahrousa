@@ -41,7 +41,8 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
   if (!isOpen || !tile) return null
 
   const isOwner = owner?.id === myId
-  const canAct = isMyTurn && turnPhase === 'ROLL' && isOwner
+  const validPhases = ['ROLL', 'ACTION', 'END']
+  const canAct = isMyTurn && validPhases.includes(turnPhase) && isOwner
   const currentHouses = tile.houses || 0
   const maxHouses = tile.rent ? tile.rent.length - 1 : 0
 
