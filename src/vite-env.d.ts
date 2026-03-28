@@ -17,6 +17,7 @@ interface Window {
 
 interface ImportMetaEnv {
   readonly VITE_ADSENSE_PUB_ID: string
+  readonly VITE_IS_PROD: string
 }
 
 interface ImportMeta {

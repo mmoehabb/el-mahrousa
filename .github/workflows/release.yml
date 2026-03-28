@@ -31,7 +31,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build:prod
         env:
           VITE_ADSENSE_PUB_ID: ${{ secrets.VITE_ADSENSE_PUB_ID }}
 

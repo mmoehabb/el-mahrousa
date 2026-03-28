@@ -52,7 +52,10 @@
           'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' +
           window.adsensePubId
         script.crossOrigin = 'anonymous'
-        script.setAttribute('data-adbreak-test', 'on') // Remove or disable for prod
+        window.isProd = '%VITE_IS_PROD%'
+        if (window.isProd !== 'true') {
+          script.setAttribute('data-adbreak-test', 'on') // Remove or disable for prod
+        }
         document.head.appendChild(script)
 
         window.adConfig = function (o) {
