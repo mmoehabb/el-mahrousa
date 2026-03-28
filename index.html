@@ -60,7 +60,10 @@
 
         window.adConfig = function (o) {
           window.adsbygoogle = window.adsbygoogle || []
-          window.adsbygoogle.push({ adConfig: o })
+          if (!window.adConfigPushed) {
+            window.adsbygoogle.push({ adConfig: o })
+            window.adConfigPushed = true
+          }
         }
       }
     </script>
