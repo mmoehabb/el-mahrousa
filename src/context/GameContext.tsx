@@ -99,14 +99,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   useEffect(() => {
-    // Initialize adConfig when component mounts and update when audio settings change
+    // Initialize adConfig when component mounts
     if (window.adConfig) {
       window.adConfig({
         preloadAdBreaks: 'on',
-        sound: isBgmEnabled ? 'on' : 'off',
+        sound: 'on',
       })
     }
-  }, [isBgmEnabled])
+  }, [])
 
   return (
     <GameContext.Provider
