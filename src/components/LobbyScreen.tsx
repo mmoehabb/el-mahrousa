@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAdBreak } from '../hooks/useAdBreak'
 
 interface LobbyScreenProps {
   createLobby: () => void
@@ -8,8 +9,15 @@ interface LobbyScreenProps {
 
 export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps) {
   const { t } = useTranslation()
+  const { showInterstitialAd } = useAdBreak()
   const [joinId, setJoinId] = useState('')
   const [joinError, setJoinError] = useState('')
+
+  const handleCreateLobby = () => {
+    showInterstitialAd(() => {
+      createLobby()
+    })
+  }
 
   const handleJoinLobby = () => {
     const sanitizedId = joinId.trim().replace(/[<>&"'`]/g, '')
@@ -18,7 +26,9 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
       return
     }
     setJoinError('')
-    joinLobby(sanitizedId)
+    showInterstitialAd(() => {
+      joinLobby(sanitizedId)
+    })
   }
 
   return (
@@ -29,7 +39,7 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
 
       <div className="space-y-4">
         <button
-          onClick={createLobby}
+          onClick={handleCreateLobby}
           className="w-full bg-egyptian-gold text-white dark:text-slate-900 py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors"
         >
           {t('lobby.createNewLobby')}

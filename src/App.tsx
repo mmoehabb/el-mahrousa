@@ -11,6 +11,7 @@ import { Settings, X } from 'lucide-react'
 import GameScreen from './components/GameScreen'
 import useSound from 'use-sound'
 import Toast from './components/Toast'
+import { useAdBreak } from './hooks/useAdBreak'
 
 function App() {
   const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume } = useGame()
@@ -19,6 +20,7 @@ function App() {
     volume: bgmVolume,
   })
   const { t } = useTranslation()
+  const { showInterstitialAd } = useAdBreak()
   const {
     createLobby,
     joinLobby,
@@ -50,12 +52,14 @@ function App() {
       const urlParams = new URLSearchParams(window.location.search)
       const lobbyFromUrl = urlParams.get('lobby')
       if (lobbyFromUrl) {
-        joinLobby(lobbyFromUrl)
+        showInterstitialAd(() => {
+          joinLobby(lobbyFromUrl)
+        })
         // Clean up the URL
         window.history.replaceState({}, '', window.location.pathname)
       }
     }
-  }, [playerName, gameState.status, joinLobby])
+  }, [playerName, gameState.status, joinLobby, showInterstitialAd])
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>

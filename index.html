@@ -42,6 +42,28 @@
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Lalezar&display=swap"
       rel="stylesheet"
     />
+
+    <script>
+      window.adsensePubId = '%VITE_ADSENSE_PUB_ID%'
+      if (window.adsensePubId && window.adsensePubId !== '%VITE_ADSENSE_PUB_ID%') {
+        var script = document.createElement('script')
+        script.async = true
+        script.src =
+          'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' +
+          window.adsensePubId
+        script.crossOrigin = 'anonymous'
+        window.isProd = '%VITE_IS_PROD%'
+        if (window.isProd !== 'true') {
+          script.setAttribute('data-adbreak-test', 'on') // Remove or disable for prod
+        }
+        document.head.appendChild(script)
+
+        window.adConfig = function (o) {
+          window.adsbygoogle = window.adsbygoogle || []
+          window.adsbygoogle.push({ adConfig: o })
+        }
+      }
+    </script>
   </head>
 
   <body>
