@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { GameState } from '../types/game'
 import { createInitialState } from '../logic/gameLogic'
 
@@ -97,6 +97,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIceServersState(servers)
     localStorage.setItem('iceServers', JSON.stringify(servers))
   }
+
+  useEffect(() => {
+    // Initialize adConfig when component mounts and update when audio settings change
+    if (window.adConfig) {
+      window.adConfig({
+        preloadAdBreaks: 'on',
+        sound: isBgmEnabled ? 'on' : 'off',
+      })
+    }
+  }, [isBgmEnabled])
 
   return (
     <GameContext.Provider
