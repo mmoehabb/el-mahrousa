@@ -32,6 +32,8 @@ jobs:
 
       - name: Build
         run: pnpm run build
+        env:
+          VITE_ADSENSE_PUB_ID: ${{ secrets.VITE_ADSENSE_PUB_ID }}
 
       - name: Publish to Surge
         run: surge dist ${{ secrets.SURGE_DOMAIN }} --token ${{ secrets.SURGE_TOKEN }}

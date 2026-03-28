@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
+    'import.meta.env.VITE_ADSENSE_PUB_ID': JSON.stringify(process.env.VITE_ADSENSE_PUB_ID || ''),
   },
   server: {
     port: 3000,
