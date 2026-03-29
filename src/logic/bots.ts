@@ -32,11 +32,11 @@ const getBotMemory = (botId: string, currentTurnIndex: number) => {
 /**
  * Check if acquiring a specific property completes a color group for a player
  */
-const completesColorGroup = (gameState: GameState, player: Player, tileId: number): boolean => {
+const completesColorGroup = (gameState: GameState, playerId: string, tileId: number): boolean => {
   const tile = gameState.tiles[tileId]
   if (!tile.group) return false
   const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
-  const playerProps = player.properties || []
+  const playerProps = gameState.players.find((p) => p.id === playerId)?.properties || []
 
   // They complete the group if they own all other tiles in the group
   return groupTiles.every((t) => t.id === tileId || playerProps.includes(t.id))
@@ -45,11 +45,11 @@ const completesColorGroup = (gameState: GameState, player: Player, tileId: numbe
 /**
  * Check if losing a specific property breaks a complete color group for a player
  */
-const breaksColorGroup = (gameState: GameState, player: Player, tileId: number): boolean => {
+const breaksColorGroup = (gameState: GameState, playerId: string, tileId: number): boolean => {
   const tile = gameState.tiles[tileId]
   if (!tile.group) return false
   const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
-  const playerProps = player.properties || []
+  const playerProps = gameState.players.find((p) => p.id === playerId)?.properties || []
 
   // They break the group if they currently own all tiles in the group
   return groupTiles.every((t) => playerProps.includes(t.id))
@@ -80,7 +80,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     // Check if the trade completes a color group for the bot
     let completesGroupForBot = false
     for (const propId of pendingTrade.myProperties) {
-      if (completesColorGroup(gameState, currentPlayer, propId)) {
+      if (completesColorGroup(gameState, currentPlayer.id, propId)) {
         completesGroupForBot = true
       }
     }
@@ -97,14 +97,11 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
     // 1. DANGER: Does it give the other player a town that completes a color group?
     let isDangerTrade = false
-    const partner = gameState.players.find((p) => p.id === pendingTrade.fromId)
-    if (partner) {
-      for (const propId of pendingTrade.partnerProperties) {
-        // properties the bot is giving away
-        if (completesColorGroup(gameState, partner, propId)) {
-          isDangerTrade = true
-          break
-        }
+    for (const propId of pendingTrade.partnerProperties) {
+      // properties the bot is giving away
+      if (completesColorGroup(gameState, pendingTrade.fromId!, propId)) {
+        isDangerTrade = true
+        break
       }
     }
 
@@ -119,7 +116,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
     // 2. NAIVE: Does it make the bot lose a complete color group?
     for (const propId of pendingTrade.partnerProperties) {
-      if (breaksColorGroup(gameState, currentPlayer, propId)) {
+      if (breaksColorGroup(gameState, currentPlayer.id, propId)) {
         return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
       }
     }
@@ -220,16 +217,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
       // If we landed on an unowned property, consider buying it
       const currentTile = gameState.tiles[currentPlayer.position]
-
-      // Pre-compute owned properties to avoid O(N) lookup
-      const ownedProperties = new Set<number>()
-      for (const p of gameState.players) {
-        for (const propId of p.properties) {
-          ownedProperties.add(propId)
-        }
-      }
-
-      if (isPropertyUnowned(ownedProperties, currentTile.id) && currentTile.price) {
+      if (isPropertyUnowned(gameState, currentTile.id) && currentTile.price) {
         // Simple heuristic: buy if we have enough money, leaving a buffer of 200 EGP
         if (currentPlayer.balance >= currentTile.price + 200) {
           return { type: 'BUY' }
@@ -302,8 +290,8 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 }
 
 // Helper: Check if a property is unowned
-const isPropertyUnowned = (ownedProperties: Set<number>, tileId: number): boolean => {
-  return !ownedProperties.has(tileId)
+const isPropertyUnowned = (gameState: GameState, tileId: number): boolean => {
+  return !gameState.players.some((p) => p.properties.includes(tileId))
 }
 
 // Helper: Determine if the bot should buy a house on any property
@@ -389,8 +377,6 @@ const getNeededProperties = (
 ): { tileId: number; ownerId: string }[] => {
   const needed: { tileId: number; ownerId: string }[] = []
 
-  let ownerByTileId: Map<number, Player> | null = null
-
   // Iterate over properties we own
   for (const propId of player.properties) {
     const tile = gameState.tiles[propId]
@@ -401,19 +387,9 @@ const getNeededProperties = (
 
     // If we only need 1 or 2 tiles to complete the town
     if (missingTiles.length > 0 && missingTiles.length <= 2) {
-      if (!ownerByTileId) {
-        ownerByTileId = new Map()
-        for (let i = 0; i < gameState.players.length; i++) {
-          const p = gameState.players[i]
-          for (let j = 0; j < p.properties.length; j++) {
-            ownerByTileId.set(p.properties[j], p)
-          }
-        }
-      }
-
       for (const missing of missingTiles) {
         // Find owner
-        const owner = ownerByTileId.get(missing.id)
+        const owner = gameState.players.find((p) => p.properties.includes(missing.id))
         // If owned by someone else (not the bank) and they are not a bot
         if (owner && owner.id !== player.id) {
           // Avoid duplicate requests for the same tile
