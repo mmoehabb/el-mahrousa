@@ -45,11 +45,11 @@ const completesColorGroup = (gameState: GameState, playerId: string, tileId: num
 /**
  * Check if losing a specific property breaks a complete color group for a player
  */
-const breaksColorGroup = (gameState: GameState, playerId: string, tileId: number): boolean => {
+const breaksColorGroup = (gameState: GameState, player: Player, tileId: number): boolean => {
   const tile = gameState.tiles[tileId]
   if (!tile.group) return false
   const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
-  const playerProps = gameState.players.find((p) => p.id === playerId)?.properties || []
+  const playerProps = player.properties || []
 
   // They break the group if they currently own all tiles in the group
   return groupTiles.every((t) => playerProps.includes(t.id))
@@ -116,7 +116,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
     // 2. NAIVE: Does it make the bot lose a complete color group?
     for (const propId of pendingTrade.partnerProperties) {
-      if (breaksColorGroup(gameState, currentPlayer.id, propId)) {
+      if (breaksColorGroup(gameState, currentPlayer, propId)) {
         return { type: 'REJECT_TRADE', tradeId: pendingTrade.id! }
       }
     }
