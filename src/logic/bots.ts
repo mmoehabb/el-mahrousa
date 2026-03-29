@@ -377,6 +377,8 @@ const getNeededProperties = (
 ): { tileId: number; ownerId: string }[] => {
   const needed: { tileId: number; ownerId: string }[] = []
 
+  let ownerByTileId: Map<number, Player> | null = null
+
   // Iterate over properties we own
   for (const propId of player.properties) {
     const tile = gameState.tiles[propId]
@@ -387,9 +389,19 @@ const getNeededProperties = (
 
     // If we only need 1 or 2 tiles to complete the town
     if (missingTiles.length > 0 && missingTiles.length <= 2) {
+      if (!ownerByTileId) {
+        ownerByTileId = new Map()
+        for (let i = 0; i < gameState.players.length; i++) {
+          const p = gameState.players[i]
+          for (let j = 0; j < p.properties.length; j++) {
+            ownerByTileId.set(p.properties[j], p)
+          }
+        }
+      }
+
       for (const missing of missingTiles) {
         // Find owner
-        const owner = gameState.players.find((p) => p.properties.includes(missing.id))
+        const owner = ownerByTileId.get(missing.id)
         // If owned by someone else (not the bank) and they are not a bot
         if (owner && owner.id !== player.id) {
           // Avoid duplicate requests for the same tile
