@@ -58,9 +58,10 @@
         }
         document.head.appendChild(script)
 
-        window.adConfig = function (o) {
-          window.adsbygoogle = window.adsbygoogle || []
-          window.adsbygoogle.push({ adConfig: o })
+        // as documented here: https://support.google.com/adsense/answer/9955214?hl=en&ref_topic=9960293&sjid=15476448188750742990-EU
+        window.adsbygoogle = window.adsbygoogle || []
+        window.adBreak = adConfig = function (o) {
+          adsbygoogle.push(o)
         }
       }
     </script>

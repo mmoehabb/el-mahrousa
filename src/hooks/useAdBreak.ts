@@ -1,19 +1,6 @@
-import { useCallback, useEffect } from 'react'
-import { useGame } from '../context/GameContext'
+import { useCallback } from 'react'
 
 export function useAdBreak() {
-  const { isBgmEnabled } = useGame()
-
-  useEffect(() => {
-    // Initialize adConfig when component mounts
-    if (window.adConfig) {
-      window.adConfig({
-        preloadAdBreaks: 'on',
-        sound: isBgmEnabled ? 'on' : 'off',
-      })
-    }
-  }, [isBgmEnabled])
-
   const showInterstitialAd = useCallback((onComplete: () => void) => {
     // If adBreak is not loaded or not configured, just proceed
     if (!window.adBreak) {
@@ -23,17 +10,12 @@ export function useAdBreak() {
     }
 
     window.adBreak({
-      type: 'interstitial',
+      type: 'start',
       name: 'lobby-transition',
+      // For 'start' types, this is the only completion callback required
       adBreakDone: () => {
-        console.log('Ad break done (completed, skipped, or no fill)')
+        console.log('Ad break finished. Resuming app flow.')
         onComplete()
-      },
-      adDismissed: () => {
-        console.log('Ad dismissed')
-      },
-      adViewed: () => {
-        console.log('Ad viewed')
       },
     })
   }, [])
