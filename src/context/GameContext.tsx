@@ -23,6 +23,8 @@ interface GameContextType {
   setBgmVolume: (volume: number) => void
   iceServers: string[]
   setIceServers: (servers: string[]) => void
+  isAdblockDetected: boolean
+  setIsAdblockDetected: (detected: boolean) => void
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -62,6 +64,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (v): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string'),
     ),
   )
+
+  const [isAdblockDetected, setIsAdblockDetected] = useState(false)
 
   const handleSetPlayerName = (name: string) => {
     setPlayerName(name)
@@ -120,6 +124,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setBgmVolume: handleSetBgmVolume,
         iceServers,
         setIceServers: handleSetIceServers,
+        isAdblockDetected,
+        setIsAdblockDetected,
       }}
     >
       {children}

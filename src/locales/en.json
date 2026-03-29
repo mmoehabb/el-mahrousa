@@ -39,6 +39,11 @@
     "lobbyIdInput": "Lobby ID",
     "errorEmpty": "Please enter a Lobby ID"
   },
+  "adblock": {
+    "title": "AdBlocker Detected",
+    "message": "We noticed you are using an ad blocker. Please disable it to play the game, then refresh the page.",
+    "refreshBtn": "Refresh Page"
+  },
   "login": {
     "title": "El-Mahrousa",
     "subtitle": "Enter your name to join the game",
