@@ -234,9 +234,7 @@ export const applyLandingLogic = (state: GameState): GameState => {
 
   if (tile.type === TileType.TAX) {
     return handleTaxLanding(newState)
-  } else if (
-    [TileType.PROPERTY, TileType.AIRPORT, TileType.UTILITY].includes(tile.type)
-  ) {
+  } else if ([TileType.PROPERTY, TileType.AIRPORT, TileType.UTILITY].includes(tile.type)) {
     return handlePropertyLanding(newState)
   } else if (tile.name.includes('Prison')) {
     return handlePrisonLanding(newState)
