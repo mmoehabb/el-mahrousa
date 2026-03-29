@@ -217,7 +217,16 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
       // If we landed on an unowned property, consider buying it
       const currentTile = gameState.tiles[currentPlayer.position]
-      if (isPropertyUnowned(gameState, currentTile.id) && currentTile.price) {
+
+      // Pre-compute owned properties to avoid O(N) lookup
+      const ownedProperties = new Set<number>()
+      for (const p of gameState.players) {
+        for (const propId of p.properties) {
+          ownedProperties.add(propId)
+        }
+      }
+
+      if (isPropertyUnowned(ownedProperties, currentTile.id) && currentTile.price) {
         // Simple heuristic: buy if we have enough money, leaving a buffer of 200 EGP
         if (currentPlayer.balance >= currentTile.price + 200) {
           return { type: 'BUY' }
@@ -290,8 +299,8 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 }
 
 // Helper: Check if a property is unowned
-const isPropertyUnowned = (gameState: GameState, tileId: number): boolean => {
-  return !gameState.players.some((p) => p.properties.includes(tileId))
+const isPropertyUnowned = (ownedProperties: Set<number>, tileId: number): boolean => {
+  return !ownedProperties.has(tileId)
 }
 
 // Helper: Determine if the bot should buy a house on any property
