@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 import type { GameState } from '../types/game'
 import { createInitialState } from '../logic/gameLogic'
+import { getStoredItem } from '../logic/utils/storageUtils'
 
 interface GameContextType {
   gameState: GameState
@@ -42,26 +43,25 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   )
 
   // Audio settings
-  const [isSfxEnabled, setIsSfxEnabled] = useState(() => {
-    const stored = localStorage.getItem('isSfxEnabled')
-    return stored ? JSON.parse(stored) : true
-  })
-  const [isBgmEnabled, setIsBgmEnabled] = useState(() => {
-    const stored = localStorage.getItem('isBgmEnabled')
-    return stored ? JSON.parse(stored) : true
-  })
-  const [sfxVolume, setSfxVolumeState] = useState(() => {
-    const stored = localStorage.getItem('sfxVolume')
-    return stored ? JSON.parse(stored) : 0.5
-  })
-  const [bgmVolume, setBgmVolumeState] = useState(() => {
-    const stored = localStorage.getItem('bgmVolume')
-    return stored ? JSON.parse(stored) : 0.3
-  })
-  const [iceServers, setIceServersState] = useState<string[]>(() => {
-    const stored = localStorage.getItem('iceServers')
-    return stored ? JSON.parse(stored) : []
-  })
+  const [isSfxEnabled, setIsSfxEnabled] = useState(() =>
+    getStoredItem('isSfxEnabled', true, (v): v is boolean => typeof v === 'boolean'),
+  )
+  const [isBgmEnabled, setIsBgmEnabled] = useState(() =>
+    getStoredItem('isBgmEnabled', true, (v): v is boolean => typeof v === 'boolean'),
+  )
+  const [sfxVolume, setSfxVolumeState] = useState(() =>
+    getStoredItem('sfxVolume', 0.5, (v): v is number => typeof v === 'number'),
+  )
+  const [bgmVolume, setBgmVolumeState] = useState(() =>
+    getStoredItem('bgmVolume', 0.3, (v): v is number => typeof v === 'number'),
+  )
+  const [iceServers, setIceServersState] = useState<string[]>(() =>
+    getStoredItem(
+      'iceServers',
+      [],
+      (v): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string'),
+    ),
+  )
 
   const handleSetPlayerName = (name: string) => {
     setPlayerName(name)
