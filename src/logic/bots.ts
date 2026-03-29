@@ -157,6 +157,12 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     case 'ACTION': {
       // If balance is negative, we MUST sell, trade, or bankrupt
       if (currentPlayer.balance < 0) {
+        // We must check if there is an active trade involving this bot already to avoid spamming
+        const activeTrade = gameState.trades.find(
+          (t) => t.fromId === currentPlayer.id && t.status === 'PENDING',
+        )
+        if (activeTrade) return null // Wait for the trade to be accepted or rejected
+
         // First try to sell properties to other players before the bank
         const sellableProperties = getSellableProperties(gameState, currentPlayer)
         if (sellableProperties.length > 0) {
@@ -179,12 +185,6 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
               // Ask for enough cash to clear debt + 100
               const askingPrice = Math.abs(currentPlayer.balance) + 100
               if (buyer.balance >= askingPrice) {
-                // We must check if there is an active trade involving this bot already to avoid spamming
-                const activeTrade = gameState.trades.find(
-                  (t) => t.fromId === currentPlayer.id && t.status === 'PENDING',
-                )
-                if (activeTrade) return null // Wait for the trade to be accepted or rejected
-
                 memory.rejectedOffers.push({ toId: buyer.id, propertyId: propId })
                 return {
                   type: 'PROPOSE_TRADE',
