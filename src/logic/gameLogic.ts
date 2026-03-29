@@ -359,11 +359,28 @@ export const sellProperty = (state: GameState, tileId: number): GameState => {
   }
 }
 
+const ownedPropertiesCache = new WeakMap<Player[], Set<number>>()
+
+const isPropertyOwned = (players: Player[], tileId: number): boolean => {
+  let cached = ownedPropertiesCache.get(players)
+  if (!cached) {
+    cached = new Set<number>()
+    for (let i = 0; i < players.length; i++) {
+      const props = players[i].properties
+      for (let j = 0; j < props.length; j++) {
+        cached.add(props[j])
+      }
+    }
+    ownedPropertiesCache.set(players, cached)
+  }
+  return cached.has(tileId)
+}
+
 export const buyProperty = (state: GameState, tileId: number): GameState => {
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[tileId]
 
-  const isOwned = state.players.some((p) => p.properties.includes(tileId))
+  const isOwned = isPropertyOwned(state.players, tileId)
   if (isOwned || !tile.price || player.balance < tile.price) return state
 
   const newPlayers = [...state.players]
