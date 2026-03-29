@@ -183,9 +183,7 @@ export const applyEventLogic = (state: GameState): GameState => {
     // Get all PROPERTY, AIRPORT, UTILITY tiles
     const properties = state.tiles.filter(
       (t) =>
-        t.type === TileType.PROPERTY ||
-        t.type === TileType.AIRPORT ||
-        t.type === TileType.UTILITY,
+        t.type === TileType.PROPERTY || t.type === TileType.AIRPORT || t.type === TileType.UTILITY,
     )
     const randomTile = properties[Math.floor(secureRandom() * properties.length)]
     const newPlayers = [...state.players]
