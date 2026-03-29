@@ -1,4 +1,4 @@
-import { TileType, type GameState, type TradeOffer } from '../types/game.ts'
+import { TileType, type GameState, type TradeOffer, type Player } from '../types/game.ts'
 import { GAME_CONFIG, HAZAK_EVENTS } from '../config/gameConfig.ts'
 import { BOARD_DATA } from '../config/gameConfig.ts'
 import { validateTrade, applyTradeToPlayers } from './utils/tradeUtils.ts'
