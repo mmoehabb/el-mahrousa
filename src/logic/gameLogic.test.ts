@@ -16,6 +16,7 @@ import {
   acceptTrade,
   rejectTrade,
   cancelTrade,
+  processDebtRepayment,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
 import { TileType } from '../types/game.ts'
@@ -1398,5 +1399,121 @@ describe('cancelTrade', () => {
     const newState = cancelTrade(state, tradeId)
 
     assert.strictEqual(newState, state)
+  })
+})
+
+describe('processDebtRepayment', () => {
+  test('should return exactly newState if no player has debt', () => {
+    const prevState = createMockState([createMockPlayer({ id: 'p1', balance: 100 })])
+    const newState = createMockState([createMockPlayer({ id: 'p1', balance: 200 })])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    assert.strictEqual(result, newState)
+  })
+
+  test('should partially repay debt to another player and retain debtTo', () => {
+    const prevState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -400, debtTo: 'p2' }),
+      createMockPlayer({ id: 'p2', balance: 1000 }),
+    ])
+    const newState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -100, debtTo: 'p2' }),
+      createMockPlayer({ id: 'p2', balance: 1000 }),
+    ])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    assert.notStrictEqual(result, newState)
+    assert.strictEqual(result.players[0].balance, -100)
+    assert.strictEqual(result.players[0].debtTo, 'p2')
+    // Creditor p2 should receive the amount gained (300)
+    assert.strictEqual(result.players[1].balance, 1300)
+  })
+
+  test('should fully repay debt to another player and clear debtTo', () => {
+    const prevState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -400, debtTo: 'p2' }),
+      createMockPlayer({ id: 'p2', balance: 1000 }),
+    ])
+    // Player gains 500, new balance is 100
+    const newState = createMockState([
+      createMockPlayer({ id: 'p1', balance: 100, debtTo: 'p2' }),
+      createMockPlayer({ id: 'p2', balance: 1000 }),
+    ])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    assert.notStrictEqual(result, newState)
+    assert.strictEqual(result.players[0].balance, 100)
+    // Should clear debtTo
+    assert.strictEqual(result.players[0].debtTo, undefined)
+    // Creditor p2 should only receive the debt amount (400)
+    assert.strictEqual(result.players[1].balance, 1400)
+  })
+
+  test('should partially repay debt to the bank and retain debtTo', () => {
+    const prevState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -400, debtTo: 'bank' }),
+    ])
+    // Player gains 300, new balance is -100
+    const newState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -100, debtTo: 'bank' }),
+    ])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    assert.notStrictEqual(result, newState)
+    assert.strictEqual(result.players[0].balance, -100)
+    assert.strictEqual(result.players[0].debtTo, 'bank')
+  })
+
+  test('should fully repay debt to the bank and clear debtTo', () => {
+    const prevState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -400, debtTo: 'bank' }),
+    ])
+    // Player gains 500, new balance is 100
+    const newState = createMockState([createMockPlayer({ id: 'p1', balance: 100, debtTo: 'bank' })])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    assert.notStrictEqual(result, newState)
+    assert.strictEqual(result.players[0].balance, 100)
+    // Should clear debtTo
+    assert.strictEqual(result.players[0].debtTo, undefined)
+  })
+
+  test('should not repay debt if player balance does not increase', () => {
+    const prevState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -400, debtTo: 'p2' }),
+      createMockPlayer({ id: 'p2', balance: 1000 }),
+    ])
+    // Player loses 100, new balance is -500
+    const newState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -500, debtTo: 'p2' }),
+      createMockPlayer({ id: 'p2', balance: 1000 }),
+    ])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    // Should return unchanged state reference since no debt repaid
+    assert.strictEqual(result, newState)
+  })
+
+  test('should fully repay debt even if creditor is missing', () => {
+    const prevState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -400, debtTo: 'missing-id' }),
+    ])
+    // Player gains 500, new balance is 100
+    const newState = createMockState([
+      createMockPlayer({ id: 'p1', balance: 100, debtTo: 'missing-id' }),
+    ])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    assert.notStrictEqual(result, newState)
+    assert.strictEqual(result.players[0].balance, 100)
+    // Should still clear debtTo for p1
+    assert.strictEqual(result.players[0].debtTo, undefined)
   })
 })
