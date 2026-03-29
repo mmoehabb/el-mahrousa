@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { X, Home } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGame } from '../context/GameContext'
-import type { Tile, Player, GameAction } from '../types/game'
+import { TileType, type Tile, type Player, type GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { getContrastColor } from '../logic/utils/colorUtils'
 
@@ -126,7 +126,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             </div>
 
             {/* Rent Table */}
-            {tile.type === 'PROPERTY' && tile.rent && (
+            {tile.type === TileType.PROPERTY && tile.rent && (
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between font-bold border-b border-slate-200 dark:border-slate-700 pb-1">
                   <span>{t('game.rentLevel')}</span>
@@ -185,9 +185,11 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
 
             {/* Actions */}
             {canAct &&
-              (tile.type === 'PROPERTY' || tile.type === 'AIRPORT' || tile.type === 'UTILITY') && (
+              (tile.type === TileType.PROPERTY ||
+                tile.type === TileType.AIRPORT ||
+                tile.type === TileType.UTILITY) && (
                 <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-700">
-                  {tile.type === 'PROPERTY' && (
+                  {tile.type === TileType.PROPERTY && (
                     <>
                       <button
                         onClick={handleBuyHouse}

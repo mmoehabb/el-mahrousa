@@ -1,14 +1,16 @@
-import type { GameState, Player, Tile } from '../../types/game.ts'
+import { TileType, type GameState, type Player, type Tile } from '../../types/game.ts'
 
 export const calculateRent = (tile: Tile, owner: Player, allTiles: Tile[]): number => {
-  if (tile.type === 'PROPERTY') {
+  if (tile.type === TileType.PROPERTY) {
     if (!tile.rent) return 0
     const houses = tile.houses || 0
     return tile.rent[houses] || tile.rent[0]
   }
-  if (tile.type === 'AIRPORT' || tile.type === 'UTILITY') {
+  if (tile.type === TileType.AIRPORT || tile.type === TileType.UTILITY) {
     const count = allTiles.filter(
-      (t) => (t.type === 'AIRPORT' || t.type === 'UTILITY') && owner.properties.includes(t.id),
+      (t) =>
+        (t.type === TileType.AIRPORT || t.type === TileType.UTILITY) &&
+        owner.properties.includes(t.id),
     ).length
     return 25 * Math.pow(2, count - 1)
   }

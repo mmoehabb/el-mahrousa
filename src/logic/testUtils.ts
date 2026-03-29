@@ -1,4 +1,4 @@
-import type { Player, GameState, Tile } from '../types/game.ts'
+import { TileType, type Player, type GameState, type Tile } from '../types/game.ts'
 
 export const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
   id: 'p1',
@@ -16,7 +16,7 @@ export const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
 export const createMockTile = (overrides: Partial<Tile> = {}): Tile => ({
   id: 1,
   name: 'Property 1',
-  type: 'PROPERTY',
+  type: TileType.PROPERTY,
   price: 100,
   housePrice: 50,
   rent: [10, 50, 150],
