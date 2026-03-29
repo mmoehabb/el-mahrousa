@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { GameState } from '../types/game'
 import { createInitialState } from '../logic/gameLogic'
 import { getStoredItem } from '../logic/utils/storageUtils'
@@ -66,6 +66,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   )
 
   const [isAdblockDetected, setIsAdblockDetected] = useState(false)
+
+  useEffect(() => {
+    if (window.adConfig) {
+      window.adConfig({
+        preloadAdBreaks: 'on',
+        sound: 'on',
+        onReady: () => {
+          console.log('AdSense H5 Games Ads ready')
+        },
+      })
+    }
+  }, [])
 
   const handleSetPlayerName = (name: string) => {
     setPlayerName(name)
