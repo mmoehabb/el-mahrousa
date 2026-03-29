@@ -32,11 +32,11 @@ const getBotMemory = (botId: string, currentTurnIndex: number) => {
 /**
  * Check if acquiring a specific property completes a color group for a player
  */
-const completesColorGroup = (gameState: GameState, playerId: string, tileId: number): boolean => {
+const completesColorGroup = (gameState: GameState, player: Player, tileId: number): boolean => {
   const tile = gameState.tiles[tileId]
   if (!tile.group) return false
   const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
-  const playerProps = gameState.players.find((p) => p.id === playerId)?.properties || []
+  const playerProps = player.properties || []
 
   // They complete the group if they own all other tiles in the group
   return groupTiles.every((t) => t.id === tileId || playerProps.includes(t.id))
@@ -80,7 +80,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
     // Check if the trade completes a color group for the bot
     let completesGroupForBot = false
     for (const propId of pendingTrade.myProperties) {
-      if (completesColorGroup(gameState, currentPlayer.id, propId)) {
+      if (completesColorGroup(gameState, currentPlayer, propId)) {
         completesGroupForBot = true
       }
     }
@@ -97,11 +97,14 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
     // 1. DANGER: Does it give the other player a town that completes a color group?
     let isDangerTrade = false
-    for (const propId of pendingTrade.partnerProperties) {
-      // properties the bot is giving away
-      if (completesColorGroup(gameState, pendingTrade.fromId!, propId)) {
-        isDangerTrade = true
-        break
+    const partner = gameState.players.find((p) => p.id === pendingTrade.fromId)
+    if (partner) {
+      for (const propId of pendingTrade.partnerProperties) {
+        // properties the bot is giving away
+        if (completesColorGroup(gameState, partner, propId)) {
+          isDangerTrade = true
+          break
+        }
       }
     }
 
