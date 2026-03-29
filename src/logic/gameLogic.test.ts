@@ -18,6 +18,7 @@ import {
   cancelTrade,
 } from './gameLogic.ts'
 import type { GameState, Player, TradeOffer } from '../types/game.ts'
+import { TileType } from '../types/game.ts'
 import { createMockPlayer, createMockTile, createMockState } from './testUtils.ts'
 
 const proposeAndAcceptTrade = (state: GameState, p1Id: string, p2Id: string, offer: TradeOffer) => {
@@ -426,7 +427,7 @@ describe('applyLandingLogic', () => {
   test('pays rent to owner when landing on owned PROPERTY', () => {
     const state = getBaseState()
 
-    const propIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
+    const propIndex = state.tiles.findIndex((t) => t.type === TileType.PROPERTY)
     assert.notStrictEqual(propIndex, -1, 'Board must have at least one PROPERTY tile')
 
     const propTile = state.tiles[propIndex]
@@ -447,7 +448,7 @@ describe('applyLandingLogic', () => {
   test('does not pay rent if owner is bankrupt', () => {
     const state = getBaseState()
 
-    const propIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
+    const propIndex = state.tiles.findIndex((t) => t.type === TileType.PROPERTY)
     const propTile = state.tiles[propIndex]
 
     // Player 2 owns it but is bankrupt
@@ -489,7 +490,7 @@ describe('applyLandingLogic', () => {
     state.players[0].balance = 10
 
     // Find property tile
-    const propertyTileIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
+    const propertyTileIndex = state.tiles.findIndex((t) => t.type === TileType.PROPERTY)
 
     // Deep clone the tiles array to avoid polluting global state
     state.tiles = state.tiles.map((t) => ({ ...t }))
@@ -526,14 +527,14 @@ describe('applyLandingLogic', () => {
 
     const mockTiles = state.tiles.map((t) => ({ ...t }))
 
-    const airport1Index = mockTiles.findIndex((t) => t.type === 'AIRPORT')
+    const airport1Index = mockTiles.findIndex((t) => t.type === TileType.AIRPORT)
     assert.notStrictEqual(airport1Index, -1, 'Board must have at least one AIRPORT tile')
 
-    const utility1Index = mockTiles.findIndex((t) => t.type === 'UTILITY')
+    const utility1Index = mockTiles.findIndex((t) => t.type === TileType.UTILITY)
     assert.notStrictEqual(utility1Index, -1, 'Board must have at least one UTILITY tile')
 
-    const allAirports = mockTiles.filter((t) => t.type === 'AIRPORT')
-    const allUtilities = mockTiles.filter((t) => t.type === 'UTILITY')
+    const allAirports = mockTiles.filter((t) => t.type === TileType.AIRPORT)
+    const allUtilities = mockTiles.filter((t) => t.type === TileType.UTILITY)
 
     const airport1 = allAirports[0]
     const utility1 = allUtilities[0]
@@ -554,7 +555,7 @@ describe('applyLandingLogic', () => {
 
   test('makes properties available for purchase after bankrupt player is stripped of them', () => {
     let state = getBaseState()
-    const propTileIndex = state.tiles.findIndex((t) => t.type === 'PROPERTY')
+    const propTileIndex = state.tiles.findIndex((t) => t.type === TileType.PROPERTY)
 
     // Deep clone tiles to safely mutate state for the test
     state.tiles = state.tiles.map((t) => ({ ...t }))
@@ -584,7 +585,7 @@ describe('buyProperty', () => {
   ): import('../types/game.ts').Tile => ({
     id: 1,
     name: 'Property 1',
-    type: 'PROPERTY',
+    type: TileType.PROPERTY,
     price: 100,
     ...overrides,
   })
@@ -661,7 +662,7 @@ describe('buyProperty', () => {
 
   test('should not buy if tile has no price (e.g., GO or Tax)', () => {
     const player = createMockPlayer({ balance: 500 })
-    const tile = createMockTile({ id: 1, type: 'SPECIAL', price: undefined })
+    const tile = createMockTile({ id: 1, type: TileType.SPECIAL, price: undefined })
     const state = createMockState([player], [createMockTile({ id: 0, price: 0 }), tile])
 
     const newState = buyProperty(state, 1)
@@ -880,7 +881,7 @@ describe('buyHouse', () => {
   ): import('../types/game.ts').Tile => ({
     id: 1,
     name: 'Property 1',
-    type: 'PROPERTY',
+    type: TileType.PROPERTY,
     price: 100,
     housePrice: 50,
     rent: [10, 50, 150],
@@ -1106,7 +1107,7 @@ describe('sellProperty', () => {
   ): import('../types/game.ts').Tile => ({
     id: 1,
     name: 'Property 1',
-    type: 'PROPERTY',
+    type: TileType.PROPERTY,
     price: 200,
     ...overrides,
   })

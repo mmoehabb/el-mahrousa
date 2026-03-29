@@ -1,4 +1,4 @@
-import type { GameAction, TradeOffer, GameState } from '../types/game'
+import { TileType, type GameAction, type TradeOffer, type GameState } from '../types/game.ts'
 
 export const isValidTradeOffer = (offer: unknown): offer is TradeOffer => {
   if (!offer || typeof offer !== 'object') return false
@@ -39,6 +39,11 @@ export const isValidGameState = (state: unknown): state is GameState => {
 
   if (typeof s.currentPlayerIndex !== 'number') return false
   if (!Array.isArray(s.tiles)) return false
+  for (const t of s.tiles) {
+    if (!t || typeof t !== 'object') return false
+    const tile = t as Record<string, unknown>
+    if (!Object.values(TileType).includes(tile.type as TileType)) return false
+  }
   if (!['LOBBY', 'PLAYING', 'FINISHED', 'WAITING'].includes(s.status as string)) return false
   if (!['ROLL', 'ROLLING', 'MOVING', 'ACTION', 'END'].includes(s.turnPhase as string)) return false
 

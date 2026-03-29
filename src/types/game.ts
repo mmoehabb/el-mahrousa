@@ -1,4 +1,13 @@
-export type TileType = 'PROPERTY' | 'AIRPORT' | 'UTILITY' | 'TAX' | 'EVENT' | 'SPECIAL'
+export const TileType = {
+  PROPERTY: 'PROPERTY',
+  AIRPORT: 'AIRPORT',
+  UTILITY: 'UTILITY',
+  TAX: 'TAX',
+  EVENT: 'EVENT',
+  SPECIAL: 'SPECIAL',
+} as const
+
+export type TileType = (typeof TileType)[keyof typeof TileType]
 
 export interface Tile {
   id: number

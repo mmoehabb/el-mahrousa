@@ -1,4 +1,4 @@
-import type { GameState, TradeOffer } from '../types/game.ts'
+import { TileType, type GameState, type TradeOffer } from '../types/game.ts'
 import { GAME_CONFIG, HAZAK_EVENTS } from '../config/gameConfig.ts'
 import { BOARD_DATA } from '../config/gameConfig.ts'
 import { validateTrade, applyTradeToPlayers } from './utils/tradeUtils.ts'
@@ -182,7 +182,7 @@ export const applyEventLogic = (state: GameState): GameState => {
     // Sodfa Random Teleportation
     // Get all PROPERTY, AIRPORT, UTILITY tiles
     const properties = state.tiles.filter((t) =>
-      ['PROPERTY', 'AIRPORT', 'UTILITY'].includes(t.type),
+      [TileType.PROPERTY, TileType.AIRPORT, TileType.UTILITY].includes(t.type),
     )
     const randomTile = properties[Math.floor(secureRandom() * properties.length)]
     const newPlayers = [...state.players]
@@ -228,15 +228,16 @@ export const applyLandingLogic = (state: GameState): GameState => {
   const tile = state.tiles[player.position]
   const newState = { ...state }
 
-  if (tile.type === 'EVENT') {
+  if (tile.type === TileType.EVENT) {
     return applyEventLogic(newState)
   }
 
-  if (tile.type === 'TAX') {
+  if (tile.type === TileType.TAX) {
     return handleTaxLanding(newState)
-  } else if (tile.type === 'PROPERTY' || tile.type === 'AIRPORT' || tile.type === 'UTILITY') {
+  } else if (
+    [TileType.PROPERTY, TileType.AIRPORT, TileType.UTILITY].includes(tile.type)
+  ) {
     return handlePropertyLanding(newState)
-    // TODO: these special tiles should be stored in an enum variable
   } else if (tile.name.includes('Prison')) {
     return handlePrisonLanding(newState)
   }
