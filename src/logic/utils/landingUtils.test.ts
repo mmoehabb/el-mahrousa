@@ -41,8 +41,9 @@ describe('handleTaxLanding', () => {
     assert.strictEqual(newState.players[0].balance, 975)
     assert.strictEqual(newState.turnPhase, 'END')
     assert.strictEqual(newState.players[0].debtTo, undefined)
-    assert.strictEqual((newState.logs[0] as any).key, 'paidTax')
-    assert.strictEqual((newState.logs[0] as any).params.amount, 25)
+    const log = newState.logs[0] as { key: string; params: Record<string, string | number> }
+    assert.strictEqual(log.key, 'paidTax')
+    assert.strictEqual(log.params.amount, 25)
   })
 
   test('Income Tax with properties (2.5% of balance + 0.5% per property)', () => {
@@ -94,7 +95,8 @@ describe('handleTaxLanding', () => {
 
     assert.strictEqual(newState.players[0].balance, 850)
     assert.strictEqual(newState.turnPhase, 'END')
-    assert.strictEqual((newState.logs[0] as any).params.amount, 150)
+    const log = newState.logs[0] as { params: Record<string, string | number> }
+    assert.strictEqual(log.params.amount, 150)
   })
 
   test('Generic tax tile without price (defaults to 0)', () => {
@@ -106,7 +108,8 @@ describe('handleTaxLanding', () => {
 
     assert.strictEqual(newState.players[0].balance, 1000)
     assert.strictEqual(newState.turnPhase, 'END')
-    assert.strictEqual((newState.logs[0] as any).params.amount, 0)
+    const log = newState.logs[0] as { params: Record<string, string | number> }
+    assert.strictEqual(log.params.amount, 0)
   })
 
   test('Tax payment bringing balance below 0', () => {
@@ -132,5 +135,4 @@ describe('handleTaxLanding', () => {
     assert.strictEqual(newState.players[0].debtTo, undefined)
     assert.strictEqual(newState.turnPhase, 'END')
   })
-
 })
