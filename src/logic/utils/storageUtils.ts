@@ -5,7 +5,7 @@
 export function getStoredItem<T>(
   key: string,
   defaultValue: T,
-  validator?: (val: any) => val is T,
+  validator?: (val: unknown) => val is T,
 ): T {
   const stored = localStorage.getItem(key)
   if (!stored) return defaultValue

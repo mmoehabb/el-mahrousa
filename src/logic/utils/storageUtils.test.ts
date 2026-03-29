@@ -47,7 +47,8 @@ describe('getStoredItem', () => {
     const result = getStoredItem(
       'key',
       [],
-      (v): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string'),
+      (v: unknown): v is string[] =>
+        Array.isArray(v) && v.every((s) => typeof s === 'string'),
     )
     assert.deepStrictEqual(result, ['a', 'b'])
   })
@@ -57,18 +58,27 @@ describe('getStoredItem', () => {
     const result = getStoredItem(
       'key',
       [],
-      (v): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string'),
+      (v: unknown): v is string[] =>
+        Array.isArray(v) && v.every((s) => typeof s === 'string'),
     )
     assert.deepStrictEqual(result, [])
   })
 
   test('should handle primitive types correctly', () => {
     localStorage.setItem('volume', JSON.stringify(0.8))
-    const result = getStoredItem('volume', 0.5, (v): v is number => typeof v === 'number')
+    const result = getStoredItem(
+      'volume',
+      0.5,
+      (v: unknown): v is number => typeof v === 'number',
+    )
     assert.strictEqual(result, 0.8)
 
     localStorage.setItem('enabled', JSON.stringify(false))
-    const result2 = getStoredItem('enabled', true, (v): v is boolean => typeof v === 'boolean')
+    const result2 = getStoredItem(
+      'enabled',
+      true,
+      (v: unknown): v is boolean => typeof v === 'boolean',
+    )
     assert.strictEqual(result2, false)
   })
 })
