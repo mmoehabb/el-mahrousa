@@ -58,14 +58,11 @@
         }
         document.head.appendChild(script)
 
+        // as documented here: https://support.google.com/adsense/answer/9955214?hl=en&ref_topic=9960293&sjid=15476448188750742990-EU
         window.adsbygoogle = window.adsbygoogle || []
-        window.adConfig = function (o) {
-          window.adsbygoogle.push({ adConfig: o })
+        window.adBreak = adConfig = function (o) {
+          adsbygoogle.push(o)
         }
-        window.adConfig({
-          preloadAdBreaks: 'on',
-          sound: 'on',
-        })
       }
     </script>
   </head>

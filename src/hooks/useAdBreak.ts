@@ -10,17 +10,12 @@ export function useAdBreak() {
     }
 
     window.adBreak({
-      type: 'interstitial',
+      type: 'start',
       name: 'lobby-transition',
+      // For 'start' types, this is the only completion callback required
       adBreakDone: () => {
-        console.log('Ad break done (completed, skipped, or no fill)')
+        console.log('Ad break finished. Resuming app flow.')
         onComplete()
-      },
-      adDismissed: () => {
-        console.log('Ad dismissed')
-      },
-      adViewed: () => {
-        console.log('Ad viewed')
       },
     })
   }, [])
