@@ -181,8 +181,11 @@ export const applyEventLogic = (state: GameState): GameState => {
   } else if (tile.name === 'Sodfa') {
     // Sodfa Random Teleportation
     // Get all PROPERTY, AIRPORT, UTILITY tiles
-    const properties = state.tiles.filter((t) =>
-      [TileType.PROPERTY, TileType.AIRPORT, TileType.UTILITY].includes(t.type),
+    const properties = state.tiles.filter(
+      (t) =>
+        t.type === TileType.PROPERTY ||
+        t.type === TileType.AIRPORT ||
+        t.type === TileType.UTILITY,
     )
     const randomTile = properties[Math.floor(secureRandom() * properties.length)]
     const newPlayers = [...state.players]
@@ -234,7 +237,11 @@ export const applyLandingLogic = (state: GameState): GameState => {
 
   if (tile.type === TileType.TAX) {
     return handleTaxLanding(newState)
-  } else if ([TileType.PROPERTY, TileType.AIRPORT, TileType.UTILITY].includes(tile.type)) {
+  } else if (
+    tile.type === TileType.PROPERTY ||
+    tile.type === TileType.AIRPORT ||
+    tile.type === TileType.UTILITY
+  ) {
     return handlePropertyLanding(newState)
   } else if (tile.name.includes('Prison')) {
     return handlePrisonLanding(newState)

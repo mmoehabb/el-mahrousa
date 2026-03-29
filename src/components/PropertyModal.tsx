@@ -185,7 +185,9 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
 
             {/* Actions */}
             {canAct &&
-              [TileType.PROPERTY, TileType.AIRPORT, TileType.UTILITY].includes(tile.type) && (
+              (tile.type === TileType.PROPERTY ||
+                tile.type === TileType.AIRPORT ||
+                tile.type === TileType.UTILITY) && (
                 <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                   {tile.type === TileType.PROPERTY && (
                     <>
