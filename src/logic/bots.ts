@@ -296,15 +296,24 @@ const isPropertyUnowned = (gameState: GameState, tileId: number): boolean => {
 
 // Helper: Determine if the bot should buy a house on any property
 const getHouseToBuy = (gameState: GameState, player: Player): number | null => {
+  // Pre-calculate owned properties as a Set for O(1) lookups
+  const ownedProps = new Set(player.properties)
+
+  // Cache groups we've already determined the player owns fully
+  const ownedGroups: Record<string, boolean> = {}
+
   // Find properties where we own the whole group and can build
   const buildableTiles = player.properties.filter((tileId) => {
     const tile = gameState.tiles[tileId]
     if (!tile.group || !tile.housePrice || !tile.rent) return false
 
-    // Check if we own all in the group
-    const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
-    const ownsAll = groupTiles.every((t) => player.properties.includes(t.id))
-    if (!ownsAll) return false
+    // Check if we own all in the group (using cache to avoid redundant checks)
+    if (ownedGroups[tile.group] === undefined) {
+      const groupTiles = gameState.tiles.filter((t) => t.group === tile.group)
+      ownedGroups[tile.group] = groupTiles.every((t) => ownedProps.has(t.id))
+    }
+
+    if (!ownedGroups[tile.group]) return false
 
     // Check if we haven't reached max houses
     const currentHouses = tile.houses || 0
