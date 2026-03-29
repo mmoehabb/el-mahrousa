@@ -59,9 +59,9 @@ describe('handlePropertyLanding', () => {
     assert.strictEqual(newState.logs.length, 1)
 
     const log = newState.logs[0]
-    assert.ok(typeof log === 'object' && log !== null)
-    assert.strictEqual((log as any).key, 'paidRent')
-    assert.strictEqual((log as any).params.amount, 50)
+    assert.ok(typeof log === 'object' && log !== null && 'key' in log && 'params' in log)
+    assert.strictEqual(log.key, 'paidRent')
+    assert.strictEqual((log.params as Record<string, string | number>).amount, 50)
   })
 
   test('should handle debt correctly if player does not have enough balance', () => {
@@ -89,9 +89,9 @@ describe('handlePropertyLanding', () => {
     assert.strictEqual(newState.logs.length, 1)
 
     const log = newState.logs[0]
-    assert.ok(typeof log === 'object' && log !== null)
-    assert.strictEqual((log as any).key, 'paidRent')
-    assert.strictEqual((log as any).params.amount, 50)
+    assert.ok(typeof log === 'object' && log !== null && 'key' in log && 'params' in log)
+    assert.strictEqual(log.key, 'paidRent')
+    assert.strictEqual((log.params as Record<string, string | number>).amount, 50)
   })
 
   test.skip('should handle negative initial balance correctly (player already in debt)', () => {
@@ -115,10 +115,7 @@ describe('handlePropertyLanding', () => {
     assert.strictEqual(newPlayer1.balance, -60) // -10 - 50 = -60
     assert.strictEqual(newPlayer1.debtTo, 'p2')
 
-    // TODO: There is a bug in the implementation of amountPaidImmediately when the player
-    // is already in debt before landing on the property. `newBalance` will be heavily negative
-    // causing `rent + newBalance` to be negative, meaning the owner LOSES money.
-    // Testing the current buggy behavior for now to document it.
-    assert.strictEqual(newPlayer2.balance, 490) // 500 + (-10) = 490
+    // Expected correct behavior once the bug is fixed: owner should get 0, not lose money.
+    assert.strictEqual(newPlayer2.balance, 500)
   })
 })
