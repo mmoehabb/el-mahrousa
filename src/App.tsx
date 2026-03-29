@@ -12,9 +12,11 @@ import GameScreen from './components/GameScreen'
 import useSound from 'use-sound'
 import Toast from './components/Toast'
 import { useAdBreak } from './hooks/useAdBreak'
+import AdBlockScreen from './components/AdBlockScreen'
 
 function App() {
-  const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume } = useGame()
+  const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume, isAdblockDetected } =
+    useGame()
   const [playBgm, { stop: stopBgm }] = useSound('/sounds/bgm.mp3', {
     loop: true,
     volume: bgmVolume,
@@ -79,6 +81,10 @@ function App() {
       setShowCopied(true)
       setTimeout(() => setShowCopied(false), 2000)
     })
+  }
+
+  if (isAdblockDetected) {
+    return <AdBlockScreen />
   }
 
   return (
