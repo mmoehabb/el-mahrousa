@@ -62,7 +62,14 @@ export const handlePropertyLanding = (state: GameState): GameState => {
   const player = state.players[state.currentPlayerIndex]
   const tile = state.tiles[player.position]
 
-  const owner = state.players.find((p) => p.properties.includes(tile.id))
+  const tileOwners = new Map<number, Player>()
+  for (const p of state.players) {
+    for (const propId of p.properties) {
+      tileOwners.set(propId, p)
+    }
+  }
+
+  const owner = tileOwners.get(tile.id)
 
   if (owner && owner.id !== player.id && !owner.isBankrupt) {
     const rent = calculateRent(tile, owner, state.tiles)
