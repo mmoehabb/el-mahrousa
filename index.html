@@ -58,13 +58,14 @@
         }
         document.head.appendChild(script)
 
+        window.adsbygoogle = window.adsbygoogle || []
         window.adConfig = function (o) {
-          window.adsbygoogle = window.adsbygoogle || []
-          if (!window.adConfigPushed) {
-            window.adsbygoogle.push({ adConfig: o })
-            window.adConfigPushed = true
-          }
+          window.adsbygoogle.push({ adConfig: o })
         }
+        window.adConfig({
+          preloadAdBreaks: 'on',
+          sound: 'on',
+        })
       }
     </script>
   </head>

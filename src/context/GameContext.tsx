@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import type { GameState } from '../types/game'
 import { createInitialState } from '../logic/gameLogic'
 
@@ -97,16 +97,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIceServersState(servers)
     localStorage.setItem('iceServers', JSON.stringify(servers))
   }
-
-  useEffect(() => {
-    // Initialize adConfig when component mounts
-    if (window.adConfig) {
-      window.adConfig({
-        preloadAdBreaks: 'on',
-        sound: 'on',
-      })
-    }
-  }, [])
 
   return (
     <GameContext.Provider
