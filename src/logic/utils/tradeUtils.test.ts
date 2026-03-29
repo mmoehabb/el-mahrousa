@@ -1,112 +1,167 @@
 import { test, describe } from 'node:test'
 import assert from 'node:assert'
-import { validateTrade } from './tradeUtils.ts'
+import { validateTrade, applyTradeToPlayers } from './tradeUtils.ts'
 import { createMockPlayer } from '../testUtils.ts'
 import type { TradeOffer } from '../../types/game.ts'
 
-describe('validateTrade', () => {
-  test('should return valid for a correct trade', () => {
-    const p1 = createMockPlayer({ id: 'p1', balance: 500, properties: [1, 2] })
-    const p2 = createMockPlayer({ id: 'p2', balance: 500, properties: [3, 4] })
+describe('tradeUtils', () => {
+  describe('validateTrade', () => {
+    test('should return invalid if either player is missing', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 1000 })
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 100,
+        partnerCash: 0,
+        myProperties: [],
+        partnerProperties: [],
+      }
 
-    const trade: TradeOffer = {
-      myCash: 100,
-      partnerCash: 200,
-      myProperties: [1],
-      partnerProperties: [3],
-    }
+      const result1 = validateTrade(p1, undefined, trade)
+      assert.strictEqual(result1.valid, false)
+      assert.strictEqual(result1.error, 'Trade failed: One or both players not found.')
 
-    const result = validateTrade(p1, p2, trade)
-    assert.strictEqual(result.valid, true)
-    assert.strictEqual(result.error, undefined)
+      const result2 = validateTrade(undefined, p1, trade)
+      assert.strictEqual(result2.valid, false)
+      assert.strictEqual(result2.error, 'Trade failed: One or both players not found.')
+    })
+
+    test('should return invalid if p1 has insufficient funds', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 50 })
+      const p2 = createMockPlayer({ id: 'p2', balance: 1000 })
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 100, // Wants to trade 100, but only has 50
+        partnerCash: 0,
+        myProperties: [],
+        partnerProperties: [],
+      }
+
+      const result = validateTrade(p1, p2, trade)
+      assert.strictEqual(result.valid, false)
+      assert.strictEqual(result.error, 'Trade failed: Insufficient funds.')
+    })
+
+    test('should return invalid if p2 has insufficient funds', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 1000 })
+      const p2 = createMockPlayer({ id: 'p2', balance: 50 })
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 0,
+        partnerCash: 100, // Wants 100 from p2, but p2 only has 50
+        myProperties: [],
+        partnerProperties: [],
+      }
+
+      const result = validateTrade(p1, p2, trade)
+      assert.strictEqual(result.valid, false)
+      assert.strictEqual(result.error, 'Trade failed: Insufficient funds.')
+    })
+
+    test('should return invalid if p1 tries to trade properties they do not own', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 1000, properties: [1] })
+      const p2 = createMockPlayer({ id: 'p2', balance: 1000, properties: [2] })
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 0,
+        partnerCash: 0,
+        myProperties: [1, 3], // p1 does not own 3
+        partnerProperties: [2],
+      }
+
+      const result = validateTrade(p1, p2, trade)
+      assert.strictEqual(result.valid, false)
+      assert.strictEqual(result.error, 'Trade failed: Properties not owned.')
+    })
+
+    test('should return invalid if p2 is asked to trade properties they do not own', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 1000, properties: [1] })
+      const p2 = createMockPlayer({ id: 'p2', balance: 1000, properties: [2] })
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 0,
+        partnerCash: 0,
+        myProperties: [1],
+        partnerProperties: [2, 4], // p2 does not own 4
+      }
+
+      const result = validateTrade(p1, p2, trade)
+      assert.strictEqual(result.valid, false)
+      assert.strictEqual(result.error, 'Trade failed: Properties not owned.')
+    })
+
+    test('should return valid if both players have sufficient funds and properties', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 1000, properties: [1, 2] })
+      const p2 = createMockPlayer({ id: 'p2', balance: 1000, properties: [3, 4] })
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 100,
+        partnerCash: 200,
+        myProperties: [1],
+        partnerProperties: [4],
+      }
+
+      const result = validateTrade(p1, p2, trade)
+      assert.strictEqual(result.valid, true)
+      assert.strictEqual(result.error, undefined)
+    })
   })
 
-  test('should return invalid if a player is missing', () => {
-    const p1 = createMockPlayer()
-    const trade: TradeOffer = { myCash: 0, partnerCash: 0, myProperties: [], partnerProperties: [] }
+  describe('applyTradeToPlayers', () => {
+    test('should correctly apply trade cash and properties to the involved players', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 1000, properties: [1, 2] })
+      const p2 = createMockPlayer({ id: 'p2', balance: 1000, properties: [3, 4] })
+      const p3 = createMockPlayer({ id: 'p3', balance: 1000, properties: [5] })
 
-    const result1 = validateTrade(undefined, p1, trade)
-    assert.strictEqual(result1.valid, false)
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 100, // p1 gives 100
+        partnerCash: 200, // p2 gives 200
+        myProperties: [1], // p1 gives 1
+        partnerProperties: [4], // p2 gives 4
+      }
 
-    const result2 = validateTrade(p1, undefined, trade)
-    assert.strictEqual(result2.valid, false)
+      const players = [p1, p2, p3]
+      const result = applyTradeToPlayers(players, trade)
 
-    const result3 = validateTrade(undefined, undefined, trade)
-    assert.strictEqual(result3.valid, false)
-  })
+      // p1 logic check: balance = 1000 - 100 + 200 = 1100
+      // p1 properties: loses 1, gets 4 -> [2, 4]
+      const resultingP1 = result.find((p) => p.id === 'p1')!
+      assert.strictEqual(resultingP1.balance, 1100)
+      assert.deepStrictEqual(resultingP1.properties, [2, 4])
 
-  test('should return invalid if p1 has insufficient funds', () => {
-    const p1 = createMockPlayer({ id: 'p1', balance: 50, properties: [] })
-    const p2 = createMockPlayer({ id: 'p2', balance: 500, properties: [] })
+      // p2 logic check: balance = 1000 - 200 + 100 = 900
+      // p2 properties: loses 4, gets 1 -> [3, 1]
+      const resultingP2 = result.find((p) => p.id === 'p2')!
+      assert.strictEqual(resultingP2.balance, 900)
+      assert.deepStrictEqual(resultingP2.properties, [3, 1])
+    })
 
-    const trade: TradeOffer = {
-      myCash: 100, // p1 offers 100 but only has 50
-      partnerCash: 0,
-      myProperties: [],
-      partnerProperties: [],
-    }
+    test('should not mutate players not involved in the trade', () => {
+      const p1 = createMockPlayer({ id: 'p1', balance: 1000, properties: [1] })
+      const p2 = createMockPlayer({ id: 'p2', balance: 1000, properties: [2] })
+      const p3 = createMockPlayer({ id: 'p3', balance: 1000, properties: [3] })
 
-    const result = validateTrade(p1, p2, trade)
-    assert.strictEqual(result.valid, false)
-  })
+      const trade: TradeOffer = {
+        fromId: 'p1',
+        toId: 'p2',
+        myCash: 0,
+        partnerCash: 0,
+        myProperties: [],
+        partnerProperties: [],
+      }
 
-  test('should return invalid if p2 has insufficient funds', () => {
-    const p1 = createMockPlayer({ id: 'p1', balance: 500, properties: [] })
-    const p2 = createMockPlayer({ id: 'p2', balance: 50, properties: [] })
+      const players = [p1, p2, p3]
+      const result = applyTradeToPlayers(players, trade)
 
-    const trade: TradeOffer = {
-      myCash: 0,
-      partnerCash: 100, // asks p2 for 100 but they only have 50
-      myProperties: [],
-      partnerProperties: [],
-    }
-
-    const result = validateTrade(p1, p2, trade)
-    assert.strictEqual(result.valid, false)
-  })
-
-  test('should allow trade if player is in debt but offers 0 cash', () => {
-    const p1 = createMockPlayer({ id: 'p1', balance: -200, properties: [1] })
-    const p2 = createMockPlayer({ id: 'p2', balance: 500, properties: [] })
-
-    const trade: TradeOffer = {
-      myCash: 0, // p1 offers 0 cash
-      partnerCash: 100, // asks p2 for 100
-      myProperties: [1],
-      partnerProperties: [],
-    }
-
-    const result = validateTrade(p1, p2, trade)
-    assert.strictEqual(result.valid, true)
-  })
-
-  test('should return invalid if p1 does not own offered properties', () => {
-    const p1 = createMockPlayer({ id: 'p1', balance: 500, properties: [1] }) // only owns 1
-    const p2 = createMockPlayer({ id: 'p2', balance: 500, properties: [] })
-
-    const trade: TradeOffer = {
-      myCash: 0,
-      partnerCash: 0,
-      myProperties: [1, 2], // offers 1 and 2
-      partnerProperties: [],
-    }
-
-    const result = validateTrade(p1, p2, trade)
-    assert.strictEqual(result.valid, false)
-  })
-
-  test('should return invalid if p2 does not own requested properties', () => {
-    const p1 = createMockPlayer({ id: 'p1', balance: 500, properties: [] })
-    const p2 = createMockPlayer({ id: 'p2', balance: 500, properties: [3] }) // only owns 3
-
-    const trade: TradeOffer = {
-      myCash: 0,
-      partnerCash: 0,
-      myProperties: [],
-      partnerProperties: [3, 4], // asks for 3 and 4
-    }
-
-    const result = validateTrade(p1, p2, trade)
-    assert.strictEqual(result.valid, false)
+      const resultingP3 = result.find((p) => p.id === 'p3')!
+      assert.strictEqual(resultingP3, p3) // Referential equality
+    })
   })
 })
