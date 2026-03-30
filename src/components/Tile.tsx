@@ -83,36 +83,8 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
       {/* Container for players, absolutely positioned near the center to avoid shifting layout */}
       <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-1.5 z-20 pointer-events-none p-1 pt-6">
         {tilePlayers.map((p) => (
-          <motion.div
-            key={p.id}
-            layoutId={`player-${p.id}`}
-            transition={{
-              type: 'spring',
-              stiffness: 300,
-              damping: 20,
-              bounce: 0.5,
-            }}
-            initial={{ scale: 0.8 }}
-            animate={
-              p.isBankrupt
-                ? { scale: 1, y: 0, opacity: 0.6, rotate: 90, filter: 'grayscale(100%)' }
-                : { scale: 1, y: [0, -15, 0] }
-            }
-            className={`w-10 h-10 rounded-full border-[3px] shadow-md overflow-hidden bg-white ${
-              p.isBankrupt ? 'border-slate-400' : ''
-            } relative`}
-            style={{ borderColor: p.isBankrupt ? '#94a3b8' : p.color }}
-            title={`${p.name}${p.isBankrupt ? ` (${t('game.bankruptLabel')})` : ''}`}
-            role="img"
-            aria-label={`${p.name} piece`}
-            tabIndex={0}
-          >
-            <img
-              src={getAvatarPath(p.avatar)}
-              alt={AVATAR_NAMES[p.avatar] || p.name}
-              className="w-full h-full object-cover"
-            />
-            {/* Floating Text Animation */}
+          <div key={p.id} className="relative z-30">
+            {/* Floating Text Animation OUTSIDE overflow-hidden container */}
             <AnimatePresence>
               {(balanceChanges[p.id] || []).map((change) => (
                 <motion.div
@@ -121,10 +93,10 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
                   animate={{ opacity: 1, y: -40 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 1.5, ease: 'easeOut' }}
-                  className={`absolute top-[-20px] left-1/2 transform -translate-x-1/2 font-bold text-sm z-50 whitespace-nowrap ${
+                  className={`absolute top-[-10px] left-1/2 transform -translate-x-1/2 font-black text-[20px] z-[100] whitespace-nowrap pointer-events-none ${
                     change.diff > 0
-                      ? 'text-green-500 drop-shadow-md'
-                      : 'text-red-500 drop-shadow-md'
+                      ? 'text-green-400 drop-shadow-[0_2px_2px_rgba(0,0,0,1)]'
+                      : 'text-red-500 drop-shadow-[0_2px_2px_rgba(0,0,0,1)]'
                   }`}
                 >
                   {change.diff > 0 ? '+' : ''}
@@ -133,38 +105,70 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
               ))}
             </AnimatePresence>
 
-            {/* Jail Overlay Animation */}
-            <AnimatePresence>
-              {(gameState.prison[p.id]?.turnsLeft ?? 0) > 0 && (
-                <motion.div
-                  initial={{ y: -50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -50, opacity: 0 }}
-                  transition={{ type: 'spring', bounce: 0.6 }}
-                  className="absolute inset-0 flex space-x-1 p-1 bg-black/40"
-                  style={{ gap: '2px', padding: '4px' }}
-                >
-                  <div className="w-1 bg-gray-400 h-full"></div>
-                  <div className="w-1 bg-gray-400 h-full"></div>
-                  <div className="w-1 bg-gray-400 h-full"></div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <motion.div
+              layoutId={`player-${p.id}`}
+              layout="position"
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 25,
+                mass: 0.8,
+                bounce: 0.6,
+                duration: 0.6,
+              }}
+              initial={{ scale: 0.8 }}
+              animate={
+                p.isBankrupt
+                  ? { scale: 1, y: 0, opacity: 0.6, rotate: 90, filter: 'grayscale(100%)' }
+                  : { scale: 1, y: [0, -20, 0] }
+              }
+              className={`w-10 h-10 rounded-full border-[3px] shadow-md overflow-hidden bg-white ${
+                p.isBankrupt ? 'border-slate-400' : ''
+              } relative`}
+              style={{ borderColor: p.isBankrupt ? '#94a3b8' : p.color }}
+              title={`${p.name}${p.isBankrupt ? ` (${t('game.bankruptLabel')})` : ''}`}
+              role="img"
+              aria-label={`${p.name} piece`}
+              tabIndex={0}
+            >
+              <img
+                src={getAvatarPath(p.avatar)}
+                alt={AVATAR_NAMES[p.avatar] || p.name}
+                className="w-full h-full object-cover pointer-events-auto"
+              />
+              {/* Jail Overlay Animation */}
+              <AnimatePresence>
+                {(gameState.prison[p.id]?.turnsLeft ?? 0) > 0 && (
+                  <motion.div
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -50, opacity: 0 }}
+                    transition={{ type: 'spring', bounce: 0.6 }}
+                    className="absolute inset-0 flex space-x-1 p-1 bg-black/40"
+                    style={{ gap: '2px', padding: '4px' }}
+                  >
+                    <div className="w-1 bg-gray-400 h-full"></div>
+                    <div className="w-1 bg-gray-400 h-full"></div>
+                    <div className="w-1 bg-gray-400 h-full"></div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-            {/* Bankruptcy Overlay Animation */}
-            <AnimatePresence>
-              {p.isBankrupt && (
-                <motion.div
-                  initial={{ scale: 2, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/60"
-                >
-                  <span className="text-red-500 font-bold text-[24px]">X</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+              {/* Bankruptcy Overlay Animation */}
+              <AnimatePresence>
+                {p.isBankrupt && (
+                  <motion.div
+                    initial={{ scale: 2, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute inset-0 flex items-center justify-center bg-black/60"
+                  >
+                    <span className="text-red-500 font-bold text-[24px]">X</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
         ))}
       </div>
 
