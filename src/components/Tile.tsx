@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Home } from 'lucide-react'
 import { getAvatarPath, AVATAR_NAMES } from '../utils/avatars'
-import { useGame } from '../context/GameContext'
+
 import { useEffect, useState } from 'react'
 
 interface TileProps {
@@ -17,33 +17,38 @@ interface TileProps {
 
 const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick }) => {
   const { t } = useTranslation()
-  const { gameState } = useGame()
   const [balanceChanges, setBalanceChanges] = useState<
     Record<string, { diff: number; id: number }[]>
   >({})
-  const [prevBalances, setPrevBalances] = useState<Record<string, number>>({})
+  const [, setPrevBalances] = useState<Record<string, number>>({})
 
+  const playerBalancesHash = tilePlayers.map((p) => p.balance).join(',')
+  const playerBalancesHash = tilePlayers.map((p) => p.balance).join(',')
   useEffect(() => {
-    tilePlayers.forEach((p) => {
-      const prev = prevBalances[p.id]
-      if (prev !== undefined && prev !== p.balance) {
-        const diff = p.balance - prev
-        setBalanceChanges((current) => ({
-          ...current,
-          [p.id]: [...(current[p.id] || []), { diff, id: Date.now() }],
-        }))
-
-        // Remove after 2 seconds
-        setTimeout(() => {
-          setBalanceChanges((current) => ({
-            ...current,
-            [p.id]: current[p.id]?.slice(1) || [],
+    setPrevBalances((currentPrevBalances) => {
+      const newPrevBalances = { ...currentPrevBalances }
+      tilePlayers.forEach((p) => {
+        const prev = currentPrevBalances[p.id]
+        if (prev !== undefined && prev !== p.balance) {
+          const diff = p.balance - prev
+          setBalanceChanges((currentChanges) => ({
+            ...currentChanges,
+            [p.id]: [...(currentChanges[p.id] || []), { diff, id: Date.now() }],
           }))
-        }, 2000)
-      }
-      setPrevBalances((current) => ({ ...current, [p.id]: p.balance }))
+
+          // Remove after 2 seconds
+          setTimeout(() => {
+            setBalanceChanges((currentChanges) => ({
+              ...currentChanges,
+              [p.id]: currentChanges[p.id]?.slice(1) || [],
+            }))
+          }, 2000)
+        }
+        newPrevBalances[p.id] = p.balance
+      })
+      return newPrevBalances
     })
-  }, [tilePlayers.map((p) => p.balance).join(',')])
+  }, [playerBalancesHash, tilePlayers])
 
   return (
     <div
@@ -111,7 +116,7 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
             />
             {/* Floating Text Animation */}
             <AnimatePresence>
-              {(balanceChanges[p.id] || []).map((change, i) => (
+              {(balanceChanges[p.id] || []).map((change) => (
                 <motion.div
                   key={change.id}
                   initial={{ opacity: 0, y: 0 }}
