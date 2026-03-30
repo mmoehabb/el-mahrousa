@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import type { Tile, Player } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { useTranslation } from 'react-i18next'
@@ -15,38 +15,36 @@ interface TileProps {
   onClick?: () => void
 }
 
+import { useGame } from '../context/GameContext'
+
 const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick }) => {
   const { t } = useTranslation()
+  const { gameState } = useGame()
   const [balanceChanges, setBalanceChanges] = useState<
     Record<string, { diff: number; id: number }[]>
   >({})
-  const [, setPrevBalances] = useState<Record<string, number>>({})
+  const prevBalancesRef = useRef<Record<string, number>>({})
 
-  const playerBalancesHash = tilePlayers.map((p) => p.balance).join(',')
   const playerBalancesHash = tilePlayers.map((p) => p.balance).join(',')
   useEffect(() => {
-    setPrevBalances((currentPrevBalances) => {
-      const newPrevBalances = { ...currentPrevBalances }
-      tilePlayers.forEach((p) => {
-        const prev = currentPrevBalances[p.id]
-        if (prev !== undefined && prev !== p.balance) {
-          const diff = p.balance - prev
+    tilePlayers.forEach((p) => {
+      const prev = prevBalancesRef.current[p.id]
+      if (prev !== undefined && prev !== p.balance) {
+        const diff = p.balance - prev
+        setBalanceChanges((currentChanges) => ({
+          ...currentChanges,
+          [p.id]: [...(currentChanges[p.id] || []), { diff, id: Date.now() }],
+        }))
+
+        // Remove after 2 seconds
+        setTimeout(() => {
           setBalanceChanges((currentChanges) => ({
             ...currentChanges,
-            [p.id]: [...(currentChanges[p.id] || []), { diff, id: Date.now() }],
+            [p.id]: currentChanges[p.id]?.slice(1) || [],
           }))
-
-          // Remove after 2 seconds
-          setTimeout(() => {
-            setBalanceChanges((currentChanges) => ({
-              ...currentChanges,
-              [p.id]: currentChanges[p.id]?.slice(1) || [],
-            }))
-          }, 2000)
-        }
-        newPrevBalances[p.id] = p.balance
-      })
-      return newPrevBalances
+        }, 2000)
+      }
+      prevBalancesRef.current[p.id] = p.balance
     })
   }, [playerBalancesHash, tilePlayers])
 
@@ -137,7 +135,7 @@ const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick 
 
             {/* Jail Overlay Animation */}
             <AnimatePresence>
-              {p.jailTurns > 0 && (
+              {(gameState.prison[p.id]?.turnsLeft ?? 0) > 0 && (
                 <motion.div
                   initial={{ y: -50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
