@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Loader2 } from 'lucide-react'
 import { useAdBreak } from '../hooks/useAdBreak'
 
 interface LobbyScreenProps {
@@ -12,9 +13,13 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
   const { showInterstitialAd } = useAdBreak()
   const [joinId, setJoinId] = useState('')
   const [joinError, setJoinError] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
+  const [isJoining, setIsJoining] = useState(false)
 
   const handleCreateLobby = () => {
+    setIsCreating(true)
     showInterstitialAd(() => {
+      setIsCreating(false)
       createLobby()
     })
   }
@@ -26,7 +31,9 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
       return
     }
     setJoinError('')
+    setIsJoining(true)
     showInterstitialAd(() => {
+      setIsJoining(false)
       joinLobby(sanitizedId)
     })
   }
@@ -40,8 +47,10 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
       <div className="space-y-4">
         <button
           onClick={handleCreateLobby}
-          className="w-full bg-egyptian-gold text-white dark:text-slate-900 py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors"
+          disabled={isCreating || isJoining}
+          className="flex items-center justify-center gap-2 w-full bg-egyptian-gold text-white dark:text-slate-900 py-3 rounded-lg font-bold hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
+          {isCreating && <Loader2 className="w-5 h-5 animate-spin" />}
           {t('lobby.createNewLobby')}
         </button>
 
@@ -70,8 +79,10 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
           </div>
           <button
             onClick={handleJoinLobby}
-            className="bg-egyptian-blue text-white px-4 py-2 rounded-lg font-bold"
+            disabled={isCreating || isJoining}
+            className="flex items-center justify-center gap-2 bg-egyptian-blue text-white px-4 py-2 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
+            {isJoining && <Loader2 className="w-5 h-5 animate-spin" />}
             {t('lobby.joinBtn')}
           </button>
         </div>
