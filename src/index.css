@@ -15,7 +15,7 @@
 body {
   background-color: #fff7ed;
   color: #0f172a;
-  background-image: var(--background-image-papyrus);
+  /* background-image: var(--background-image-papyrus); */
 }
 
 body.font-english-pixel {
@@ -175,4 +175,130 @@ body.font-arabic-pixel {
       #d4af3722 75%,
       #d4af3722
     );
+}
+
+/* Retro Dynamic Backgrounds */
+.retro-clouds {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2;
+  background-color: #87ceeb; /* Sky blue */
+  background-image:
+    radial-gradient(circle, #fff 10%, transparent 10.5%),
+    radial-gradient(circle, #fff 10%, transparent 10.5%),
+    radial-gradient(circle, #fff 10%, transparent 10.5%);
+  background-size:
+    100px 100px,
+    150px 150px,
+    200px 200px;
+  background-position:
+    0 0,
+    50px 50px,
+    100px 100px;
+  animation: moveClouds 60s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes moveClouds {
+  from {
+    background-position:
+      0 0,
+      50px 50px,
+      100px 100px;
+  }
+  to {
+    background-position:
+      -100px 0,
+      -100px 50px,
+      -100px 100px;
+  }
+}
+
+.dark .retro-clouds {
+  display: none;
+}
+
+.retro-stars {
+  display: none;
+}
+
+.dark .retro-stars {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2;
+  background-color: #0b0b1a; /* Deep space blue */
+  background-image:
+    radial-gradient(circle, #fff 2px, transparent 2px),
+    radial-gradient(circle, #fff 1px, transparent 1px),
+    radial-gradient(circle, #fff 1px, transparent 1px);
+  background-size:
+    150px 150px,
+    100px 100px,
+    50px 50px;
+  background-position:
+    0 0,
+    50px 50px,
+    25px 25px;
+  animation:
+    twinkleStars 10s linear infinite,
+    moveStars 120s linear infinite;
+}
+
+@keyframes moveStars {
+  from {
+    background-position:
+      0 0,
+      50px 50px,
+      25px 25px;
+  }
+  to {
+    background-position:
+      -150px 0,
+      -50px 50px,
+      75px 25px;
+  }
+}
+
+@keyframes twinkleStars {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+/* Subtle CRT Overlay */
+.crt::before {
+  content: ' ';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+  z-index: 1000;
+  background-size:
+    100% 4px,
+    6px 100%;
+  pointer-events: none;
+}
+
+.dark .crt::before {
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 255, 255, 0.03) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
 }
