@@ -14,19 +14,14 @@ import Toast from './components/Toast'
 import { useAdBreak } from './hooks/useAdBreak'
 import AdBlockScreen from './components/AdBlockScreen'
 
-const bgmTracks = [
-  '/sounds/bgm.mp3',
-  '/sounds/bgm2.mp3',
-  '/sounds/bgm3.mp3',
-  '/sounds/bgm4.mp3',
-]
+const bgmTracks = ['/sounds/bgm.mp3', '/sounds/bgm2.mp3', '/sounds/bgm3.mp3', '/sounds/bgm4.mp3']
 
 function App() {
   const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume, isAdblockDetected } =
     useGame()
 
   const [currentBgmIndex, setCurrentBgmIndex] = useState(() =>
-    Math.floor(Math.random() * bgmTracks.length)
+    Math.floor(Math.random() * bgmTracks.length),
   )
 
   const [playBgm, { stop: stopBgm }] = useSound(bgmTracks[currentBgmIndex], {
