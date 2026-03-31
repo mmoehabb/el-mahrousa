@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGame } from './context/GameContext'
 import { useNetworking } from './hooks/useNetworking'
-import { useEffect } from 'react'
 import LoginScreen from './components/LoginScreen'
 import LobbyScreen from './components/LobbyScreen'
 import WaitingScreen from './components/WaitingScreen'
@@ -15,13 +14,32 @@ import Toast from './components/Toast'
 import { useAdBreak } from './hooks/useAdBreak'
 import AdBlockScreen from './components/AdBlockScreen'
 
+const bgmTracks = [
+  '/sounds/bgm.mp3',
+  '/sounds/bgm2.mp3',
+  '/sounds/bgm3.mp3',
+  '/sounds/bgm4.mp3',
+]
+
 function App() {
   const { gameState, myId, playerName, isHost, isBgmEnabled, bgmVolume, isAdblockDetected } =
     useGame()
-  const [playBgm, { stop: stopBgm }] = useSound('/sounds/bgm.mp3', {
-    loop: true,
+
+  const [currentBgmIndex, setCurrentBgmIndex] = useState(() =>
+    Math.floor(Math.random() * bgmTracks.length)
+  )
+
+  const [playBgm, { stop: stopBgm }] = useSound(bgmTracks[currentBgmIndex], {
     volume: bgmVolume,
+    onend: () => {
+      let nextIndex = Math.floor(Math.random() * bgmTracks.length)
+      while (nextIndex === currentBgmIndex) {
+        nextIndex = Math.floor(Math.random() * bgmTracks.length)
+      }
+      setCurrentBgmIndex(nextIndex)
+    },
   })
+
   const { t } = useTranslation()
   const { showInterstitialAd } = useAdBreak()
   const {
@@ -49,6 +67,23 @@ function App() {
     }
     return () => stopBgm()
   }, [isBgmEnabled, playBgm, stopBgm])
+
+  const prevIsBgmEnabled = useRef(isBgmEnabled)
+  useEffect(() => {
+    if (!isBgmEnabled && prevIsBgmEnabled.current) {
+      // Disable the rule specifically for this line as this is how we
+      // trigger a track shuffle when music is paused.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCurrentBgmIndex((prevIndex) => {
+        let nextIndex = Math.floor(Math.random() * bgmTracks.length)
+        while (nextIndex === prevIndex) {
+          nextIndex = Math.floor(Math.random() * bgmTracks.length)
+        }
+        return nextIndex
+      })
+    }
+    prevIsBgmEnabled.current = isBgmEnabled
+  }, [isBgmEnabled])
 
   useEffect(() => {
     if (playerName && gameState.status === 'LOBBY') {
