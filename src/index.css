@@ -9,13 +9,39 @@
   --color-egyptian-blue: #1034a6;
   --color-egyptian-red: #e0115f;
   --color-sand: #f4a460;
-  --background-image-papyrus: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
 }
 
 body {
   background-color: #fff7ed;
   color: #0f172a;
-  /* background-image: var(--background-image-papyrus); */
+}
+
+.dark {
+  /* Override Slate and Blue colors for Synthwave Dark Mode */
+  --color-slate-900: #0b021a; /* Background / Base */
+  --color-slate-800: #1a0b2e; /* Surface / Cards */
+  --color-slate-700: #2a1147; /* Surface Hover / Borders */
+  --color-slate-600: #4a1e7a; /* Muted Borders */
+  --color-slate-500: #884fc5; /* Muted Text */
+  --color-slate-400: #b580f5; /* Muted Text Lighter */
+  --color-slate-300: #d8b4fe; /* Sub-text */
+  --color-slate-200: #f3e8ff; /* Light Text */
+  --color-slate-100: #faf5ff; /* Extra Light Text */
+  --color-slate-50: #ffffff; /* White */
+
+  --color-blue-400: #ff00ff; /* Neon Pink accents */
+  --color-blue-500: #e0115f; /* Deep Pink */
+  --color-blue-600: #c00f51; /* Darker Pink */
+
+  --color-yellow-400: #00ffff; /* Cyan accents */
+  --color-yellow-500: #00cccc;
+  --color-yellow-600: #009999;
+}
+
+.dark body {
+  background-color: var(--color-slate-900);
+  color: var(--color-slate-100);
+  background-image: none;
 }
 
 body.font-english-pixel {
@@ -115,12 +141,6 @@ body.font-arabic-pixel {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-.dark body {
-  background-color: #0f172a;
-  color: #f8fafc;
-  background-image: none;
 }
 
 .dark .egyptian-pattern {
