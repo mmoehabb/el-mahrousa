@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useGame } from './context/GameContext'
 import { useNetworking } from './hooks/useNetworking'
 import { useEffect } from 'react'
@@ -88,75 +89,117 @@ function App() {
   }
 
   return (
-    <div
-      className={`min-h-screen ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center`}
-    >
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-
-      <Toast message={voiceError ? t(voiceError) : null} onClose={() => setVoiceError?.(null)} />
-      <Toast
-        message={connectionError ? t(connectionError) : null}
-        onClose={() => setConnectionError?.(null)}
-      />
+    <>
+      <div className="retro-clouds" />
+      <div className="retro-stars" />
       <div
-        className={`${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? 'hidden lg:block ' : ''}fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]`}
+        className={`min-h-screen ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center crt`}
       >
-        <button
-          id="global-settings-btn"
-          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-          className="bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold transition-colors flex items-center justify-center shadow-md"
-          aria-label={isSettingsOpen ? t('common.settings.close') : t('common.settings.title')}
+        <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
+        <Toast message={voiceError ? t(voiceError) : null} onClose={() => setVoiceError?.(null)} />
+        <Toast
+          message={connectionError ? t(connectionError) : null}
+          onClose={() => setConnectionError?.(null)}
+        />
+        <div
+          className={`${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? 'hidden lg:block ' : ''}fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]`}
         >
-          {isSettingsOpen ? (
-            <X size={24} className="text-egyptian-blue" />
+          <button
+            id="global-settings-btn"
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className="bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold transition-colors flex items-center justify-center shadow-md"
+            aria-label={isSettingsOpen ? t('common.settings.close') : t('common.settings.title')}
+          >
+            {isSettingsOpen ? (
+              <X size={24} className="text-egyptian-blue" />
+            ) : (
+              <Settings size={24} className="text-egyptian-blue" />
+            )}
+          </button>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {!playerName ? (
+            <motion.div
+              key="login"
+              initial={{ x: '-100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              className="w-full flex justify-center"
+            >
+              <LoginScreen />
+            </motion.div>
+          ) : gameState.status === 'LOBBY' ? (
+            <motion.div
+              key="lobby"
+              initial={{ x: '-100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              className="w-full flex justify-center"
+            >
+              <LobbyScreen createLobby={createLobby} joinLobby={joinLobby} />
+            </motion.div>
+          ) : gameState.status === 'WAITING' ? (
+            <motion.div
+              key="waiting"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.2, opacity: 0 }}
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              className="w-full flex justify-center"
+            >
+              <WaitingScreen
+                gameState={gameState}
+                myId={myId}
+                isHost={isHost}
+                lobbyId={lobbyId}
+                showCopied={showCopied}
+                handleShareLink={handleShareLink}
+                sendAction={sendAction}
+                toggleVoiceChat={toggleVoiceChat}
+                isMuted={isMuted}
+                hasJoinedVoice={hasJoinedVoice}
+              />
+            </motion.div>
           ) : (
-            <Settings size={24} className="text-egyptian-blue" />
+            <motion.div
+              key="game"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="w-full h-full"
+            >
+              <GameScreen
+                lobbyId={lobbyId}
+                sendAction={sendAction}
+                showCopied={showCopied}
+                handleShareLink={handleShareLink}
+                toggleVoiceChat={toggleVoiceChat}
+                isMuted={isMuted}
+                hasJoinedVoice={hasJoinedVoice}
+              />
+            </motion.div>
           )}
-        </button>
+        </AnimatePresence>
+
+        {/* Hidden audio elements for voice chat */}
+        {Object.entries(remoteStreams).map(([peerId, stream]) => (
+          <audio
+            key={peerId}
+            autoPlay
+            ref={(audio) => {
+              if (audio && audio.srcObject !== stream) {
+                audio.srcObject = stream
+              }
+            }}
+          />
+        ))}
       </div>
-
-      {!playerName ? (
-        <LoginScreen />
-      ) : gameState.status === 'LOBBY' ? (
-        <LobbyScreen createLobby={createLobby} joinLobby={joinLobby} />
-      ) : gameState.status === 'WAITING' ? (
-        <WaitingScreen
-          gameState={gameState}
-          myId={myId}
-          isHost={isHost}
-          lobbyId={lobbyId}
-          showCopied={showCopied}
-          handleShareLink={handleShareLink}
-          sendAction={sendAction}
-          toggleVoiceChat={toggleVoiceChat}
-          isMuted={isMuted}
-          hasJoinedVoice={hasJoinedVoice}
-        />
-      ) : (
-        <GameScreen
-          lobbyId={lobbyId}
-          sendAction={sendAction}
-          showCopied={showCopied}
-          handleShareLink={handleShareLink}
-          toggleVoiceChat={toggleVoiceChat}
-          isMuted={isMuted}
-          hasJoinedVoice={hasJoinedVoice}
-        />
-      )}
-
-      {/* Hidden audio elements for voice chat */}
-      {Object.entries(remoteStreams).map(([peerId, stream]) => (
-        <audio
-          key={peerId}
-          autoPlay
-          ref={(audio) => {
-            if (audio && audio.srcObject !== stream) {
-              audio.srcObject = stream
-            }
-          }}
-        />
-      ))}
-    </div>
+    </>
   )
 }
 

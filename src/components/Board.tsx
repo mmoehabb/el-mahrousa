@@ -39,6 +39,75 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
   const { gameState } = useGame()
   const tiles = gameState.tiles
 
+  // Global balance tracking for floating text
+  const [balanceChanges, setBalanceChanges] = useState<
+    Record<string, { diff: number; id: number }[]>
+  >({})
+  const prevBalancesRef = React.useRef<Record<string, number>>({})
+
+  const playerBalancesHash = gameState.players.map((p) => p.balance).join(',')
+
+  useEffect(() => {
+    gameState.players.forEach((p) => {
+      const prev = prevBalancesRef.current[p.id]
+      if (prev !== undefined && prev !== p.balance) {
+        const diff = p.balance - prev
+
+        // Accumulate diffs for this player if they are currently moving/rolling
+        if (gameState.turnPhase === 'MOVING' || gameState.turnPhase === 'ROLLING') {
+          // Store the pending diffs to be shown later
+          prevBalancesRef.current[`${p.id}_pending_diff`] =
+            (prevBalancesRef.current[`${p.id}_pending_diff`] || 0) + diff
+        } else {
+          // If not moving, show the diff immediately
+          const totalDiff = (prevBalancesRef.current[`${p.id}_pending_diff`] || 0) + diff
+          prevBalancesRef.current[`${p.id}_pending_diff`] = 0 // reset
+
+          if (totalDiff !== 0) {
+            setBalanceChanges((currentChanges) => ({
+              ...currentChanges,
+              [p.id]: [...(currentChanges[p.id] || []), { diff: totalDiff, id: Date.now() }],
+            }))
+
+            // Remove after 2.5 seconds
+            setTimeout(() => {
+              setBalanceChanges((currentChanges) => ({
+                ...currentChanges,
+                [p.id]: currentChanges[p.id]?.slice(1) || [],
+              }))
+            }, 2500)
+          }
+        }
+      }
+      prevBalancesRef.current[p.id] = p.balance
+    })
+  }, [playerBalancesHash, gameState.players, gameState.turnPhase])
+
+  // A second effect to flush pending diffs when the phase changes FROM MOVING -> ACTION/END
+  useEffect(() => {
+    if (gameState.turnPhase !== 'MOVING' && gameState.turnPhase !== 'ROLLING') {
+      gameState.players.forEach((p) => {
+        const pendingDiff = prevBalancesRef.current[`${p.id}_pending_diff`]
+        if (pendingDiff) {
+          prevBalancesRef.current[`${p.id}_pending_diff`] = 0 // reset
+
+          setBalanceChanges((currentChanges) => ({
+            ...currentChanges,
+            [p.id]: [...(currentChanges[p.id] || []), { diff: pendingDiff, id: Date.now() }],
+          }))
+
+          // Remove after 2.5 seconds
+          setTimeout(() => {
+            setBalanceChanges((currentChanges) => ({
+              ...currentChanges,
+              [p.id]: currentChanges[p.id]?.slice(1) || [],
+            }))
+          }, 2500)
+        }
+      })
+    }
+  }, [gameState.turnPhase, gameState.players])
+
   const isRolling = gameState.turnPhase === 'ROLLING'
   const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
 
@@ -142,6 +211,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             style={{ gridColumnStart: i + 1, gridRowStart: 1 }}
           >
             <TileComponent
+              balanceChanges={balanceChanges}
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
@@ -213,6 +283,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             style={{ gridColumnStart: 1, gridRowStart: i + 2 }}
           >
             <TileComponent
+              balanceChanges={balanceChanges}
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
@@ -229,6 +300,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             style={{ gridColumnStart: 11, gridRowStart: i + 2 }}
           >
             <TileComponent
+              balanceChanges={balanceChanges}
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
@@ -245,6 +317,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
             style={{ gridColumnStart: i + 1, gridRowStart: 11 }}
           >
             <TileComponent
+              balanceChanges={balanceChanges}
               tile={tile}
               tilePlayers={playersByPosition[tile.id] || []}
               owner={ownerByTile[tile.id]}
