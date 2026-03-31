@@ -27,7 +27,10 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import { Home } from 'lucide-react'
 import Toast from './Toast'
-import TradeNotification, { type TradeNotificationData, type TradeNotificationType } from './TradeNotification'
+import TradeNotification, {
+  type TradeNotificationData,
+  type TradeNotificationType,
+} from './TradeNotification'
 
 interface GameScreenProps {
   lobbyId: string | null
@@ -53,7 +56,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const { t } = useTranslation()
   const { gameState, myId, isHost } = useGame()
   const [isTradeOpen, setIsTradeOpen] = useState(false)
-  const [tradeModalTab, setTradeModalTab] = useState<'PROPOSE' | 'PENDING' | 'ACCEPTED' | 'REJECTED'>('PROPOSE')
+  const [tradeModalTab, setTradeModalTab] = useState<
+    'PROPOSE' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  >('PROPOSE')
   const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
   const [tradeNotifications, setTradeNotifications] = useState<TradeNotificationData[]>([])
   const prevTradesRef = useRef(gameState.trades)
@@ -145,7 +150,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
         else if (
           prevTrade?.status === 'PENDING' &&
           trade.status === 'ACCEPTED' &&
-          trade.fromId === myId && trade.toId
+          trade.fromId === myId &&
+          trade.toId
         ) {
           type = 'ACCEPT'
           otherPlayerId = trade.toId
@@ -154,7 +160,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
         else if (
           prevTrade?.status === 'PENDING' &&
           trade.status === 'REJECTED' &&
-          trade.fromId === myId && trade.toId
+          trade.fromId === myId &&
+          trade.toId
         ) {
           type = 'REJECT'
           otherPlayerId = trade.toId
@@ -189,15 +196,15 @@ const GameScreen: React.FC<GameScreenProps> = ({
     const handleDebug = (e: CustomEvent) => {
       if (e.detail?.type === 'DEBUG_TRADE_NOTIFICATION') {
         const payload = e.detail.payload
-        setTradeNotifications(prev => [
+        setTradeNotifications((prev) => [
           ...prev,
           {
             id: `debug-${Date.now()}`,
             type: payload.type,
             playerName: payload.playerName,
             avatarName: payload.avatarName,
-            color: payload.color
-          }
+            color: payload.color,
+          },
         ])
         sounds.playClick()
       }

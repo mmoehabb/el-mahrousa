@@ -67,9 +67,7 @@ export default function TradeNotification({
       </div>
 
       <div className="flex-1 min-w-0 pr-2">
-        <p className="text-sm font-bold text-slate-800 dark:text-white truncate">
-          {message}
-        </p>
+        <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{message}</p>
       </div>
 
       <button
