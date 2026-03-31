@@ -33,12 +33,12 @@ body {
   --color-blue-500: #e0115f; /* Deep Pink */
   --color-blue-600: #c00f51; /* Darker Pink */
 
-  --color-yellow-400: #00ffff; /* Cyan accents */
-  --color-yellow-500: #00cccc;
-  --color-yellow-600: #009999;
+  --color-yellow-400: #ffe600; /* Neon Yellow/Gold accents */
+  --color-yellow-500: #ffcc00;
+  --color-yellow-600: #e6b800;
 
   /* Synthwave Overrides for Egyptian Theme Colors */
-  --color-egyptian-gold: #00ffff; /* Cyan */
+  --color-egyptian-gold: #ffcc00; /* Neon Gold */
   --color-egyptian-blue: #ff00ff; /* Neon Pink */
   --color-egyptian-red: #ff3333; /* Bright Red/Orange */
   --color-sand: #1a0b2e; /* Dark Purple Surface (matches slate-800 for seamless integration) */
