@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import type { Tile, Player } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { useTranslation } from 'react-i18next'
@@ -6,52 +6,30 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Home } from 'lucide-react'
 import { getAvatarPath, AVATAR_NAMES } from '../utils/avatars'
 
-import { useEffect, useState } from 'react'
-
 interface TileProps {
   tile: Tile
   tilePlayers: Player[]
   owner?: Player
   onClick?: () => void
+  balanceChanges?: Record<string, { diff: number; id: number }[]>
 }
 
 import { useGame } from '../context/GameContext'
 
-const TileComponent: React.FC<TileProps> = ({ tile, tilePlayers, owner, onClick }) => {
+const TileComponent: React.FC<TileProps> = ({
+  tile,
+  tilePlayers,
+  owner,
+  onClick,
+  balanceChanges = {},
+}) => {
   const { t } = useTranslation()
   const { gameState } = useGame()
-  const [balanceChanges, setBalanceChanges] = useState<
-    Record<string, { diff: number; id: number }[]>
-  >({})
-  const prevBalancesRef = useRef<Record<string, number>>({})
-
-  const playerBalancesHash = tilePlayers.map((p) => p.balance).join(',')
-  useEffect(() => {
-    tilePlayers.forEach((p) => {
-      const prev = prevBalancesRef.current[p.id]
-      if (prev !== undefined && prev !== p.balance) {
-        const diff = p.balance - prev
-        setBalanceChanges((currentChanges) => ({
-          ...currentChanges,
-          [p.id]: [...(currentChanges[p.id] || []), { diff, id: Date.now() }],
-        }))
-
-        // Remove after 2 seconds
-        setTimeout(() => {
-          setBalanceChanges((currentChanges) => ({
-            ...currentChanges,
-            [p.id]: currentChanges[p.id]?.slice(1) || [],
-          }))
-        }, 2000)
-      }
-      prevBalancesRef.current[p.id] = p.balance
-    })
-  }, [playerBalancesHash, tilePlayers])
 
   return (
     <div
       id={`tile-${tile.id}`}
-      className={`board-tile bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 ${onClick ? 'cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition-colors' : ''}`}
+      className={`board-tile bg-white/80 dark:bg-[#0b021a]/85 backdrop-blur-sm border border-slate-200 dark:border-pink-500/40 dark:shadow-[0_0_10px_rgba(224,17,95,0.2)] ${onClick ? 'cursor-pointer hover:bg-white dark:hover:bg-[#1a0b2e] transition-colors' : ''}`}
       onClick={onClick}
     >
       {tile.color && (
