@@ -36,6 +36,12 @@ body {
   --color-yellow-400: #00ffff; /* Cyan accents */
   --color-yellow-500: #00cccc;
   --color-yellow-600: #009999;
+
+  /* Synthwave Overrides for Egyptian Theme Colors */
+  --color-egyptian-gold: #00ffff; /* Cyan */
+  --color-egyptian-blue: #ff00ff; /* Neon Pink */
+  --color-egyptian-red: #ff3333; /* Bright Red/Orange */
+  --color-sand: #1a0b2e; /* Dark Purple Surface (matches slate-800 for seamless integration) */
 }
 
 .dark body {
