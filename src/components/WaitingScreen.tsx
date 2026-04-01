@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 import { Users, UserMinus, Mic, MicOff, PhoneCall, Bot } from 'lucide-react'
 import type { GameState } from '../types/game'
+import ConfirmDialog from './ConfirmDialog'
 
 interface WaitingScreenProps {
   gameState: GameState
@@ -30,9 +32,21 @@ export default function WaitingScreen({
   hasJoinedVoice,
 }: WaitingScreenProps) {
   const { t } = useTranslation()
+  const [playerToKick, setPlayerToKick] = useState<string | null>(null)
 
   return (
     <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20 relative">
+      <ConfirmDialog
+        isOpen={!!playerToKick}
+        message={t('game.confirmKick', 'Are you sure you want to kick this player?')}
+        onConfirm={() => {
+          if (playerToKick) {
+            sendAction({ type: 'KICK_PLAYER', playerId: playerToKick })
+            setPlayerToKick(null)
+          }
+        }}
+        onCancel={() => setPlayerToKick(null)}
+      />
       <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest">
         {t('waiting.title')}
       </h1>
@@ -123,7 +137,7 @@ export default function WaitingScreen({
 
                   {isHost && p.id !== myId && (
                     <button
-                      onClick={() => sendAction({ type: 'KICK_PLAYER', playerId: p.id })}
+                      onClick={() => setPlayerToKick(p.id)}
                       className="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors ml-1"
                       title={t('game.kickPlayer', 'Kick Player')}
                     >

@@ -31,6 +31,7 @@ import TradeNotification, {
   type TradeNotificationData,
   type TradeNotificationType,
 } from './TradeNotification'
+import ConfirmDialog from './ConfirmDialog'
 
 interface GameScreenProps {
   lobbyId: string | null
@@ -61,6 +62,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   >('PROPOSE')
   const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
   const [tradeNotifications, setTradeNotifications] = useState<TradeNotificationData[]>([])
+  const [playerToKick, setPlayerToKick] = useState<string | null>(null)
   const prevTradesRef = useRef(gameState.trades)
   const isRollingRef = useRef(false)
   const sounds = useGameSounds()
@@ -315,7 +317,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 </span>
                 {isHost && p.id !== myId && !p.isBankrupt && (
                   <button
-                    onClick={() => sendAction({ type: 'KICK_PLAYER', playerId: p.id })}
+                    onClick={() => setPlayerToKick(p.id)}
                     className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 p-1 rounded transition-colors"
                     title={t('game.kickPlayer', 'Kick Player')}
                   >
@@ -409,6 +411,17 @@ const GameScreen: React.FC<GameScreenProps> = ({
   return (
     <>
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      <ConfirmDialog
+        isOpen={!!playerToKick}
+        message={t('game.confirmKick', 'Are you sure you want to kick this player?')}
+        onConfirm={() => {
+          if (playerToKick) {
+            sendAction({ type: 'KICK_PLAYER', playerId: playerToKick })
+            setPlayerToKick(null)
+          }
+        }}
+        onCancel={() => setPlayerToKick(null)}
+      />
       <div className="game-screen-container flex flex-col w-full max-w-full justify-start items-center relative pb-16 lg:pb-0 fixed inset-0 h-screen w-screen overflow-hidden">
         <PropertyModal
           isOpen={!!selectedTile}
