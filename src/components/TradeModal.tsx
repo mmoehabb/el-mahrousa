@@ -4,6 +4,8 @@ import { GAME_CONFIG } from '../config/gameConfig'
 import { X, ArrowRightLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+type TabType = 'PROPOSE' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
+
 interface TradeModalProps {
   isOpen: boolean
   onClose: () => void
@@ -12,9 +14,8 @@ interface TradeModalProps {
   allTiles: Tile[]
   trades: TradeOffer[]
   sendAction: (action: GameAction) => void
+  initialTab?: TabType
 }
-
-type TabType = 'PROPOSE' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
 
 const TradeModal: React.FC<TradeModalProps> = ({
   isOpen,
@@ -24,6 +25,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
   allTiles,
   trades,
   sendAction,
+  initialTab = 'PROPOSE',
 }) => {
   const { t } = useTranslation()
   const me = players.find((p) => p.id === myId)
@@ -43,10 +45,10 @@ const TradeModal: React.FC<TradeModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       closeButtonRef.current?.focus()
-      // Reset propose tab when opening
-      setTimeout(() => setActiveTab('PROPOSE'), 0)
+      // Set to initialTab when opening
+      setTimeout(() => setActiveTab(initialTab), 0)
     }
-  }, [isOpen])
+  }, [isOpen, initialTab])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

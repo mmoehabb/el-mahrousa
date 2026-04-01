@@ -159,7 +159,12 @@
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected"
     },
-    "noTradesFound": "No {{status}} trades found."
+    "noTradesFound": "No {{status}} trades found.",
+    "notifications": {
+      "offer": "{{playerName}} has offered you a trade.",
+      "accept": "{{playerName}} accepted your trade.",
+      "reject": "{{playerName}} refused your trade."
+    }
   },
   "logs": {
     "started": "Game started!",

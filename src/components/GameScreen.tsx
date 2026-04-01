@@ -27,6 +27,10 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import { Home } from 'lucide-react'
 import Toast from './Toast'
+import TradeNotification, {
+  type TradeNotificationData,
+  type TradeNotificationType,
+} from './TradeNotification'
 
 interface GameScreenProps {
   lobbyId: string | null
@@ -52,7 +56,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const { t } = useTranslation()
   const { gameState, myId, isHost } = useGame()
   const [isTradeOpen, setIsTradeOpen] = useState(false)
+  const [tradeModalTab, setTradeModalTab] = useState<
+    'PROPOSE' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  >('PROPOSE')
   const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
+  const [tradeNotifications, setTradeNotifications] = useState<TradeNotificationData[]>([])
+  const prevTradesRef = useRef(gameState.trades)
   const isRollingRef = useRef(false)
   const sounds = useGameSounds()
   const prevPhaseRef = useRef(gameState.turnPhase)
@@ -114,6 +123,96 @@ const GameScreen: React.FC<GameScreenProps> = ({
     }
   }, [gameState.turnPhase, gameState.logs, sounds])
 
+  // Handle new trade notifications
+  useEffect(() => {
+    const prevTrades = prevTradesRef.current
+    const currentTrades = gameState.trades
+
+    if (currentTrades.length > 0 && currentTrades !== prevTrades) {
+      const newNotifications: TradeNotificationData[] = []
+
+      // Check for new trades or status changes
+      currentTrades.forEach((trade) => {
+        const prevTrade = prevTrades.find((t) => t.id === trade.id)
+
+        // Ignore trades not involving me
+        if (trade.toId !== myId && trade.fromId !== myId) return
+
+        let type: TradeNotificationType | null = null
+        let otherPlayerId = ''
+
+        // 1. New pending trade offered TO me
+        if (!prevTrade && trade.status === 'PENDING' && trade.toId === myId && trade.fromId) {
+          type = 'OFFER'
+          otherPlayerId = trade.fromId
+        }
+        // 2. Trade I sent got accepted
+        else if (
+          prevTrade?.status === 'PENDING' &&
+          trade.status === 'ACCEPTED' &&
+          trade.fromId === myId &&
+          trade.toId
+        ) {
+          type = 'ACCEPT'
+          otherPlayerId = trade.toId
+        }
+        // 3. Trade I sent got rejected
+        else if (
+          prevTrade?.status === 'PENDING' &&
+          trade.status === 'REJECTED' &&
+          trade.fromId === myId &&
+          trade.toId
+        ) {
+          type = 'REJECT'
+          otherPlayerId = trade.toId
+        }
+
+        if (type && otherPlayerId) {
+          const otherPlayer = gameState.players.find((p) => p.id === otherPlayerId)
+          if (otherPlayer) {
+            newNotifications.push({
+              id: `${trade.id}-${trade.status}-${Date.now()}`,
+              type,
+              playerName: otherPlayer.name,
+              avatarName: otherPlayer.avatar,
+              color: otherPlayer.color,
+            })
+            sounds.playClick() // A little notification ping
+          }
+        }
+      })
+
+      if (newNotifications.length > 0) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setTradeNotifications((prev) => [...prev, ...newNotifications])
+      }
+    }
+
+    prevTradesRef.current = currentTrades
+  }, [gameState.trades, gameState.players, myId, sounds])
+
+  // DEBUG HOOK FOR PLAYWRIGHT
+  useEffect(() => {
+    const handleDebug = (e: CustomEvent) => {
+      if (e.detail?.type === 'DEBUG_TRADE_NOTIFICATION') {
+        const payload = e.detail.payload
+        setTradeNotifications((prev) => [
+          ...prev,
+          {
+            id: `debug-${Date.now()}`,
+            type: payload.type,
+            playerName: payload.playerName,
+            avatarName: payload.avatarName,
+            color: payload.color,
+          },
+        ])
+        sounds.playClick()
+      }
+    }
+    window.addEventListener('action', handleDebug as EventListener)
+    return () => window.removeEventListener('action', handleDebug as EventListener)
+  }, [sounds])
+
   // Handle camera follow logic
   useEffect(() => {
     if (isFollowCameraOn && currentPlayer) {
@@ -161,46 +260,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-
-  // Track previously notified trades to show a toast for new incoming trades
-  const notifiedTradeIdsRef = useRef<Set<string>>(new Set())
-
-  useEffect(() => {
-    const currentTrades = gameState.trades || []
-
-    // Find any new pending trade targeted at the current user that we haven't notified about yet
-    const newIncomingTrade = currentTrades.find(
-      (t) =>
-        t.toId === myId && t.status === 'PENDING' && t.id && !notifiedTradeIdsRef.current.has(t.id),
-    )
-
-    if (newIncomingTrade && newIncomingTrade.id) {
-      notifiedTradeIdsRef.current.add(newIncomingTrade.id)
-
-      const sender =
-        gameState.players.find((p) => p.id === newIncomingTrade.fromId)?.name || 'Unknown'
-
-      // Using setTimeout avoids the 'calling setState synchronously within an effect' warning
-      // since we are showing a non-critical UI notification
-      setTimeout(() => {
-        setToastMessage(
-          t('trade.incomingTradeFrom', {
-            name: sender,
-            defaultValue: `New trade offer from ${sender}!`,
-          }),
-        )
-        sounds.playClick() // Or a specific notification sound if one exists
-      }, 0)
-    }
-
-    // Also add any other new incoming pending trades to the notified set so we don't spam toasts
-    // if multiple are received at once
-    currentTrades.forEach((t) => {
-      if (t.toId === myId && t.status === 'PENDING' && t.id) {
-        notifiedTradeIdsRef.current.add(t.id)
-      }
-    })
-  }, [gameState.trades, myId, gameState.players, t, sounds])
 
   const handleEndTurnClick = () => {
     sounds.playClick()
@@ -411,13 +470,39 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         <TradeModal
           isOpen={isTradeOpen}
-          onClose={() => setIsTradeOpen(false)}
+          onClose={() => {
+            setIsTradeOpen(false)
+            setTradeModalTab('PROPOSE')
+          }}
           players={gameState.players}
           myId={myId}
           allTiles={gameState.tiles}
           trades={gameState.trades || []}
           sendAction={sendAction}
+          initialTab={tradeModalTab}
         />
+
+        {/* Trade Notifications Container */}
+        <div className="fixed bottom-16 left-4 z-[70] flex flex-col gap-2 w-[90%] max-w-sm pointer-events-none">
+          <AnimatePresence>
+            {tradeNotifications.map((notification) => (
+              <TradeNotification
+                key={notification.id}
+                notification={notification}
+                message={t(`trade.notifications.${notification.type.toLowerCase()}`, {
+                  playerName: notification.playerName,
+                })}
+                onClose={(id) => {
+                  setTradeNotifications((prev) => prev.filter((n) => n.id !== id))
+                }}
+                onClick={() => {
+                  setTradeModalTab('PENDING')
+                  setIsTradeOpen(true)
+                }}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
 
         {/* Desktop Left Panel Toggle Button */}
         <div className="hidden lg:block fixed top-4 left-4 z-40">
