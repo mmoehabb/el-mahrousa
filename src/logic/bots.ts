@@ -267,9 +267,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
 
               // Check if we already rejected any of these
               const hasRejected = tileIds.some((tileId) =>
-                memory.rejectedOffers.some(
-                  (ro) => ro.toId === ownerId && ro.propertyId === tileId,
-                ),
+                memory.rejectedOffers.some((ro) => ro.toId === ownerId && ro.propertyId === tileId),
               )
               if (hasRejected) continue
 
@@ -294,7 +292,8 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
               const multiplier = N > 1 ? Math.pow(1.08, N) : 1
 
               const baseAttractiveOffer = averagePrice * 2
-              const baseVeryAttractiveOffer = baseAttractiveOffer + Math.floor(currentPlayer.balance / 2)
+              const baseVeryAttractiveOffer =
+                baseAttractiveOffer + Math.floor(currentPlayer.balance / 2)
 
               const finalAttractiveOffer = Math.floor(baseAttractiveOffer * multiplier)
               const finalVeryAttractiveOffer = Math.floor(baseVeryAttractiveOffer * multiplier)
