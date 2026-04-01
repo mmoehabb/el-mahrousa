@@ -118,7 +118,8 @@
     "sellPropertyBtn": "SELL PROPERTY",
     "mustSellHousesFirst": "Must sell all houses first to sell property",
     "mustOwnAllInGroup": "Must own all properties in this group to buy houses",
-    "mustPayDebts": "You must pay your debts or declare bankruptcy before ending your turn!"
+    "mustPayDebts": "You must pay your debts or declare bankruptcy before ending your turn!",
+    "confirmKick": "Are you sure you want to kick this player?"
   },
   "trade": {
     "title": "Trade Proposal",
