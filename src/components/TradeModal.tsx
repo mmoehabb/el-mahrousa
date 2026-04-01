@@ -260,7 +260,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                     </label>
                     <input
                       type="number"
-                      className="w-full border border-slate-200 dark:border-slate-700 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
+                      className="w-full bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded p-2 text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-egyptian-gold transition-colors"
                       value={offer.myCash}
                       onChange={(e) =>
                         setOffer({ ...offer, myCash: parseInt(e.target.value) || 0 })
@@ -283,7 +283,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                             id={`my-property-${pid}`}
                             checked={offer.myProperties.includes(pid)}
                             onChange={() => toggleProperty(pid, true)}
-                            className="w-3 h-3 text-egyptian-gold focus:ring-2 focus:ring-egyptian-gold"
+                            className="appearance-none w-4 h-4 border-2 border-egyptian-blue dark:border-egyptian-gold rounded-sm checked:bg-egyptian-blue dark:checked:bg-egyptian-gold cursor-pointer transition-colors relative before:content-[''] before:absolute before:inset-0 before:bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%224%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3e%3cpolyline points=%2220 6 9 17 4 12%22%3e%3c/polyline%3e%3c/svg%3e')] before:bg-no-repeat before:bg-center before:bg-[length:80%_80%] before:opacity-0 checked:before:opacity-100"
                           />
                           <label
                             htmlFor={`my-property-${pid}`}
@@ -303,13 +303,20 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
                 {/* Partner side */}
                 <div className="flex-1 space-y-4">
-                  <h3 className="font-bold border-b pb-1 text-sm">
+                  <div className="border-b pb-1">
                     <select
-                      className="bg-transparent"
+                      className="w-full bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded p-2 text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-egyptian-gold transition-colors appearance-none cursor-pointer"
                       value={partnerId}
                       onChange={(e) => {
                         setPartnerId(e.target.value)
                         setOffer({ ...offer, partnerProperties: [], partnerCash: 0 })
+                      }}
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 0.5rem center',
+                        backgroundSize: '1em',
+                        paddingRight: '2.5rem'
                       }}
                     >
                       {others.map((o) => (
@@ -318,7 +325,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                         </option>
                       ))}
                     </select>
-                  </h3>
+                  </div>
                   {partner && (
                     <>
                       <div className="space-y-2">
@@ -327,7 +334,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                         </label>
                         <input
                           type="number"
-                          className="w-full border border-slate-200 dark:border-slate-700 rounded p-1 text-sm focus:border-egyptian-blue focus:border-2"
+                          className="w-full bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded p-2 text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-egyptian-gold transition-colors"
                           value={offer.partnerCash}
                           onChange={(e) =>
                             setOffer({ ...offer, partnerCash: parseInt(e.target.value) || 0 })
@@ -350,7 +357,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                                 id={`partner-property-${pid}`}
                                 checked={offer.partnerProperties.includes(pid)}
                                 onChange={() => toggleProperty(pid, false)}
-                                className="w-3 h-3 text-egyptian-gold focus:ring-2 focus:ring-egyptian-gold"
+                                className="appearance-none w-4 h-4 border-2 border-egyptian-blue dark:border-egyptian-gold rounded-sm checked:bg-egyptian-blue dark:checked:bg-egyptian-gold cursor-pointer transition-colors relative before:content-[''] before:absolute before:inset-0 before:bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%224%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3e%3cpolyline points=%2220 6 9 17 4 12%22%3e%3c/polyline%3e%3c/svg%3e')] before:bg-no-repeat before:bg-center before:bg-[length:80%_80%] before:opacity-0 checked:before:opacity-100"
                               />
                               <label
                                 htmlFor={`partner-property-${pid}`}
