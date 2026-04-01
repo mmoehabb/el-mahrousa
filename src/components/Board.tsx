@@ -76,6 +76,11 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
 
   // Effect to process the queues and show them consecutively with a delay
   useEffect(() => {
+    // Only process the queue if we are NOT moving or rolling
+    if (gameState.turnPhase === 'MOVING' || gameState.turnPhase === 'ROLLING') {
+      return
+    }
+
     gameState.players.forEach((p) => {
       const queue = pendingChangesQueueRef.current[p.id] || []
 
@@ -101,7 +106,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
           setTimeout(() => {
             setBalanceChanges((currentChanges) => ({
               ...currentChanges,
-              [p.id]: currentChanges[p.id]?.filter(c => c.id !== nextChange.id) || [],
+              [p.id]: currentChanges[p.id]?.filter((c) => c.id !== nextChange.id) || [],
             }))
           }, 2500)
 
@@ -113,7 +118,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
         processNext()
       }
     })
-  })
+  }, [gameState.turnPhase, gameState.players])
 
   const isRolling = gameState.turnPhase === 'ROLLING'
   const [rollingDice, setRollingDice] = useState<[number, number]>([1, 1])
