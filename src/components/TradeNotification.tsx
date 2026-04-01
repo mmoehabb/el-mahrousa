@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
+import { getAvatarPath } from '../utils/avatars'
 
 export type TradeNotificationType = 'OFFER' | 'ACCEPT' | 'REJECT'
 
@@ -56,7 +57,7 @@ export default function TradeNotification({
           {notification.playerName.charAt(0)}
         </span>
         <img
-          src={`/assets/avatars/${notification.avatarName}.png`}
+          src={getAvatarPath(notification.avatarName)}
           alt={notification.playerName}
           className="w-full h-full object-cover z-10"
           onError={(e) => {
