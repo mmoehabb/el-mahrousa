@@ -45,67 +45,79 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
   >({})
   const prevBalancesRef = React.useRef<Record<string, number>>({})
 
+  // Ref to hold queues of pending balance changes for each player
+  const pendingChangesQueueRef = React.useRef<Record<string, { diff: number; id: number }[]>>({})
+
+  // Ref to track if a player currently has an active interval processing their queue
+  const isProcessingQueueRef = React.useRef<Record<string, boolean>>({})
+
   const playerBalancesHash = gameState.players.map((p) => p.balance).join(',')
 
+  // Effect to detect balance changes and add them to the queue
   useEffect(() => {
     gameState.players.forEach((p) => {
       const prev = prevBalancesRef.current[p.id]
       if (prev !== undefined && prev !== p.balance) {
         const diff = p.balance - prev
 
-        // Accumulate diffs for this player if they are currently moving/rolling
-        if (gameState.turnPhase === 'MOVING' || gameState.turnPhase === 'ROLLING') {
-          // Store the pending diffs to be shown later
-          prevBalancesRef.current[`${p.id}_pending_diff`] =
-            (prevBalancesRef.current[`${p.id}_pending_diff`] || 0) + diff
-        } else {
-          // If not moving, show the diff immediately
-          const totalDiff = (prevBalancesRef.current[`${p.id}_pending_diff`] || 0) + diff
-          prevBalancesRef.current[`${p.id}_pending_diff`] = 0 // reset
-
-          if (totalDiff !== 0) {
-            setBalanceChanges((currentChanges) => ({
-              ...currentChanges,
-              [p.id]: [...(currentChanges[p.id] || []), { diff: totalDiff, id: Date.now() }],
-            }))
-
-            // Remove after 2.5 seconds
-            setTimeout(() => {
-              setBalanceChanges((currentChanges) => ({
-                ...currentChanges,
-                [p.id]: currentChanges[p.id]?.slice(1) || [],
-              }))
-            }, 2500)
+        if (diff !== 0) {
+          // Initialize queue if it doesn't exist
+          if (!pendingChangesQueueRef.current[p.id]) {
+            pendingChangesQueueRef.current[p.id] = []
           }
+
+          // Push the new diff to the queue
+          pendingChangesQueueRef.current[p.id].push({ diff, id: Date.now() + Math.random() })
         }
       }
       prevBalancesRef.current[p.id] = p.balance
     })
-  }, [playerBalancesHash, gameState.players, gameState.turnPhase])
+  }, [playerBalancesHash, gameState.players])
 
-  // A second effect to flush pending diffs when the phase changes FROM MOVING -> ACTION/END
+  // Effect to process the queues and show them consecutively with a delay
   useEffect(() => {
-    if (gameState.turnPhase !== 'MOVING' && gameState.turnPhase !== 'ROLLING') {
-      gameState.players.forEach((p) => {
-        const pendingDiff = prevBalancesRef.current[`${p.id}_pending_diff`]
-        if (pendingDiff) {
-          prevBalancesRef.current[`${p.id}_pending_diff`] = 0 // reset
+    // Only process the queue if we are NOT moving or rolling
+    if (gameState.turnPhase === 'MOVING' || gameState.turnPhase === 'ROLLING') {
+      return
+    }
 
+    gameState.players.forEach((p) => {
+      const queue = pendingChangesQueueRef.current[p.id] || []
+
+      if (queue.length > 0 && !isProcessingQueueRef.current[p.id]) {
+        isProcessingQueueRef.current[p.id] = true
+
+        const processNext = () => {
+          const currentQueue = pendingChangesQueueRef.current[p.id] || []
+          if (currentQueue.length === 0) {
+            isProcessingQueueRef.current[p.id] = false
+            return
+          }
+
+          const nextChange = currentQueue.shift()! // remove first item
+
+          // Show the change
           setBalanceChanges((currentChanges) => ({
             ...currentChanges,
-            [p.id]: [...(currentChanges[p.id] || []), { diff: pendingDiff, id: Date.now() }],
+            [p.id]: [...(currentChanges[p.id] || []), nextChange],
           }))
 
-          // Remove after 2.5 seconds
+          // Remove from screen after 2.5 seconds
           setTimeout(() => {
             setBalanceChanges((currentChanges) => ({
               ...currentChanges,
-              [p.id]: currentChanges[p.id]?.slice(1) || [],
+              [p.id]: currentChanges[p.id]?.filter((c) => c.id !== nextChange.id) || [],
             }))
           }, 2500)
+
+          // Wait 0.5s before processing the next item in the queue
+          setTimeout(processNext, 500)
         }
-      })
-    }
+
+        // Start processing the queue for this player
+        processNext()
+      }
+    })
   }, [gameState.turnPhase, gameState.players])
 
   const isRolling = gameState.turnPhase === 'ROLLING'
