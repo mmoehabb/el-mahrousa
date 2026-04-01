@@ -188,15 +188,7 @@ export const applyEventLogic = (state: GameState): GameState => {
     const randomTile = properties[Math.floor(secureRandom() * properties.length)]
     const newPlayers = [...state.players]
 
-    if (randomTile.id < player.position) {
-      newPlayers[state.currentPlayerIndex] = {
-        ...player,
-        position: randomTile.id,
-        balance: player.balance + GAME_CONFIG.GO_REWARD,
-      }
-    } else {
-      newPlayers[state.currentPlayerIndex] = { ...player, position: randomTile.id }
-    }
+    newPlayers[state.currentPlayerIndex] = { ...player, position: randomTile.id }
 
     newState.players = newPlayers
     newState.activeEvent = {
