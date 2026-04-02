@@ -348,7 +348,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         <Info size={20} className="text-egyptian-blue dark:text-egyptian-gold" />
                         <span className="font-bold">{t('common.settings.version', 'Version')}</span>
                       </div>
-                      <span className="font-mono bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-600">
+                      <span className="font-mono fs-lg bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-600">
                         v{__APP_VERSION__}
                       </span>
                     </div>
