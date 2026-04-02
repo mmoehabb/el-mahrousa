@@ -109,11 +109,7 @@ const LoginScreen: React.FC = () => {
               aria-describedby={error ? 'name-error' : undefined}
             />
             {error && (
-              <p
-                id="name-error"
-                className="text-red-500 dark:text-red-400 fs-xs mt-1"
-                role="alert"
-              >
+              <p id="name-error" className="text-red-500 dark:text-red-400 fs-xs mt-1" role="alert">
                 {error}
               </p>
             )}

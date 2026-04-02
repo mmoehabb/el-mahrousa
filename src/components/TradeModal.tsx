@@ -161,9 +161,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
           <ArrowRightLeft className="text-slate-400" />
 
           <div className="flex-1 space-y-2 text-right">
-            <div className="font-bold fs-xs text-slate-500 uppercase">
-              {t('trade.youReceive')}
-            </div>
+            <div className="font-bold fs-xs text-slate-500 uppercase">{t('trade.youReceive')}</div>
             <div className="font-bold">
               {GAME_CONFIG.CURRENCY} {isSender ? trade.partnerCash : trade.myCash}
             </div>
@@ -299,10 +297,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                             onChange={() => toggleProperty(pid, true)}
                             className="appearance-none w-4 h-4 border-2 border-egyptian-blue dark:border-egyptian-gold rounded-sm checked:bg-egyptian-blue dark:checked:bg-egyptian-gold cursor-pointer transition-colors relative before:content-[''] before:absolute before:inset-0 before:bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%224%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3e%3cpolyline points=%2220 6 9 17 4 12%22%3e%3c/polyline%3e%3c/svg%3e')] before:bg-no-repeat before:bg-center before:bg-[length:80%_80%] before:opacity-0 checked:before:opacity-100"
                           />
-                          <label
-                            htmlFor={`my-property-${pid}`}
-                            className="fs-2xs cursor-pointer"
-                          >
+                          <label htmlFor={`my-property-${pid}`} className="fs-2xs cursor-pointer">
                             {t(`tiles.${allTiles[pid].name.toLowerCase().replace(/ /g, '-')}`)}
                           </label>
                         </div>

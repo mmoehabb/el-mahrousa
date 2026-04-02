@@ -68,11 +68,7 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
               aria-describedby={joinError ? 'join-error' : undefined}
             />
             {joinError && (
-              <p
-                id="join-error"
-                className="text-red-500 dark:text-red-400 fs-xs mt-1"
-                role="alert"
-              >
+              <p id="join-error" className="text-red-500 dark:text-red-400 fs-xs mt-1" role="alert">
                 {joinError}
               </p>
             )}
