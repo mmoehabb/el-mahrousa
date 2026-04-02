@@ -66,7 +66,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col md:flex-row bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+    <div className="fixed inset-0 z-[200] flex flex-col md:flex-row bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
       {/* Sidebar Navigation */}
       <div className="w-full md:w-64 border-b md:border-b-0 md:border-e border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex flex-col">
         <div className="p-4 md:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center md:block">
