@@ -21,7 +21,7 @@ const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
       {dots.map((_, i) => (
         <div
           key={i}
-          className="w-2.5 h-2.5 bg-egyptian-blue rounded-full font-english-pixel text-xs"
+          className="w-2.5 h-2.5 bg-egyptian-blue rounded-full font-english-pixel fs-xs"
         />
       ))}
     </div>
@@ -265,7 +265,7 @@ const Board: React.FC<BoardProps> = ({
               <div
                 className={`absolute flex flex-col items-center gap-1 pointer-events-auto ${getGridCoordinates(currentPlayer.position).row <= 2 ? '-bottom-24 flex-col-reverse' : '-top-20'}`}
               >
-                <div className="text-[10px] font-bold text-egyptian-blue dark:text-blue-400 bg-white/90 dark:bg-slate-900/90 px-2 py-0.5 rounded-full shadow-md backdrop-blur uppercase whitespace-nowrap">
+                <div className="fs-xl font-bold text-egyptian-blue dark:text-blue-400 bg-white/90 dark:bg-slate-900/90 px-2 py-0.5 rounded-full shadow-md backdrop-blur uppercase whitespace-nowrap">
                   {t('game.rollDiceBtn')}
                 </div>
                 <button
@@ -390,7 +390,7 @@ const Board: React.FC<BoardProps> = ({
             {isMyTurn && gameState.turnPhase === 'ROLL' && (
               <button
                 onClick={handleRoll}
-                className="w-full bg-egyptian-blue text-white py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-xs sm:text-base md:text-xl shadow-lg"
+                className="w-full fs-xl bg-egyptian-blue text-white py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 fs-xs sm:fs-base md:fs-xl shadow-lg"
               >
                 <Dice5 className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8" /> {t('game.rollDiceBtn')}
               </button>
@@ -405,7 +405,7 @@ const Board: React.FC<BoardProps> = ({
                       disabled={
                         currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
                       }
-                      className="w-full bg-green-600 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-green-700 text-[10px] sm:text-sm md:text-lg shadow-md"
+                      className="fs-xl w-full bg-green-600 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-green-700 fs-2xs sm:fs-sm md:fs-lg shadow-md"
                     >
                       {t('game.buyForBtn', {
                         price: gameState.tiles[currentPlayer.position].price,
@@ -414,7 +414,7 @@ const Board: React.FC<BoardProps> = ({
                   )}
                 <button
                   onClick={handleEndTurnClick}
-                  className="w-full bg-slate-500 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-slate-600 text-[10px] sm:text-sm md:text-lg shadow-md"
+                  className="w-full bg-slate-500 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-slate-600 fs-xl sm:fs-sm md:fs-lg shadow-md"
                 >
                   {t('game.skipEndTurnBtn')}
                 </button>
@@ -424,7 +424,7 @@ const Board: React.FC<BoardProps> = ({
             {isMyTurn && gameState.turnPhase === 'END' && (
               <button
                 onClick={handleEndTurnClick}
-                className="w-full bg-egyptian-blue text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-[10px] sm:text-sm md:text-lg shadow-md"
+                className="w-full bg-egyptian-blue text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold fs-xl sm:fs-sm md:fs-lg shadow-md"
               >
                 {t('game.endTurnBtn')}
               </button>
@@ -441,7 +441,7 @@ const Board: React.FC<BoardProps> = ({
                   return (
                     <div
                       key={i}
-                      className="text-xs md:text-sm text-slate-800 dark:text-slate-100 leading-tight w-full origin-top-left rtl:origin-top-right py-0.5"
+                      className="fs-xs md:fs-sm text-slate-800 dark:text-slate-100 leading-tight w-full origin-top-left rtl:origin-top-right py-0.5"
                       style={{
                         transform: `scale(${scale})`,
                         opacity: opacity,
@@ -453,7 +453,7 @@ const Board: React.FC<BoardProps> = ({
                   )
                 })
               ) : (
-                <div className="text-xs md:text-sm text-slate-700 dark:text-slate-200 leading-tight w-full">
+                <div className="fs-xs md:fs-sm text-slate-700 dark:text-slate-200 leading-tight w-full">
                   {t('game.gameLogs')}
                 </div>
               )}

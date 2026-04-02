@@ -18,11 +18,11 @@ const AdBlockScreen: React.FC = () => {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold text-red-700 dark:text-red-500 mb-4 uppercase tracking-widest">
+        <h1 className="fs-3xl font-bold text-red-700 dark:text-red-500 mb-4 uppercase tracking-widest">
           {t('adblock.title', 'AdBlocker Detected')}
         </h1>
 
-        <p className="text-slate-700 dark:text-slate-300 text-lg mb-8 leading-relaxed">
+        <p className="text-slate-700 dark:text-slate-300 fs-lg mb-8 leading-relaxed">
           {t(
             'adblock.message',
             'We noticed you are using an ad blocker. Please disable it to play the game, then refresh the page.',
@@ -31,7 +31,7 @@ const AdBlockScreen: React.FC = () => {
 
         <button
           onClick={handleRefresh}
-          className="flex items-center justify-center w-full gap-3 bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl font-bold text-xl transition-all hover:scale-105 active:scale-95 shadow-lg"
+          className="flex items-center justify-center w-full gap-3 bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl font-bold fs-xl transition-all hover:scale-105 active:scale-95 shadow-lg"
         >
           <RefreshCw size={24} />
           {t('adblock.refreshBtn', 'Refresh Page')}

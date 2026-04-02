@@ -100,7 +100,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
               <X size={20} style={{ color: headerTextColor }} />
             </button>
             <h2
-              className="text-xl font-black uppercase tracking-wider drop-shadow-md relative z-0 px-8"
+              className="fs-xl font-black uppercase tracking-wider drop-shadow-md relative z-0 px-8"
               style={{ color: headerTextColor }}
             >
               {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
@@ -113,13 +113,13 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
               {owner ? (
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: owner.color }} />
-                  <span className="font-bold text-sm">
+                  <span className="font-bold fs-sm">
                     {t('game.ownedBy', { name: owner.name })}
                     {isOwner ? ` (${t('waiting.you')})` : ''}
                   </span>
                 </div>
               ) : (
-                <div className="inline-block px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-800 font-bold text-sm">
+                <div className="inline-block px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-800 font-bold fs-sm">
                   {t('game.unowned')}
                 </div>
               )}
@@ -135,7 +135,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 {tile.rent.map((amount, idx) => (
                   <div
                     key={idx}
-                    className={`flex justify-between text-sm py-1 px-2 rounded ${
+                    className={`flex justify-between fs-sm py-1 px-2 rounded ${
                       currentHouses === idx
                         ? 'bg-egyptian-gold/20 font-bold'
                         : 'text-slate-600 dark:text-slate-400'
@@ -160,7 +160,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             )}
 
             {/* Price Info */}
-            <div className="grid grid-cols-2 gap-4 mb-6 text-sm text-center">
+            <div className="grid grid-cols-2 gap-4 mb-6 fs-sm text-center">
               {tile.price && (
                 <div className="bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700">
                   <div className="text-slate-500 dark:text-slate-400">
@@ -196,7 +196,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                         disabled={
                           currentHouses >= maxHouses || myBalance < buyCost || !ownsAllInGroup
                         }
-                        className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
+                        className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:fs-lg rtl:py-1"
                       >
                         <span>{t('game.buyHouseBtn')}</span>
                         {currentHouses < maxHouses && (
@@ -206,7 +206,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                         )}
                       </button>
                       {!ownsAllInGroup && currentHouses < maxHouses && (
-                        <div className="text-xs text-center text-red-500 mt-1">
+                        <div className="fs-xs text-center text-red-500 mt-1">
                           {t('game.mustOwnAllInGroup')}
                         </div>
                       )}
@@ -214,7 +214,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                       <button
                         onClick={handleSellHouse}
                         disabled={currentHouses === 0}
-                        className="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
+                        className="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:fs-lg rtl:py-1"
                       >
                         <span>{t('game.sellHouseBtn')}</span>
                         {currentHouses > 0 && (
@@ -229,7 +229,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                   <button
                     onClick={handleSellProperty}
                     disabled={currentHouses > 0}
-                    className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:text-lg rtl:py-1"
+                    className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-between px-4 rtl:fs-lg rtl:py-1"
                   >
                     <span>{t('game.sellPropertyBtn')}</span>
                     {currentHouses === 0 && (
@@ -239,7 +239,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                     )}
                   </button>
                   {currentHouses > 0 && (
-                    <div className="text-xs text-center text-red-500 mt-1">
+                    <div className="fs-xs text-center text-red-500 mt-1">
                       {t('game.mustSellHousesFirst')}
                     </div>
                   )}

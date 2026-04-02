@@ -70,7 +70,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       {/* Sidebar Navigation */}
       <div className="w-full md:w-64 border-b md:border-b-0 md:border-e border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex flex-col">
         <div className="p-4 md:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center md:block">
-          <h2 className="text-xl md:text-2xl font-bold text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest flex items-center gap-2">
+          <h2 className="fs-xl md:fs-2xl font-bold text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest flex items-center gap-2">
             <Settings size={24} />
             {t('common.settings.title')}
           </h2>
@@ -142,7 +142,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             {activeTab === 'general' && (
               <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
+                  <h3 className="fs-lg md:fs-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
                     {t('common.settings.language')}
                   </h3>
                   <div className="flex flex-col gap-2">
@@ -158,7 +158,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </section>
 
                 <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
+                  <h3 className="fs-lg md:fs-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
                     {t('common.settings.displayMode')}
                   </h3>
                   <div className="flex items-center gap-4">
@@ -187,7 +187,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </section>
 
                 <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
+                  <h3 className="fs-lg md:fs-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
                     {t('common.settings.audio', 'Audio')}
                   </h3>
                   <div className="flex flex-col gap-6">
@@ -226,7 +226,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           disabled={!isSfxEnabled}
                           className="w-full accent-egyptian-blue dark:accent-egyptian-gold disabled:opacity-50"
                         />
-                        <span className="text-sm text-slate-500 dark:text-slate-400 w-12 text-right">
+                        <span className="fs-sm text-slate-500 dark:text-slate-400 w-12 text-right">
                           {Math.round(sfxVolume * 100)}%
                         </span>
                       </div>
@@ -268,7 +268,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           disabled={!isBgmEnabled}
                           className="w-full accent-egyptian-blue dark:accent-egyptian-gold disabled:opacity-50"
                         />
-                        <span className="text-sm text-slate-500 dark:text-slate-400 w-12 text-right">
+                        <span className="fs-sm text-slate-500 dark:text-slate-400 w-12 text-right">
                           {Math.round(bgmVolume * 100)}%
                         </span>
                       </div>
@@ -281,7 +281,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             {activeTab === 'servers' && (
               <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
+                  <h3 className="fs-lg md:fs-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
                     {t('common.settings.addIceCandidate')}
                   </h3>
                   <form
@@ -306,7 +306,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                   {iceServers.length > 0 && (
                     <div className="mt-6 space-y-2">
-                      <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      <h4 className="fs-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         {t('common.settings.currentServers', 'Current Servers')}
                       </h4>
                       <div className="space-y-2">
@@ -315,7 +315,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             key={`${server}-${index}`}
                             className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 rounded-lg group"
                           >
-                            <code className="text-sm font-mono text-slate-700 dark:text-slate-300 break-all">
+                            <code className="fs-sm font-mono text-slate-700 dark:text-slate-300 break-all">
                               {server}
                             </code>
                             <button
@@ -337,7 +337,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             {activeTab === 'about' && (
               <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <h3 className="text-lg md:text-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-6 flex items-center gap-2">
+                  <h3 className="fs-lg md:fs-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-6 flex items-center gap-2">
                     <Info size={24} />
                     {t('common.settings.about', 'About')}
                   </h3>
@@ -348,7 +348,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         <Info size={20} className="text-egyptian-blue dark:text-egyptian-gold" />
                         <span className="font-bold">{t('common.settings.version', 'Version')}</span>
                       </div>
-                      <span className="font-mono bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-600">
+                      <span className="font-mono fs-lg bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-600">
                         v{__APP_VERSION__}
                       </span>
                     </div>

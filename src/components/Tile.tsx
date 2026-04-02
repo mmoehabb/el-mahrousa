@@ -38,12 +38,12 @@ const TileComponent: React.FC<TileProps> = ({
           style={{ backgroundColor: tile.color }}
         />
       )}
-      <div className="mt-5 font-bold uppercase tracking-tighter text-[14px] font-arabic-pixel leading-tight">
+      <div className="mt-5 font-bold uppercase tracking-tighter fs-sm font-arabic-pixel leading-tight">
         {t(`tiles.${tile.name.toLowerCase().replace(/ /g, '-')}`)}
       </div>
 
       {tile.price && (
-        <div className="text-[8px] text-slate-600 dark:text-slate-300 font-english-pixel mt-auto mb-1">
+        <div className="fs-3xs text-slate-600 dark:text-slate-300 font-english-pixel mt-auto mb-1">
           {tile.price} {GAME_CONFIG.CURRENCY}
         </div>
       )}
@@ -53,7 +53,7 @@ const TileComponent: React.FC<TileProps> = ({
         <div className="absolute top-0.5 right-0.5 flex gap-0.5 z-30">
           <div className="bg-white/80 dark:bg-slate-800/80 rounded px-0.5 flex items-center shadow-sm text-egyptian-blue dark:text-egyptian-gold">
             <Home className="w-4 h-4" />
-            <span className="text-xs font-bold font-english-pixel ml-0.5">{tile.houses}</span>
+            <span className="fs-xs font-bold font-english-pixel ml-0.5">{tile.houses}</span>
           </div>
         </div>
       ) : null}
@@ -71,7 +71,7 @@ const TileComponent: React.FC<TileProps> = ({
                   animate={{ opacity: 1, y: -40 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 1.5, ease: 'easeOut' }}
-                  className={`absolute top-[-10px] left-1/2 transform -translate-x-1/2 font-black text-[20px] z-[100] whitespace-nowrap pointer-events-none ${
+                  className={`absolute top-[-10px] left-1/2 transform -translate-x-1/2 font-black fs-xl z-[100] whitespace-nowrap pointer-events-none ${
                     change.diff > 0
                       ? 'text-green-400 drop-shadow-[0_2px_2px_rgba(0,0,0,1)]'
                       : 'text-red-500 drop-shadow-[0_2px_2px_rgba(0,0,0,1)]'
@@ -141,7 +141,7 @@ const TileComponent: React.FC<TileProps> = ({
                     transition={{ duration: 0.5 }}
                     className="absolute inset-0 flex items-center justify-center bg-black/60"
                   >
-                    <span className="text-red-500 font-bold text-[24px]">X</span>
+                    <span className="text-red-500 font-bold fs-2xl">X</span>
                   </motion.div>
                 )}
               </AnimatePresence>

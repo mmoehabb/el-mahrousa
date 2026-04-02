@@ -40,7 +40,7 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
 
   return (
     <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold mt-20">
-      <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest">
+      <h1 className="fs-3xl font-bold text-center mb-6 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest">
         {t('lobby.title')}
       </h1>
 
@@ -68,11 +68,7 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
               aria-describedby={joinError ? 'join-error' : undefined}
             />
             {joinError && (
-              <p
-                id="join-error"
-                className="text-red-500 dark:text-red-400 text-xs mt-1"
-                role="alert"
-              >
+              <p id="join-error" className="text-red-500 dark:text-red-400 fs-xs mt-1" role="alert">
                 {joinError}
               </p>
             )}

@@ -86,17 +86,17 @@ export default function GameControls({
     <div className="w-full lg:w-64 space-y-4">
       <div className="bg-white/90 dark:bg-slate-900/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
         <div className="mb-4">
-          <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase">
+          <span className="fs-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase">
             {t('game.currentTurnLabel')}
           </span>
-          <div className="font-bold text-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
+          <div className="font-bold fs-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
         </div>
 
-        <div className="space-y-2 relative">
+        <div className="relative">
           {isMyTurn && gameState.turnPhase === 'ROLL' && (
             <button
               onClick={handleRoll}
-              className="w-full bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 text-[10px]"
+              className="w-full fs-lg bg-egyptian-blue text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 fs-2xs"
             >
               <Dice5 /> {t('game.rollDiceBtn')}
             </button>
@@ -111,7 +111,7 @@ export default function GameControls({
                     disabled={
                       currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
                     }
-                    className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed text-[10px]"
+                    className="w-full fs-lg bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:!bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed fs-2xs"
                   >
                     {t('game.buyForBtn', {
                       price: gameState.tiles[currentPlayer.position].price,
@@ -120,7 +120,7 @@ export default function GameControls({
                 )}
               <button
                 onClick={handleEndTurnClick}
-                className="w-full bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600 text-[10px]"
+                className="w-full fs-lg bg-slate-500 text-white py-2 rounded-lg font-bold hover:bg-slate-600 fs-2xs"
               >
                 {t('game.skipEndTurnBtn')}
               </button>
@@ -130,7 +130,7 @@ export default function GameControls({
           {isMyTurn && gameState.turnPhase === 'END' && (
             <button
               onClick={handleEndTurnClick}
-              className="w-full bg-egyptian-blue text-white py-2 rounded-lg font-bold text-[10px]"
+              className="w-full fs-lg bg-egyptian-blue text-white py-2 rounded-lg font-bold fs-2xs"
             >
               {t('game.endTurnBtn')}
             </button>
@@ -141,7 +141,7 @@ export default function GameControls({
               sounds.playClick()
               setIsLeaveDialogOpen(true)
             }}
-            className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4 text-[10px]"
+            className="w-full fs-lg bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-all mt-4 fs-2xs"
           >
             {t('game.leaveGameBtn')}
           </button>
@@ -149,7 +149,7 @@ export default function GameControls({
           {me && !me.isBankrupt && (
             <button
               onClick={() => setIsBankruptDialogOpen(true)}
-              className="w-full border-2 border-red-600 text-red-600 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all mt-4 flex items-center justify-center gap-2 text-[10px]"
+              className="w-full fs-lg border-2 border-red-600 text-red-600 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all mt-4 flex items-center justify-center gap-2 fs-2xs"
               title={t('game.declareBankrupt')}
             >
               <Flag size={14} /> {t('game.bankruptBtn')}
@@ -175,7 +175,7 @@ export default function GameControls({
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-egyptian-gold rtl:border-l-4 rtl:border-r-0">
-        <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
+        <h3 className="font-bold flex items-center gap-2 mb-2 uppercase fs-sm">
           <Handshake size={18} /> {t('trade.tradesBtn')}
         </h3>
 
@@ -184,7 +184,7 @@ export default function GameControls({
             sounds.playClick()
             setIsTradeOpen(true)
           }}
-          className="w-full bg-egyptian-gold text-white py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-yellow-600 transition-all text-[10px] mb-3"
+          className="w-full fs-lg bg-egyptian-gold text-white py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-yellow-600 transition-all fs-2xs mb-3"
         >
           {t('trade.proposeTradeBtn')}
         </button>
@@ -200,7 +200,7 @@ export default function GameControls({
               return (
                 <div
                   key={trade.id}
-                  className="bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700 text-xs flex flex-col gap-2"
+                  className="bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700 fs-xs flex flex-col gap-2"
                 >
                   <div>
                     <span className="font-bold">{isSender ? 'To: ' : 'From: '}</span>
@@ -214,7 +214,7 @@ export default function GameControls({
                           sounds.playClick()
                           sendAction({ type: 'CANCEL_TRADE', tradeId: trade.id! })
                         }}
-                        className="flex-1 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 text-slate-800 dark:text-white py-1 rounded text-[10px] font-bold"
+                        className="flex-1 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 text-slate-800 dark:text-white py-1 rounded fs-2xs font-bold"
                       >
                         {t('trade.cancel')}
                       </button>
@@ -225,7 +225,7 @@ export default function GameControls({
                             sounds.playClick()
                             sendAction({ type: 'ACCEPT_TRADE', tradeId: trade.id! })
                           }}
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1 rounded text-[10px] font-bold"
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1 rounded fs-2xs font-bold"
                         >
                           {t('trade.acceptOffer')}
                         </button>
@@ -234,7 +234,7 @@ export default function GameControls({
                             sounds.playClick()
                             sendAction({ type: 'REJECT_TRADE', tradeId: trade.id! })
                           }}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white py-1 rounded text-[10px] font-bold"
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white py-1 rounded fs-2xs font-bold"
                         >
                           {t('trade.reject')}
                         </button>
@@ -252,7 +252,7 @@ export default function GameControls({
             sounds.playClick()
             setIsTradeOpen(true)
           }}
-          className="w-full text-center text-egyptian-gold hover:underline text-xs"
+          className="w-full fs-lg text-center text-egyptian-gold hover:underline fs-xs"
         >
           {t('trade.viewAllTrades')}
         </button>
@@ -260,7 +260,7 @@ export default function GameControls({
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-slate-400 dark:border-slate-600 rtl:border-l-4 rtl:border-r-0">
         <div className="h-40 flex flex-col">
-          <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-2 pr-1 rtl:pr-0 rtl:pl-1">
+          <div className="flex-1 overflow-y-auto fs-xs space-y-2 mb-2 pr-1 rtl:pr-0 rtl:pl-1">
             {gameState.chatMessages.length === 0 ? (
               <div className="text-slate-400 dark:text-slate-500 italic">{t('game.chatReady')}</div>
             ) : (
@@ -281,7 +281,7 @@ export default function GameControls({
           >
             <input
               type="text"
-              className="flex-1 min-w-0 border text-xs p-1 rounded"
+              className="flex-1 fs-sm min-w-0 border fs-xs p-1 rounded"
               placeholder={t('game.chatPlaceholder')}
               value={chatMsg}
               onChange={(e) => setChatMsg(e.target.value)}

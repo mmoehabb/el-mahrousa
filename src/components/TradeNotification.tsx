@@ -53,7 +53,7 @@ export default function TradeNotification({
         style={{ borderColor: notification.color }}
       >
         {/* Render initial if image fails or before loading, beneath the img */}
-        <span className="absolute text-sm font-bold uppercase text-slate-500 -z-10">
+        <span className="absolute fs-sm font-bold uppercase text-slate-500 -z-10">
           {notification.playerName.charAt(0)}
         </span>
         <img
@@ -68,7 +68,7 @@ export default function TradeNotification({
       </div>
 
       <div className="flex-1 min-w-0 pr-2">
-        <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{message}</p>
+        <p className="fs-sm font-bold text-slate-800 dark:text-white truncate">{message}</p>
       </div>
 
       <button
