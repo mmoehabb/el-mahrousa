@@ -20,6 +20,7 @@ import {
 } from '../logic/gameLogic'
 import { isValidGameAction, isValidGameState } from '../logic/validation.ts'
 import { getBotAction } from '../logic/bots.ts'
+import { GAME_CONFIG } from '../config/gameConfig.ts'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 
@@ -150,7 +151,7 @@ export const useNetworking = () => {
                 id: from,
                 name: sanitizeName(action.name, `Player ${prev.players.length + 1}`),
                 avatar: action.avatar || 'merchant',
-                balance: 1500,
+                balance: GAME_CONFIG.STARTING_BALANCE,
                 position: 0,
                 properties: [],
                 isBankrupt: false,
@@ -246,7 +247,7 @@ export const useNetworking = () => {
               logs: ['Rematch initiated! Waiting to start...'],
               players: nextState.players.map((p) => ({
                 ...p,
-                balance: 1500,
+                balance: GAME_CONFIG.STARTING_BALANCE,
                 position: 0,
                 properties: [],
                 isBankrupt: false,
@@ -267,7 +268,7 @@ export const useNetworking = () => {
               id: crypto.randomUUID(), // Assign random ID
               name: `Bot ${botCount + 1}`,
               avatar: 'bot',
-              balance: 1500,
+              balance: GAME_CONFIG.STARTING_BALANCE,
               position: 0,
               properties: [],
               isBankrupt: false,
@@ -551,7 +552,7 @@ export const useNetworking = () => {
           id: myId,
           name: sanitizeName(playerName, 'Host'),
           avatar: avatarName || 'merchant',
-          balance: 1500,
+          balance: GAME_CONFIG.STARTING_BALANCE,
           position: 0,
           properties: [],
           isBankrupt: false,

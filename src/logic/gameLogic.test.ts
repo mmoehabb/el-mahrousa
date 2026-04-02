@@ -209,6 +209,19 @@ describe('proposeAndAcceptTrade', () => {
 })
 
 describe('endTurn', () => {
+  test('should not allow endTurn if balance is negative', () => {
+    const state = createMockState(
+      [createMockPlayer({ id: '1', balance: -50 }), createMockPlayer({ id: '2' })],
+      undefined,
+      { currentPlayerIndex: 0, turnPhase: 'END' },
+    )
+
+    const newState = endTurn(state)
+    assert.strictEqual(newState, state)
+    assert.strictEqual(newState.currentPlayerIndex, 0)
+    assert.strictEqual(newState.turnPhase, 'END')
+  })
+
   test('should transition to the next player', () => {
     const state = createMockState(
       [createMockPlayer({ id: '1' }), createMockPlayer({ id: '2' }), createMockPlayer({ id: '3' })],
