@@ -245,41 +245,83 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
           // Don't propose if one is pending
           // Find properties we need to complete a town
           const neededProperties = getNeededProperties(gameState, currentPlayer)
+
+          // Group properties by owner and then by color group so we can ask for multiple at once
+          const groupedNeeds: Record<string, Record<string, number[]>> = {}
           for (const { tileId, ownerId } of neededProperties) {
-            if (
-              memory.rejectedOffers.some((ro) => ro.toId === ownerId && ro.propertyId === tileId)
-            ) {
-              continue
-            }
-
             const tile = gameState.tiles[tileId]
-            const owner = gameState.players.find((p) => p.id === ownerId)
-            if (!owner || !tile.price) continue
+            if (!tile.group) continue
 
-            // Determine if we can make a very attractive offer (2x base price + half bot balance)
-            const veryAttractiveOffer = tile.price * 2 + Math.floor(currentPlayer.balance / 2)
-            const attractiveOffer = tile.price * 2
-
-            let offerAmount = 0
-            if (currentPlayer.balance >= veryAttractiveOffer) {
-              offerAmount = veryAttractiveOffer
-            } else if (currentPlayer.balance >= attractiveOffer) {
-              offerAmount = attractiveOffer
+            if (!groupedNeeds[ownerId]) {
+              groupedNeeds[ownerId] = {}
             }
+            if (!groupedNeeds[ownerId][tile.group]) {
+              groupedNeeds[ownerId][tile.group] = []
+            }
+            groupedNeeds[ownerId][tile.group].push(tileId)
+          }
 
-            if (offerAmount > 0) {
-              memory.tradesThisTurn++
-              memory.rejectedOffers.push({ toId: ownerId, propertyId: tileId })
+          for (const ownerId of Object.keys(groupedNeeds)) {
+            for (const groupId of Object.keys(groupedNeeds[ownerId])) {
+              const tileIds = groupedNeeds[ownerId][groupId]
 
-              return {
-                type: 'PROPOSE_TRADE',
-                partnerId: ownerId,
-                offer: {
-                  myCash: offerAmount,
-                  partnerCash: 0,
-                  myProperties: [],
-                  partnerProperties: [tileId],
-                },
+              // Check if we already rejected any of these
+              const hasRejected = tileIds.some((tileId) =>
+                memory.rejectedOffers.some((ro) => ro.toId === ownerId && ro.propertyId === tileId),
+              )
+              if (hasRejected) continue
+
+              const owner = gameState.players.find((p) => p.id === ownerId)
+              if (!owner) continue
+
+              // Calculate prices
+              let totalBasePrice = 0
+              let validTilesCount = 0
+              for (const tileId of tileIds) {
+                const tile = gameState.tiles[tileId]
+                if (tile.price) {
+                  totalBasePrice += tile.price
+                  validTilesCount++
+                }
+              }
+
+              if (validTilesCount === 0) continue
+
+              const averagePrice = totalBasePrice / validTilesCount
+              const N = validTilesCount
+              const multiplier = N > 1 ? Math.pow(1.08, N) : 1
+
+              const baseAttractiveOffer = averagePrice * 2
+              const baseVeryAttractiveOffer =
+                baseAttractiveOffer + Math.floor(currentPlayer.balance / 2)
+
+              const finalAttractiveOffer = Math.floor(baseAttractiveOffer * multiplier)
+              const finalVeryAttractiveOffer = Math.floor(baseVeryAttractiveOffer * multiplier)
+
+              let offerAmount = 0
+              // Only offer very attractive if balance left > 199
+              if (currentPlayer.balance - finalVeryAttractiveOffer > 199) {
+                offerAmount = finalVeryAttractiveOffer
+              } else if (currentPlayer.balance >= finalAttractiveOffer) {
+                offerAmount = finalAttractiveOffer
+              }
+
+              if (offerAmount > 0) {
+                memory.tradesThisTurn++
+                for (const tileId of tileIds) {
+                  memory.rejectedOffers.push({ toId: ownerId, propertyId: tileId })
+                }
+
+                return {
+                  type: 'PROPOSE_TRADE',
+                  partnerId: ownerId,
+                  offer: {
+                    myCash: offerAmount,
+                    partnerCash: 0,
+                    myProperties: [],
+                    partnerProperties: tileIds,
+                  },
+                }
               }
             }
           }
