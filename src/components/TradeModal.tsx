@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import type { Player, Tile, TradeOffer, GameAction } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
-import { X, ArrowRightLeft } from 'lucide-react'
+import { X, ArrowRightLeft, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 type TabType = 'PROPOSE' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
@@ -35,12 +35,24 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
   const [activeTab, setActiveTab] = useState<TabType>('PROPOSE')
   const [partnerId, setPartnerId] = useState(others[0]?.id || '')
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const [offer, setOffer] = useState<TradeOffer>({
     myCash: 0,
     partnerCash: 0,
     myProperties: [],
     partnerProperties: [],
   })
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -303,28 +315,36 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
                 {/* Partner side */}
                 <div className="flex-1 space-y-4">
-                  <div className="border-b pb-1">
-                    <select
-                      className="w-full bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded p-2 text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-egyptian-gold transition-colors appearance-none cursor-pointer"
-                      value={partnerId}
-                      onChange={(e) => {
-                        setPartnerId(e.target.value)
-                        setOffer({ ...offer, partnerProperties: [], partnerCash: 0 })
-                      }}
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 0.5rem center',
-                        backgroundSize: '1em',
-                        paddingRight: '2.5rem',
-                      }}
+                  <div className="border-b pb-1 relative" ref={dropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                      className="w-full bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded p-2 text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-egyptian-gold transition-colors appearance-none cursor-pointer flex justify-between items-center"
                     >
-                      {others.map((o) => (
-                        <option key={o.id} value={o.id}>
-                          {o.name}
-                        </option>
-                      ))}
-                    </select>
+                      <span>{partner?.name || t('trade.unknown')}</span>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </button>
+                    {dropdownOpen && (
+                      <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded shadow-lg max-h-48 overflow-auto font-bold text-sm">
+                        {others.map((o) => (
+                          <div
+                            key={o.id}
+                            onClick={() => {
+                              setPartnerId(o.id)
+                              setOffer({ ...offer, partnerProperties: [], partnerCash: 0 })
+                              setDropdownOpen(false)
+                            }}
+                            className={`p-2 cursor-pointer transition-colors ${
+                              partnerId === o.id
+                                ? 'bg-egyptian-blue text-white dark:bg-egyptian-gold dark:text-slate-900'
+                                : 'hover:bg-egyptian-blue hover:text-white dark:hover:bg-egyptian-gold dark:hover:text-slate-900 text-slate-800 dark:text-white'
+                            }`}
+                          >
+                            {o.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   {partner && (
                     <>
