@@ -38,7 +38,7 @@ const WinnerModal: React.FC<WinnerModalProps> = ({ isOpen, winner, isHost, onRem
           </div>
 
           <div className="p-8 text-center space-y-6">
-            <div className="text-2xl font-bold text-slate-800">
+            <div className="text-2xl font-bold">
               {winner ? t('game.winnerIs', { name: winner.name }) : t('game.everyoneBankrupt')}
             </div>
 
@@ -51,14 +51,14 @@ const WinnerModal: React.FC<WinnerModalProps> = ({ isOpen, winner, isHost, onRem
                 {t('game.rematchBtn')}
               </button>
             ) : (
-              <div className="text-slate-500 font-semibold animate-pulse">
+              <div className="opacity-70 font-semibold animate-pulse">
                 {t('game.waitingForHostRematch')}
               </div>
             )}
 
             <button
               onClick={() => (window.location.href = import.meta.env.BASE_URL || '/')}
-              className="w-full bg-slate-200 text-slate-800 py-3 rounded-lg font-bold hover:bg-slate-300 transition-colors"
+              className="w-full bg-slate-200 dark:bg-slate-700 py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
             >
               {t('game.leaveGameBtn')}
             </button>
