@@ -20,7 +20,7 @@ export default function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full border-4 border-egyptian-red text-center">
-        <p className="text-lg font-bold text-gray-800 mb-6">{message}</p>
+        <p className="fs-lg font-bold text-gray-800 mb-6">{message}</p>
         <div className="flex justify-center gap-4">
           <button
             onClick={onCancel}

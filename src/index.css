@@ -62,6 +62,32 @@ body.font-arabic-pixel {
   font-size: 1.25rem;
 }
 
+@layer utilities {
+  /* --- Custom Font Size Classes --- */
+  /* Default (Arabic) Scale */
+  .fs-3xs { font-size: 8px; line-height: 10px; }
+  .fs-2xs { font-size: 10px; line-height: 12px; }
+  .fs-xs { font-size: 12px; line-height: 16px; }
+  .fs-sm { font-size: 14px; line-height: 20px; }
+  .fs-base { font-size: 16px; line-height: 24px; }
+  .fs-lg { font-size: 18px; line-height: 28px; }
+  .fs-xl { font-size: 20px; line-height: 28px; }
+  .fs-2xl { font-size: 24px; line-height: 32px; }
+  .fs-3xl { font-size: 30px; line-height: 36px; }
+
+  /* LTR (English) Scale - Proportionally smaller */
+  [dir='ltr'] .fs-3xs, html[lang='en'] .fs-3xs { font-size: 8px; line-height: 10px; }
+  [dir='ltr'] .fs-2xs, html[lang='en'] .fs-2xs { font-size: 9px; line-height: 11px; }
+  [dir='ltr'] .fs-xs, html[lang='en'] .fs-xs { font-size: 10px; line-height: 14px; }
+  [dir='ltr'] .fs-sm, html[lang='en'] .fs-sm { font-size: 12px; line-height: 16px; }
+  [dir='ltr'] .fs-base, html[lang='en'] .fs-base { font-size: 14px; line-height: 20px; }
+  [dir='ltr'] .fs-lg, html[lang='en'] .fs-lg { font-size: 16px; line-height: 24px; }
+  [dir='ltr'] .fs-xl, html[lang='en'] .fs-xl { font-size: 18px; line-height: 26px; }
+  [dir='ltr'] .fs-2xl, html[lang='en'] .fs-2xl { font-size: 20px; line-height: 28px; }
+  [dir='ltr'] .fs-3xl, html[lang='en'] .fs-3xl { font-size: 24px; line-height: 30px; }
+  /* -------------------------------- */
+}
+
 .board-tile {
   border-width: 1px;
   border-color: #94a3b8;

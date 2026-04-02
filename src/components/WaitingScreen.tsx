@@ -47,17 +47,17 @@ export default function WaitingScreen({
         }}
         onCancel={() => setPlayerToKick(null)}
       />
-      <h1 className="text-3xl font-bold text-center mb-6 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest">
+      <h1 className="fs-3xl font-bold text-center mb-6 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest">
         {t('waiting.title')}
       </h1>
 
       <div className="space-y-6">
         <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-lg border border-dashed border-slate-400 dark:border-slate-500 text-center">
-          <span className="text-sm text-slate-500 dark:text-slate-400 uppercase block mb-1">
+          <span className="fs-sm text-slate-500 dark:text-slate-400 uppercase block mb-1">
             {t('waiting.lobbyIdLabel')}
           </span>
           <span
-            className="font-mono text-xl font-bold select-all block mb-2 truncate dark:text-white"
+            className="font-mono fs-xl font-bold select-all block mb-2 truncate dark:text-white"
             title={lobbyId}
           >
             {lobbyId}
@@ -88,12 +88,12 @@ export default function WaitingScreen({
                   {p.name} {p.id === myId ? t('waiting.you') : ''}
                 </span>
                 {p.id === gameState.players[0].id && (
-                  <span className="text-xs bg-egyptian-gold text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto">
+                  <span className="fs-xs bg-egyptian-gold text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto">
                     {t('waiting.host')}
                   </span>
                 )}
                 {p.isBot && (
-                  <span className="text-xs bg-slate-500 text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto flex items-center gap-1">
+                  <span className="fs-xs bg-slate-500 text-white px-2 py-0.5 rounded ltr:ml-auto rtl:mr-auto flex items-center gap-1">
                     <Bot size={12} /> {t('waiting.bot', 'Bot')}
                   </span>
                 )}
@@ -162,14 +162,14 @@ export default function WaitingScreen({
                 </button>
                 <button
                   onClick={() => sendAction({ type: 'START_COUNTDOWN' })}
-                  className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors text-lg"
+                  className="w-full bg-egyptian-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors fs-lg"
                 >
                   {t('waiting.startGameBtn')}
                 </button>
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="text-2xl font-black text-egyptian-red animate-pulse">
+                <div className="fs-2xl font-black text-egyptian-red animate-pulse">
                   {t('waiting.startingIn', { count: gameState.countdown })}
                 </div>
                 <button

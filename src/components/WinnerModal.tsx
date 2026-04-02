@@ -32,20 +32,20 @@ const WinnerModal: React.FC<WinnerModalProps> = ({ isOpen, winner, isHost, onRem
         >
           <div className="bg-egyptian-blue p-6 text-center text-white relative">
             <Trophy className="w-16 h-16 mx-auto mb-2 text-egyptian-gold drop-shadow-lg" />
-            <h2 className="text-3xl font-black font-english-pixel tracking-widest uppercase">
+            <h2 className="fs-3xl font-black font-english-pixel tracking-widest uppercase">
               {t('game.gameOver')}
             </h2>
           </div>
 
           <div className="p-8 text-center space-y-6">
-            <div className="text-2xl font-bold">
+            <div className="fs-2xl font-bold">
               {winner ? t('game.winnerIs', { name: winner.name }) : t('game.everyoneBankrupt')}
             </div>
 
             {isHost ? (
               <button
                 onClick={onRematch}
-                className="w-full bg-egyptian-gold text-white py-4 rounded-xl font-bold text-xl flex items-center justify-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all"
+                className="w-full bg-egyptian-gold text-white py-4 rounded-xl font-bold fs-xl flex items-center justify-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all"
               >
                 <RotateCcw className="w-6 h-6" />
                 {t('game.rematchBtn')}

@@ -30,8 +30,8 @@ export default function InformationDialog({
           {/* Decorative background element */}
           <div className="absolute top-0 left-0 w-full h-2 bg-egyptian-gold" />
 
-          <h2 className="text-2xl font-bold text-egyptian-blue mb-4">{title}</h2>
-          <p className="text-lg font-bold text-gray-800 mb-8">{message}</p>
+          <h2 className="fs-2xl font-bold text-egyptian-blue mb-4">{title}</h2>
+          <p className="fs-lg font-bold text-gray-800 mb-8">{message}</p>
 
           <div className="flex justify-center">
             <button

@@ -54,7 +54,7 @@ const LoginScreen: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold">
-        <h1 className="text-3xl font-bold text-center mb-2 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest font-english-pixel">
+        <h1 className="fs-3xl font-bold text-center mb-2 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest font-english-pixel">
           {t('login.title')}
         </h1>
         <p className="text-center text-slate-500 dark:text-slate-400 mb-6">{t('login.subtitle')}</p>
@@ -87,7 +87,7 @@ const LoginScreen: React.FC = () => {
                   </button>
                 ))}
             </div>
-            <p className="text-center text-sm mt-2 text-egyptian-blue dark:text-egyptian-gold font-bold">
+            <p className="text-center fs-sm mt-2 text-egyptian-blue dark:text-egyptian-gold font-bold">
               {AVATAR_NAMES[selectedAvatar]}
             </p>
           </div>
@@ -111,13 +111,13 @@ const LoginScreen: React.FC = () => {
             {error && (
               <p
                 id="name-error"
-                className="text-red-500 dark:text-red-400 text-xs mt-1"
+                className="text-red-500 dark:text-red-400 fs-xs mt-1"
                 role="alert"
               >
                 {error}
               </p>
             )}
-            <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
+            <p className="text-slate-400 dark:text-slate-500 fs-xs mt-1">
               {t('login.charCount', { current: name.length, max: MAX_NAME_LENGTH })}
             </p>
           </div>

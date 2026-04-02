@@ -312,7 +312,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
                     )}
                   </div>
                 )}
-                <span className="font-bold text-xs shrink-0">
+                <span className="font-bold fs-xs shrink-0">
                   {p.isBankrupt ? t('game.bankruptLabel') : `${p.balance} ${GAME_CONFIG.CURRENCY}`}
                 </span>
                 {isHost && p.id !== myId && !p.isBankrupt && (
@@ -332,7 +332,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {lobbyId && (
           <div className="space-y-2 mt-4">
             <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded border border-dashed border-slate-400 dark:border-slate-600 text-center">
-              <span className="text-xs text-slate-500 dark:text-slate-400 uppercase block">
+              <span className="fs-xs text-slate-500 dark:text-slate-400 uppercase block">
                 {t('game.shareIdLabel')}
               </span>
               <span className="font-mono font-bold select-all">{lobbyId}</span>
@@ -348,10 +348,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
       </div>
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-l-4 border-egyptian-gold rtl:border-r-4 rtl:border-l-0">
-        <h3 className="font-bold flex items-center gap-2 mb-2 uppercase text-sm">
+        <h3 className="font-bold flex items-center gap-2 mb-2 uppercase fs-sm">
           {t('game.gameLogs')}
         </h3>
-        <div className="h-48 overflow-y-auto text-[10px] space-y-1 pr-2 rtl:pr-0 rtl:pl-2">
+        <div className="h-48 overflow-y-auto fs-2xs space-y-1 pr-2 rtl:pr-0 rtl:pl-2">
           {gameState.logs.map((log, i) => {
             if (typeof log === 'string') {
               return (
@@ -449,7 +449,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             aria-label={t('game.infoLogs')}
           >
             <Info size={24} />
-            <span className="text-[10px] font-bold">{t('game.infoLogs', 'Info/Logs')}</span>
+            <span className="fs-2xs font-bold">{t('game.infoLogs', 'Info/Logs')}</span>
           </button>
           <button
             onClick={() => {
@@ -460,7 +460,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             aria-label={t('game.controls', 'Controls')}
           >
             <Gamepad2 size={24} />
-            <span className="text-[10px] font-bold">{t('game.controls', 'Controls')}</span>
+            <span className="fs-2xs font-bold">{t('game.controls', 'Controls')}</span>
             {isMyTurn && (
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse border-2 border-white dark:border-slate-900"></span>
             )}
@@ -477,7 +477,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             aria-label={t('common.settings.title', 'Settings')}
           >
             <Settings2 size={24} />
-            <span className="text-[10px] font-bold">{t('common.settings.title', 'Settings')}</span>
+            <span className="fs-2xs font-bold">{t('common.settings.title', 'Settings')}</span>
           </button>
         </div>
 
@@ -722,7 +722,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             >
               <div className="bg-sand dark:bg-slate-900 h-full w-80 shadow-2xl flex flex-col">
                 <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 bg-sand dark:bg-slate-900 z-10">
-                  <h2 className="text-xl font-bold flex items-center gap-2">
+                  <h2 className="fs-xl font-bold flex items-center gap-2">
                     <Info size={20} /> {t('game.infoLogs')}
                   </h2>
                   <button
@@ -748,7 +748,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             >
               <div className="bg-sand dark:bg-slate-900 h-full w-80 shadow-2xl flex flex-col">
                 <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 bg-sand dark:bg-slate-900 z-10">
-                  <h2 className="text-xl font-bold flex items-center gap-2">
+                  <h2 className="fs-xl font-bold flex items-center gap-2">
                     <Gamepad2 size={20} /> {t('game.controls', 'Controls')}
                   </h2>
                   <button
