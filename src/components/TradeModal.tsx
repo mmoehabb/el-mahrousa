@@ -265,7 +265,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
               <div className="p-4 flex flex-col sm:flex-row gap-4 overflow-y-auto">
                 {/* My side */}
                 <div className="flex-1 space-y-4">
-                  <h3 className="font-bold border-b pb-1 text-sm">{t('trade.yourOffer')}</h3>
+                  <div className="border-b pb-1 h-[42px] flex items-center">
+                    <h3 className="font-bold text-sm w-full">{t('trade.yourOffer')}</h3>
+                  </div>
                   <div className="space-y-2">
                     <label className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 block">
                       {GAME_CONFIG.CURRENCY}
@@ -315,17 +317,20 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
                 {/* Partner side */}
                 <div className="flex-1 space-y-4">
-                  <div className="border-b pb-1 relative" ref={dropdownRef}>
+                  <div
+                    className="border-b pb-1 relative h-[42px] flex items-center"
+                    ref={dropdownRef}
+                  >
                     <button
                       type="button"
                       onClick={() => setDropdownOpen(!dropdownOpen)}
-                      className="w-full bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded p-2 text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-egyptian-gold transition-colors appearance-none cursor-pointer flex justify-between items-center"
+                      className="w-full bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded p-2 text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-egyptian-gold transition-colors appearance-none cursor-pointer flex justify-between items-center h-[38px]"
                     >
                       <span>{partner?.name || t('trade.unknown')}</span>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </button>
                     {dropdownOpen && (
-                      <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded shadow-lg max-h-48 overflow-auto font-bold text-sm">
+                      <div className="absolute top-full z-10 w-full mt-1 bg-white dark:bg-slate-800 border-2 border-egyptian-blue dark:border-egyptian-gold rounded shadow-lg max-h-48 overflow-auto font-bold text-sm">
                         {others.map((o) => (
                           <div
                             key={o.id}
