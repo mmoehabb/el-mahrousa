@@ -5,6 +5,7 @@ import TileComponent from './Tile'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Dice5 } from 'lucide-react'
+import { useGameSounds } from '../hooks/useGameSounds'
 
 const DiceFace: React.FC<{ value: number; 'aria-label'?: string }> = ({
   value,
@@ -32,12 +33,24 @@ interface BoardProps {
   isMyTurn: boolean
   sendAction: (action: GameAction) => void
   onTileClick: (tile: Tile) => void
+  setToastMessage: (msg: string) => void
 }
 
-const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileClick }) => {
+const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileClick, setToastMessage }) => {
   const { t } = useTranslation()
   const { gameState } = useGame()
+  const sounds = useGameSounds()
   const tiles = gameState.tiles
+  const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+
+  const handleEndTurnClick = () => {
+    if (currentPlayer && currentPlayer.balance < 0) {
+      setToastMessage(t('game.mustPayDebts'))
+      sounds.playBankrupt()
+    } else {
+      sendAction({ type: 'END_TURN' })
+    }
+  }
 
   // Global balance tracking for floating text
   const [balanceChanges, setBalanceChanges] = useState<
@@ -138,8 +151,6 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
   }, [isRolling])
 
   const effectiveDisplayDice = isRolling ? rollingDice : gameState.lastDice
-
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex]
 
   // Extract the latest up to 7 game logs to show in the center
   const recentLogs = gameState.logs.slice(0, 7)
@@ -396,7 +407,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
                     </button>
                   )}
                 <button
-                  onClick={() => sendAction({ type: 'END_TURN' })}
+                  onClick={handleEndTurnClick}
                   className="w-full bg-slate-500 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-slate-600 text-[10px] sm:text-sm md:text-lg shadow-md"
                 >
                   {t('game.skipEndTurnBtn')}
@@ -406,7 +417,7 @@ const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileC
 
             {isMyTurn && gameState.turnPhase === 'END' && (
               <button
-                onClick={() => sendAction({ type: 'END_TURN' })}
+                onClick={handleEndTurnClick}
                 className="w-full bg-egyptian-blue text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-[10px] sm:text-sm md:text-lg shadow-md"
               >
                 {t('game.endTurnBtn')}

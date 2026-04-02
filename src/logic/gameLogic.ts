@@ -385,6 +385,11 @@ export const buyProperty = (state: GameState, tileId: number): GameState => {
 }
 
 export const endTurn = (state: GameState): GameState => {
+  const currentPlayer = state.players[state.currentPlayerIndex]
+  if (currentPlayer.balance < 0) {
+    return state
+  }
+
   let nextIndex = (state.currentPlayerIndex + 1) % state.players.length
   let attempts = 0
 

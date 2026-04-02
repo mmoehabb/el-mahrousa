@@ -658,6 +658,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 isMyTurn={isMyTurn}
                 sendAction={sendAction}
                 onTileClick={setSelectedTile}
+                setToastMessage={setToastMessage}
               />
             </TransformComponent>
           </TransformWrapper>
