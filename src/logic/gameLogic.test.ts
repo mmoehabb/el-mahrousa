@@ -211,10 +211,7 @@ describe('proposeAndAcceptTrade', () => {
 describe('endTurn', () => {
   test('should not allow endTurn if balance is negative', () => {
     const state = createMockState(
-      [
-        createMockPlayer({ id: '1', balance: -50 }),
-        createMockPlayer({ id: '2' }),
-      ],
+      [createMockPlayer({ id: '1', balance: -50 }), createMockPlayer({ id: '2' })],
       undefined,
       { currentPlayerIndex: 0, turnPhase: 'END' },
     )

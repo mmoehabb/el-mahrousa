@@ -36,7 +36,13 @@ interface BoardProps {
   setToastMessage: (msg: string) => void
 }
 
-const Board: React.FC<BoardProps> = ({ handleRoll, isMyTurn, sendAction, onTileClick, setToastMessage }) => {
+const Board: React.FC<BoardProps> = ({
+  handleRoll,
+  isMyTurn,
+  sendAction,
+  onTileClick,
+  setToastMessage,
+}) => {
   const { t } = useTranslation()
   const { gameState } = useGame()
   const sounds = useGameSounds()
