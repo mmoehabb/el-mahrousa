@@ -6,6 +6,14 @@ import { GameProvider } from './context/GameContext'
 import './i18n'
 
 if (
+  window.location.protocol === 'http:' &&
+  window.location.hostname !== 'localhost' &&
+  window.location.hostname !== '127.0.0.1'
+) {
+  window.location.replace(`https://${window.location.hostname}${window.location.pathname}${window.location.search}${window.location.hash}`)
+}
+
+if (
   localStorage.theme === 'dark' ||
   (!('theme' in localStorage) && document.documentElement.classList.contains('dark'))
 ) {
