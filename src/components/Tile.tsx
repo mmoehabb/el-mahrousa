@@ -11,7 +11,7 @@ interface TileProps {
   tilePlayers: Player[]
   owner?: Player
   onClick?: () => void
-  balanceChanges?: Record<string, { diff: number; id: number }[]>
+  balanceChanges?: Record<string, { diff: number; id: string }[]>
 }
 
 import { useGame } from '../context/GameContext'
