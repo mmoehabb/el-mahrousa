@@ -60,12 +60,12 @@ const Board: React.FC<BoardProps> = ({
 
   // Global balance tracking for floating text
   const [balanceChanges, setBalanceChanges] = useState<
-    Record<string, { diff: number; id: number }[]>
+    Record<string, { diff: number; id: string }[]>
   >({})
   const prevBalancesRef = React.useRef<Record<string, number>>({})
 
   // Ref to hold queues of pending balance changes for each player
-  const pendingChangesQueueRef = React.useRef<Record<string, { diff: number; id: number }[]>>({})
+  const pendingChangesQueueRef = React.useRef<Record<string, { diff: number; id: string }[]>>({})
 
   // Ref to track if a player currently has an active interval processing their queue
   const isProcessingQueueRef = React.useRef<Record<string, boolean>>({})
@@ -86,7 +86,7 @@ const Board: React.FC<BoardProps> = ({
           }
 
           // Push the new diff to the queue
-          pendingChangesQueueRef.current[p.id].push({ diff, id: Date.now() + Math.random() })
+          pendingChangesQueueRef.current[p.id].push({ diff, id: crypto.randomUUID() })
         }
       }
       prevBalancesRef.current[p.id] = p.balance
