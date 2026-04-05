@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Users, UserMinus, Mic, MicOff, PhoneCall, Bot } from 'lucide-react'
-import type { GameState } from '../types/game'
+import type { GameState, GameAction } from '../types/game'
 import ConfirmDialog from './ConfirmDialog'
 
 interface WaitingScreenProps {
@@ -11,7 +11,7 @@ interface WaitingScreenProps {
   lobbyId: string
   showCopied: boolean
   handleShareLink: () => void
-  sendAction: (action: { type: string; [key: string]: unknown }) => void
+  sendAction: (action: GameAction) => void
   toggleVoiceChat?: () => void
   isMuted?: boolean
   voiceError?: string | null
