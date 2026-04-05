@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Peer, { type DataConnection, type MediaConnection } from 'peerjs'
 import { useGame } from '../context/GameContext'
-import type { GameState, Player } from '../types/game'
+import type { GameState, Player, GameAction } from '../types/game'
 import {
   rollDice,
   moveOneStep,
@@ -54,8 +54,7 @@ export const useNetworking = () => {
   }, [])
 
   const handleAction = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (action: any, from: string) => {
+    (action: GameAction, from: string) => {
       if (!isHost) return
       if (!isValidGameAction(action)) {
         setConnectionError('errors.invalidAction')
@@ -357,8 +356,7 @@ export const useNetworking = () => {
   )
 
   const sendAction = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (action: any) => {
+    (action: GameAction) => {
       if (isHost) {
         if (action.type === 'KICK_PLAYER') {
           const targetConn = connections.current[action.playerId]
@@ -508,16 +506,22 @@ export const useNetworking = () => {
         setConnectionError('errors.failedToConnect')
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      conn.on('data', (data: any) => {
-        if (data.type === 'SYNC') {
-          if (conn.peer === lobbyIdRef.current && isValidGameState(data.state)) {
-            setGameState(data.state)
+      conn.on('data', (data: unknown) => {
+        if (!data || typeof data !== 'object') return
+        const d = data as Record<string, unknown>
+
+        if (d.type === 'SYNC') {
+          if (conn.peer === lobbyIdRef.current && isValidGameState(d.state)) {
+            setGameState(d.state)
           } else {
             setConnectionError('errors.invalidSync')
           }
-        } else if (data.type === 'ACTION' && isHostRef.current) {
-          handleActionRef.current(data.action, conn.peer)
+        } else if (d.type === 'ACTION' && isHostRef.current) {
+          if (isValidGameAction(d.action)) {
+            handleActionRef.current(d.action, conn.peer)
+          } else {
+            setConnectionError('errors.invalidAction')
+          }
         }
       })
 
@@ -597,11 +601,13 @@ export const useNetworking = () => {
         setConnectionError('errors.joinLobbyFailed')
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      conn.on('data', (data: any) => {
-        if (data.type === 'SYNC') {
-          if (conn.peer === id && isValidGameState(data.state)) {
-            setGameState(data.state)
+      conn.on('data', (data: unknown) => {
+        if (!data || typeof data !== 'object') return
+        const d = data as Record<string, unknown>
+
+        if (d.type === 'SYNC') {
+          if (conn.peer === id && isValidGameState(d.state)) {
+            setGameState(d.state)
           } else {
             setConnectionError('errors.invalidSync')
           }
