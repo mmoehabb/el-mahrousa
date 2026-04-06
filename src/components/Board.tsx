@@ -224,239 +224,242 @@ const Board: React.FC<BoardProps> = ({
   }
 
   return (
-    <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold w-[1200px] h-[1200px] min-w-[1200px] min-h-[1200px] max-w-none overflow-hidden">
-      <div
-        className="grid gap-0.5 sm:gap-1 w-full h-full relative"
-        style={{
-          gridTemplateColumns: '1.4fr repeat(9, 1fr) 1.4fr',
-          gridTemplateRows: '1.4fr repeat(9, 1fr) 1.4fr',
-        }}
-      >
-        {/* Top Row */}
-        {topRow.map((tile, i) => (
-          <div
-            key={tile.id}
-            className="col-start-1"
-            style={{ gridColumnStart: i + 1, gridRowStart: 1 }}
-          >
-            <TileComponent
-              balanceChanges={balanceChanges}
-              tile={tile}
-              tilePlayers={playersByPosition[tile.id] || []}
-              owner={ownerByTile[tile.id]}
-              onClick={() => handleTileClick(tile)}
-            />
-          </div>
-        ))}
-
-        {/* Floating Dice CTA for Mobile - Rendered over the active player's tile */}
-        {isMyTurn &&
-          (gameState.turnPhase === 'ROLL' || gameState.turnPhase === 'ROLLING') &&
-          currentPlayer && (
+    <div className="relative p-[20px]">
+      <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold w-[1200px] h-[1200px] min-w-[1200px] min-h-[1200px] max-w-none overflow-hidden">
+        <div
+          className="grid gap-0.5 sm:gap-1 w-full h-full relative"
+          style={{
+            gridTemplateColumns: '1.4fr repeat(9, 1fr) 1.4fr',
+            gridTemplateRows: '1.4fr repeat(9, 1fr) 1.4fr',
+          }}
+        >
+          {/* Top Row */}
+          {topRow.map((tile, i) => (
             <div
-              className="lg:hidden pointer-events-none relative w-full h-full flex items-center justify-center"
-              style={{
-                gridColumnStart: getGridCoordinates(currentPlayer.position).col,
-                gridRowStart: getGridCoordinates(currentPlayer.position).row,
-                zIndex: 60,
-              }}
+              key={tile.id}
+              className="col-start-1"
+              style={{ gridColumnStart: i + 1, gridRowStart: 1 }}
             >
-              {/* The actual button is offset slightly to appear "floating above" the tile, or below if on the top edge */}
-              <div
-                className={`absolute flex flex-col items-center gap-1 pointer-events-auto ${getGridCoordinates(currentPlayer.position).row <= 2 ? '-bottom-24 flex-col-reverse' : '-top-20'}`}
-              >
-                <div className="fs-xl font-bold text-egyptian-blue dark:text-blue-400 bg-white/90 dark:bg-slate-900/90 px-2 py-0.5 rounded-full shadow-md backdrop-blur uppercase whitespace-nowrap">
-                  {t('game.rollDiceBtn')}
-                </div>
-                <button
-                  onClick={handleRoll}
-                  disabled={gameState.turnPhase === 'ROLLING'}
-                  className="flex gap-2 bg-white/90 dark:bg-slate-800/90 p-2 rounded-2xl backdrop-blur-md border border-egyptian-blue shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-transform"
-                >
-                  <motion.div
-                    animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
-                    transition={{
-                      repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
-                      duration: 0.5,
-                      ease: 'easeInOut',
-                    }}
-                  >
-                    <DiceFace
-                      value={effectiveDisplayDice[0]}
-                      aria-label={`First die showing ${effectiveDisplayDice[0]}`}
-                    />
-                  </motion.div>
-                  <motion.div
-                    animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
-                    transition={{
-                      repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
-                      duration: 0.5,
-                      ease: 'easeInOut',
-                    }}
-                  >
-                    <DiceFace
-                      value={effectiveDisplayDice[1]}
-                      aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
-                    />
-                  </motion.div>
-                </button>
-              </div>
+              <TileComponent
+                balanceChanges={balanceChanges}
+                tile={tile}
+                tilePlayers={playersByPosition[tile.id] || []}
+                owner={ownerByTile[tile.id]}
+                onClick={() => handleTileClick(tile)}
+              />
             </div>
-          )}
+          ))}
 
-        {/* Left Column */}
-        {leftCol.map((tile, i) => (
-          <div
-            key={tile.id}
-            className="col-start-1"
-            style={{ gridColumnStart: 1, gridRowStart: i + 2 }}
-          >
-            <TileComponent
-              balanceChanges={balanceChanges}
-              tile={tile}
-              tilePlayers={playersByPosition[tile.id] || []}
-              owner={ownerByTile[tile.id]}
-              onClick={() => handleTileClick(tile)}
-            />
-          </div>
-        ))}
-
-        {/* Right Column */}
-        {rightCol.map((tile, i) => (
-          <div
-            key={tile.id}
-            className="col-start-11"
-            style={{ gridColumnStart: 11, gridRowStart: i + 2 }}
-          >
-            <TileComponent
-              balanceChanges={balanceChanges}
-              tile={tile}
-              tilePlayers={playersByPosition[tile.id] || []}
-              owner={ownerByTile[tile.id]}
-              onClick={() => handleTileClick(tile)}
-            />
-          </div>
-        ))}
-
-        {/* Bottom Row */}
-        {bottomRow.map((tile, i) => (
-          <div
-            key={tile.id}
-            className="col-start-1"
-            style={{ gridColumnStart: i + 1, gridRowStart: 11 }}
-          >
-            <TileComponent
-              balanceChanges={balanceChanges}
-              tile={tile}
-              tilePlayers={playersByPosition[tile.id] || []}
-              owner={ownerByTile[tile.id]}
-              onClick={() => handleTileClick(tile)}
-            />
-          </div>
-        ))}
-
-        {/* Center */}
-        <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-4 md:m-8 lg:m-12 border-2 md:border-4 border-egyptian-gold/40 rounded-lg relative p-4 sm:p-8 space-y-4 sm:space-y-6">
-          <div className="hidden lg:flex gap-4 sm:gap-6 md:gap-8 bg-white/50 dark:bg-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-150">
-            <motion.div
-              animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
-              transition={{
-                repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
-                duration: 0.5,
-                ease: 'easeInOut',
-              }}
-            >
-              <DiceFace
-                value={effectiveDisplayDice[0]}
-                aria-label={`First die showing ${effectiveDisplayDice[0]}`}
-              />
-            </motion.div>
-            <motion.div
-              animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
-              transition={{
-                repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
-                duration: 0.5,
-                ease: 'easeInOut',
-              }}
-            >
-              <DiceFace
-                value={effectiveDisplayDice[1]}
-                aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
-              />
-            </motion.div>
-          </div>
-
-          <div className="w-full max-w-[250px] sm:max-w-sm md:max-w-md space-y-2 sm:space-y-4 md:mt-6 hidden lg:block">
-            {isMyTurn && gameState.turnPhase === 'ROLL' && (
-              <button
-                onClick={handleRoll}
-                className="w-full fs-xl bg-egyptian-blue text-white py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 fs-xs sm:fs-base md:fs-xl shadow-lg"
+          {/* Floating Dice CTA for Mobile - Rendered over the active player's tile */}
+          {isMyTurn &&
+            (gameState.turnPhase === 'ROLL' || gameState.turnPhase === 'ROLLING') &&
+            currentPlayer && (
+              <div
+                className="lg:hidden pointer-events-none relative w-full h-full flex items-center justify-center"
+                style={{
+                  gridColumnStart: getGridCoordinates(currentPlayer.position).col,
+                  gridRowStart: getGridCoordinates(currentPlayer.position).row,
+                  zIndex: 60,
+                }}
               >
-                <Dice5 className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8" /> {t('game.rollDiceBtn')}
-              </button>
-            )}
-
-            {isMyTurn && gameState.turnPhase === 'ACTION' && (
-              <div className="space-y-2 sm:space-y-4">
-                {gameState.tiles[currentPlayer.position]?.price &&
-                  !ownerByTile[currentPlayer.position] && (
-                    <button
-                      onClick={() => sendAction({ type: 'BUY' })}
-                      disabled={
-                        currentPlayer.balance < (gameState.tiles[currentPlayer.position].price || 0)
-                      }
-                      className="fs-xl w-full bg-green-600 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-green-700 fs-2xs sm:fs-sm md:fs-lg shadow-md"
-                    >
-                      {t('game.buyForBtn', {
-                        price: gameState.tiles[currentPlayer.position].price,
-                      })}
-                    </button>
-                  )}
-                <button
-                  onClick={handleEndTurnClick}
-                  className="w-full bg-slate-500 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-slate-600 fs-xl sm:fs-sm md:fs-lg shadow-md"
+                {/* The actual button is offset slightly to appear "floating above" the tile, or below if on the top edge */}
+                <div
+                  className={`absolute flex flex-col items-center gap-1 pointer-events-auto ${getGridCoordinates(currentPlayer.position).row <= 2 ? '-bottom-24 flex-col-reverse' : '-top-20'}`}
                 >
-                  {t('game.skipEndTurnBtn')}
-                </button>
-              </div>
-            )}
-
-            {isMyTurn && gameState.turnPhase === 'END' && (
-              <button
-                onClick={handleEndTurnClick}
-                className="w-full bg-egyptian-blue text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold fs-xl sm:fs-sm md:fs-lg shadow-md"
-              >
-                {t('game.endTurnBtn')}
-              </button>
-            )}
-          </div>
-
-          <div className="w-full max-w-sm md:max-w-md space-y-4 mt-4 md:mt-6">
-            {/* Game Logs placed right below actions */}
-            <div className="w-full mt-4 p-4 bg-white/40 dark:bg-slate-800/60 rounded-xl backdrop-blur-sm border border-white/30 dark:border-slate-600/30 text-start font-bold flex flex-col items-start overflow-y-auto max-h-48 md:max-h-56 hide-scrollbar shadow-inner scale-125 origin-top md:scale-150">
-              {recentLogs.length > 0 ? (
-                recentLogs.map((log, i) => {
-                  const scale = 1 - (i / 6) * 0.35 // 100% to 65%
-                  const opacity = 1 - (i / 6) * 0.5 // 100% to 50%
-                  return (
-                    <div
-                      key={i}
-                      className="fs-xs md:fs-sm text-slate-800 dark:text-slate-100 leading-tight w-full origin-top-left rtl:origin-top-right py-0.5"
-                      style={{
-                        transform: `scale(${scale})`,
-                        opacity: opacity,
-                        marginBottom: i === recentLogs.length - 1 ? 0 : '0.3rem',
+                  <div className="fs-xl font-bold text-egyptian-blue dark:text-blue-400 bg-white/90 dark:bg-slate-900/90 px-2 py-0.5 rounded-full shadow-md backdrop-blur uppercase whitespace-nowrap">
+                    {t('game.rollDiceBtn')}
+                  </div>
+                  <button
+                    onClick={handleRoll}
+                    disabled={gameState.turnPhase === 'ROLLING'}
+                    className="flex gap-2 bg-white/90 dark:bg-slate-800/90 p-2 rounded-2xl backdrop-blur-md border border-egyptian-blue shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-transform"
+                  >
+                    <motion.div
+                      animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
+                      transition={{
+                        repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                        duration: 0.5,
+                        ease: 'easeInOut',
                       }}
                     >
-                      {renderLog(log)}
-                    </div>
-                  )
-                })
-              ) : (
-                <div className="fs-xs md:fs-sm text-slate-700 dark:text-slate-200 leading-tight w-full">
-                  {t('game.gameLogs')}
+                      <DiceFace
+                        value={effectiveDisplayDice[0]}
+                        aria-label={`First die showing ${effectiveDisplayDice[0]}`}
+                      />
+                    </motion.div>
+                    <motion.div
+                      animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
+                      transition={{
+                        repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                        duration: 0.5,
+                        ease: 'easeInOut',
+                      }}
+                    >
+                      <DiceFace
+                        value={effectiveDisplayDice[1]}
+                        aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
+                      />
+                    </motion.div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+          {/* Left Column */}
+          {leftCol.map((tile, i) => (
+            <div
+              key={tile.id}
+              className="col-start-1"
+              style={{ gridColumnStart: 1, gridRowStart: i + 2 }}
+            >
+              <TileComponent
+                balanceChanges={balanceChanges}
+                tile={tile}
+                tilePlayers={playersByPosition[tile.id] || []}
+                owner={ownerByTile[tile.id]}
+                onClick={() => handleTileClick(tile)}
+              />
+            </div>
+          ))}
+
+          {/* Right Column */}
+          {rightCol.map((tile, i) => (
+            <div
+              key={tile.id}
+              className="col-start-11"
+              style={{ gridColumnStart: 11, gridRowStart: i + 2 }}
+            >
+              <TileComponent
+                balanceChanges={balanceChanges}
+                tile={tile}
+                tilePlayers={playersByPosition[tile.id] || []}
+                owner={ownerByTile[tile.id]}
+                onClick={() => handleTileClick(tile)}
+              />
+            </div>
+          ))}
+
+          {/* Bottom Row */}
+          {bottomRow.map((tile, i) => (
+            <div
+              key={tile.id}
+              className="col-start-1"
+              style={{ gridColumnStart: i + 1, gridRowStart: 11 }}
+            >
+              <TileComponent
+                balanceChanges={balanceChanges}
+                tile={tile}
+                tilePlayers={playersByPosition[tile.id] || []}
+                owner={ownerByTile[tile.id]}
+                onClick={() => handleTileClick(tile)}
+              />
+            </div>
+          ))}
+
+          {/* Center */}
+          <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-4 md:m-8 lg:m-12 border-2 md:border-4 border-egyptian-gold/40 rounded-lg relative p-4 sm:p-8 space-y-4 sm:space-y-6">
+            <div className="hidden lg:flex gap-4 sm:gap-6 md:gap-8 bg-white/50 dark:bg-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl scale-150">
+              <motion.div
+                animate={{ rotate: gameState.turnPhase === 'ROLLING' ? 360 : 0 }}
+                transition={{
+                  repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                  duration: 0.5,
+                  ease: 'easeInOut',
+                }}
+              >
+                <DiceFace
+                  value={effectiveDisplayDice[0]}
+                  aria-label={`First die showing ${effectiveDisplayDice[0]}`}
+                />
+              </motion.div>
+              <motion.div
+                animate={{ rotate: gameState.turnPhase === 'ROLLING' ? -360 : 0 }}
+                transition={{
+                  repeat: gameState.turnPhase === 'ROLLING' ? Infinity : 0,
+                  duration: 0.5,
+                  ease: 'easeInOut',
+                }}
+              >
+                <DiceFace
+                  value={effectiveDisplayDice[1]}
+                  aria-label={`Second die showing ${effectiveDisplayDice[1]}`}
+                />
+              </motion.div>
+            </div>
+
+            <div className="w-full max-w-[250px] sm:max-w-sm md:max-w-md space-y-2 sm:space-y-4 md:mt-6 hidden lg:block">
+              {isMyTurn && gameState.turnPhase === 'ROLL' && (
+                <button
+                  onClick={handleRoll}
+                  className="w-full fs-xl bg-egyptian-blue text-white py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 fs-xs sm:fs-base md:fs-xl shadow-lg"
+                >
+                  <Dice5 className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8" /> {t('game.rollDiceBtn')}
+                </button>
+              )}
+
+              {isMyTurn && gameState.turnPhase === 'ACTION' && (
+                <div className="space-y-2 sm:space-y-4">
+                  {gameState.tiles[currentPlayer.position]?.price &&
+                    !ownerByTile[currentPlayer.position] && (
+                      <button
+                        onClick={() => sendAction({ type: 'BUY' })}
+                        disabled={
+                          currentPlayer.balance <
+                          (gameState.tiles[currentPlayer.position].price || 0)
+                        }
+                        className="fs-xl w-full bg-green-600 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-green-700 fs-2xs sm:fs-sm md:fs-lg shadow-md"
+                      >
+                        {t('game.buyForBtn', {
+                          price: gameState.tiles[currentPlayer.position].price,
+                        })}
+                      </button>
+                    )}
+                  <button
+                    onClick={handleEndTurnClick}
+                    className="w-full bg-slate-500 text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold hover:bg-slate-600 fs-xl sm:fs-sm md:fs-lg shadow-md"
+                  >
+                    {t('game.skipEndTurnBtn')}
+                  </button>
                 </div>
               )}
+
+              {isMyTurn && gameState.turnPhase === 'END' && (
+                <button
+                  onClick={handleEndTurnClick}
+                  className="w-full bg-egyptian-blue text-white py-2 sm:py-3 md:py-4 rounded-lg md:rounded-xl font-bold fs-xl sm:fs-sm md:fs-lg shadow-md"
+                >
+                  {t('game.endTurnBtn')}
+                </button>
+              )}
+            </div>
+
+            <div className="w-full max-w-sm md:max-w-md space-y-4 mt-4 md:mt-6">
+              {/* Game Logs placed right below actions */}
+              <div className="w-full mt-4 p-4 bg-white/40 dark:bg-slate-800/60 rounded-xl backdrop-blur-sm border border-white/30 dark:border-slate-600/30 text-start font-bold flex flex-col items-start overflow-y-auto max-h-48 md:max-h-56 hide-scrollbar shadow-inner scale-125 origin-top md:scale-150">
+                {recentLogs.length > 0 ? (
+                  recentLogs.map((log, i) => {
+                    const scale = 1 - (i / 6) * 0.35 // 100% to 65%
+                    const opacity = 1 - (i / 6) * 0.5 // 100% to 50%
+                    return (
+                      <div
+                        key={i}
+                        className="fs-xs md:fs-sm text-slate-800 dark:text-slate-100 leading-tight w-full origin-top-left rtl:origin-top-right py-0.5"
+                        style={{
+                          transform: `scale(${scale})`,
+                          opacity: opacity,
+                          marginBottom: i === recentLogs.length - 1 ? 0 : '0.3rem',
+                        }}
+                      >
+                        {renderLog(log)}
+                      </div>
+                    )
+                  })
+                ) : (
+                  <div className="fs-xs md:fs-sm text-slate-700 dark:text-slate-200 leading-tight w-full">
+                    {t('game.gameLogs')}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

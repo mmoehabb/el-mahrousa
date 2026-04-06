@@ -219,9 +219,58 @@ const GameScreen: React.FC<GameScreenProps> = ({
   useEffect(() => {
     if (isFollowCameraOn && currentPlayer) {
       const tileId = `tile-${currentPlayer.position}`
-      if (transformComponentRef.current) {
-        const scale = transformComponentRef.current.instance.transformState.scale
-        transformComponentRef.current.zoomToElement(tileId, scale, 500, 'easeInOutQuad')
+      const el = document.getElementById(tileId)
+      if (transformComponentRef.current && el) {
+        const { instance, setTransform } = transformComponentRef.current
+        const scale = instance.transformState.scale
+
+        const wrapper = instance.wrapperComponent
+        if (wrapper) {
+          const wrapperRect = wrapper.getBoundingClientRect()
+          const elRect = el.getBoundingClientRect()
+          const contentRect = instance.contentComponent?.getBoundingClientRect()
+
+          if (contentRect) {
+            // Calculate the element's center relative to the unscaled content
+            const relativeLeft = (elRect.left - contentRect.left) / scale
+            const relativeTop = (elRect.top - contentRect.top) / scale
+            const elCenterX = relativeLeft + elRect.width / scale / 2
+            const elCenterY = relativeTop + elRect.height / scale / 2
+
+            // Calculate desired X and Y to center the element
+            let targetX = wrapperRect.width / 2 - elCenterX * scale
+            let targetY = wrapperRect.height / 2 - elCenterY * scale
+
+            // Clamp to boundaries. Since we added a 20px padding wrapper to Board.tsx,
+            // the content size is actually 1240x1240.
+            // limitToBounds natively handles panning limits.
+            // We just need to compute the max and min bounds for our setTransform here.
+
+            const contentWidth = 1240 * scale
+            const contentHeight = 1240 * scale
+
+            const minX = wrapperRect.width - contentWidth
+            const minY = wrapperRect.height - contentHeight
+            const maxX = 0
+            const maxY = 0
+
+            // If the content is smaller than the wrapper, limitToBounds natively centers it,
+            // or we center it here.
+            if (contentWidth < wrapperRect.width) {
+              targetX = (wrapperRect.width - contentWidth) / 2
+            } else {
+              targetX = Math.max(minX, Math.min(targetX, maxX))
+            }
+
+            if (contentHeight < wrapperRect.height) {
+              targetY = (wrapperRect.height - contentHeight) / 2
+            } else {
+              targetY = Math.max(minY, Math.min(targetY, maxY))
+            }
+
+            setTransform(targetX, targetY, scale, 500, 'easeInOutQuad')
+          }
+        }
       }
     }
   }, [currentPlayer, isFollowCameraOn])
@@ -647,7 +696,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             pinch={{ step: 5 }}
             doubleClick={{ disabled: true }}
             panning={{ disabled: false }}
-            limitToBounds={false}
+            limitToBounds={true}
             centerOnInit={true}
             onPanning={() => setIsFollowCameraOn(false)}
             onWheel={() => setIsFollowCameraOn(false)}
