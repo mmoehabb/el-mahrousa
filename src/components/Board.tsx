@@ -224,6 +224,7 @@ const Board: React.FC<BoardProps> = ({
   }
 
   return (
+    <div className="relative p-[20px]">
     <div className="relative p-1 sm:p-2 md:p-4 bg-egyptian-pattern rounded-lg shadow-2xl border-2 md:border-4 border-egyptian-gold w-[1200px] h-[1200px] min-w-[1200px] min-h-[1200px] max-w-none overflow-hidden">
       <div
         className="grid gap-0.5 sm:gap-1 w-full h-full relative"
@@ -461,6 +462,7 @@ const Board: React.FC<BoardProps> = ({
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }
