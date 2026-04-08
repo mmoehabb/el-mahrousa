@@ -76,6 +76,28 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const isMyTurn = currentPlayer?.id === myId
 
+  const playersById = React.useMemo(() => {
+    return new Map(gameState.players.map((p) => [p.id, p]))
+  }, [gameState.players])
+
+  const me = React.useMemo(() => {
+    return playersById.get(myId)
+  }, [playersById, myId])
+
+  const ownerByTile = React.useMemo(() => {
+    const ownerMap: Record<number, (typeof gameState.players)[0]> = {}
+    gameState.players.forEach((p) => {
+      p.properties.forEach((propId) => {
+        ownerMap[propId] = p
+      })
+    })
+    return ownerMap
+  }, [gameState.players])
+
+  const winner = React.useMemo(() => {
+    return gameState.players.find((p) => !p.isBankrupt)
+  }, [gameState.players])
+
   useEffect(() => {
     const activeEventString = JSON.stringify(gameState.activeEvent)
     const prevActiveEventString = JSON.stringify(prevActiveEventRef.current)
@@ -170,7 +192,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         }
 
         if (type && otherPlayerId) {
-          const otherPlayer = gameState.players.find((p) => p.id === otherPlayerId)
+          const otherPlayer = playersById.get(otherPlayerId)
           if (otherPlayer) {
             newNotifications.push({
               id: `${trade.id}-${trade.status}-${Date.now()}`,
@@ -447,16 +469,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
     />
   )
 
-  const ownerByTile = React.useMemo(() => {
-    const ownerMap: Record<number, (typeof gameState.players)[0]> = {}
-    gameState.players.forEach((p) => {
-      p.properties.forEach((propId) => {
-        ownerMap[propId] = p
-      })
-    })
-    return ownerMap
-  }, [gameState])
-
   return (
     <>
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
@@ -476,14 +488,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
           isOpen={!!selectedTile}
           onClose={() => setSelectedTile(null)}
           tile={selectedTile}
-          owner={
-            selectedTile
-              ? gameState.players.find((p) => p.properties.includes(selectedTile.id))
-              : undefined
-          }
+          owner={selectedTile ? ownerByTile[selectedTile.id] : undefined}
           isMyTurn={isMyTurn}
           myId={myId}
-          myBalance={gameState.players.find((p) => p.id === myId)?.balance || 0}
+          myBalance={me?.balance || 0}
           turnPhase={gameState.turnPhase}
           sendAction={sendAction}
         />
@@ -715,7 +723,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         <WinnerModal
           isOpen={gameState.status === 'FINISHED'}
-          winner={gameState.players.find((p) => !p.isBankrupt)}
+          winner={winner}
           isHost={isHost}
           onRematch={() => sendAction({ type: 'REMATCH' })}
         />
