@@ -80,6 +80,8 @@ export const isValidGameAction = (action: unknown): action is GameAction => {
     case 'CLEAR_EVENT':
     case 'JOIN_VOICE':
     case 'ADD_BOT':
+    case 'TICK_TURN_TIMER':
+    case 'RESET_TURN_TIMER':
       return true
     case 'BUY_HOUSE':
     case 'SELL_HOUSE':
@@ -97,6 +99,8 @@ export const isValidGameAction = (action: unknown): action is GameAction => {
       return typeof a.name === 'string' && typeof a.avatar === 'string'
     case 'KICK_PLAYER':
       return typeof a.playerId === 'string'
+    case 'LOAD_GAME':
+      return isValidGameState(a.state)
     case 'TOGGLE_MUTE':
       return typeof a.isMuted === 'boolean'
     default:

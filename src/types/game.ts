@@ -34,6 +34,7 @@ export interface Player {
   isSpeaking?: boolean
   hasJoinedVoice?: boolean
   isBot?: boolean
+  isDisconnected?: boolean
   debtTo?: string // ID of the player they owe money to, or 'bank'
 }
 
@@ -91,6 +92,9 @@ export type GameAction =
   | { type: 'TOGGLE_MUTE'; isMuted: boolean }
   | { type: 'JOIN_VOICE' }
   | { type: 'ADD_BOT' }
+  | { type: 'LOAD_GAME'; state: GameState }
+  | { type: 'TICK_TURN_TIMER' }
+  | { type: 'RESET_TURN_TIMER' }
 
 export interface ActiveEvent {
   title: string
@@ -110,6 +114,7 @@ export interface GameState {
   stepsLeft?: number
   logs: GameLog[]
   countdown?: number | null
+  turnTimer?: number
   chatMessages: ChatMessage[]
   prison: Prison
   activeEvent: ActiveEvent | null

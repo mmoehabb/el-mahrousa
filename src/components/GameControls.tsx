@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dice5, Send, Handshake, Flag, Mic, MicOff, PhoneCall } from 'lucide-react'
+import { Dice5, Send, Handshake, Flag, Mic, MicOff, PhoneCall, Save, Upload } from 'lucide-react'
 import type { Player, GameState, GameAction } from '../types/game'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { useGame } from '../context/GameContext'
@@ -24,6 +24,7 @@ interface GameControlsProps {
   toggleVoiceChat?: () => void
   isMuted?: boolean
   hasJoinedVoice?: boolean
+  isHost?: boolean
 }
 
 export default function GameControls({
@@ -37,6 +38,7 @@ export default function GameControls({
   toggleVoiceChat,
   isMuted,
   hasJoinedVoice,
+  isHost,
 }: GameControlsProps) {
   const { t } = useTranslation()
   const { myId } = useGame()
@@ -78,6 +80,51 @@ export default function GameControls({
     }
   }
 
+  const handleSaveGame = () => {
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(gameState))
+    const downloadAnchorNode = document.createElement('a')
+    downloadAnchorNode.setAttribute('href', dataStr)
+    downloadAnchorNode.setAttribute('download', 'monopoly_save.json')
+    document.body.appendChild(downloadAnchorNode)
+    downloadAnchorNode.click()
+    downloadAnchorNode.remove()
+  }
+
+  const handleLoadGame = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const loadedState = JSON.parse(e.target?.result as string)
+        if (
+          loadedState &&
+          loadedState.players &&
+          loadedState.players.length === gameState.players.length
+        ) {
+          // Mapping existing IDs, names, avatars to the loaded state
+          loadedState.players = loadedState.players.map((p: any, index: number) => ({
+            ...p,
+            id: gameState.players[index].id,
+            name: gameState.players[index].name,
+            avatar: gameState.players[index].avatar,
+            isDisconnected: gameState.players[index].isDisconnected,
+          }))
+          sendAction({ type: 'LOAD_GAME', state: loadedState })
+          setToastMessage('Game loaded successfully!')
+        } else {
+          setToastMessage('Cannot load game: Number of players does not match.')
+        }
+      } catch (err) {
+        setToastMessage('Error parsing save file.')
+      }
+    }
+    reader.readAsText(file)
+    // clear input
+    event.target.value = ''
+  }
+
   const myPendingTrades = (gameState.trades || []).filter(
     (trade) => (trade.fromId === myId || trade.toId === myId) && trade.status === 'PENDING',
   )
@@ -86,10 +133,13 @@ export default function GameControls({
     <div className="w-full lg:w-64 space-y-4">
       <div className="bg-white/90 dark:bg-slate-900/90 p-6 rounded-lg shadow-md border-r-4 border-egyptian-red text-center rtl:border-l-4 rtl:border-r-0">
         <div className="mb-4">
-          <span className="fs-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase">
+          <span className="fs-xs text-slate-500 dark:text-slate-400 uppercase">
             {t('game.currentTurnLabel')}
           </span>
           <div className="font-bold fs-lg">{currentPlayer?.name || t('game.waitingTurn')}</div>
+          {gameState.status === 'PLAYING' && typeof gameState.turnTimer === 'number' && (
+            <div className="text-red-500 font-bold mt-1 text-sm">⏳ {gameState.turnTimer}s</div>
+          )}
         </div>
 
         <div className="relative">
@@ -154,6 +204,22 @@ export default function GameControls({
             >
               <Flag size={14} /> {t('game.bankruptBtn')}
             </button>
+          )}
+
+          {isHost && (
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={handleSaveGame}
+                className="flex-1 fs-lg border-2 border-slate-600 text-slate-600 dark:border-slate-400 dark:text-slate-400 py-2 rounded-lg font-bold hover:bg-slate-600 hover:text-white dark:hover:bg-slate-400 dark:hover:text-slate-900 transition-all flex items-center justify-center gap-1 fs-2xs"
+                title="Save Game"
+              >
+                <Save size={14} /> Save
+              </button>
+              <label className="flex-1 fs-lg border-2 border-slate-600 text-slate-600 dark:border-slate-400 dark:text-slate-400 py-2 rounded-lg font-bold hover:bg-slate-600 hover:text-white dark:hover:bg-slate-400 dark:hover:text-slate-900 transition-all flex items-center justify-center gap-1 fs-2xs cursor-pointer">
+                <Upload size={14} /> Load
+                <input type="file" accept=".json" onChange={handleLoadGame} className="hidden" />
+              </label>
+            </div>
           )}
         </div>
       </div>

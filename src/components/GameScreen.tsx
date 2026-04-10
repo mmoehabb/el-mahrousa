@@ -444,6 +444,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       toggleVoiceChat={toggleVoiceChat}
       isMuted={isMuted}
       hasJoinedVoice={hasJoinedVoice}
+      isHost={isHost}
     />
   )
 
