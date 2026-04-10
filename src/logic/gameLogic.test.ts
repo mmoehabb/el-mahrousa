@@ -1496,6 +1496,23 @@ describe('processDebtRepayment', () => {
     assert.strictEqual(result.players[0].debtTo, undefined)
   })
 
+  test('should not repay debt if player goes bankrupt in the transition', () => {
+    const prevState = createMockState([
+      createMockPlayer({ id: 'p1', balance: -200, debtTo: 'p2', isBankrupt: false }),
+      createMockPlayer({ id: 'p2', balance: 1300 }),
+    ])
+    // Player A declares bankruptcy, setting balance to 0 and isBankrupt to true
+    const newState = createMockState([
+      createMockPlayer({ id: 'p1', balance: 0, debtTo: 'p2', isBankrupt: true }),
+      createMockPlayer({ id: 'p2', balance: 1300 }),
+    ])
+
+    const result = processDebtRepayment(prevState, newState)
+
+    // Player B's balance should NOT increase to 1500
+    assert.strictEqual(result.players[1].balance, 1300)
+  })
+
   test('should not repay debt if player balance does not increase', () => {
     const prevState = createMockState([
       createMockPlayer({ id: 'p1', balance: -400, debtTo: 'p2' }),
