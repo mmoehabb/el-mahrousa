@@ -144,7 +144,7 @@ export const useNetworking = () => {
             nextState = cancelTrade(nextState, action.tradeId)
             break
           }
-          case 'JOIN':
+          case 'JOIN': {
             const existingPlayerIndex = prev.players.findIndex((p) => p.id === from)
             if (existingPlayerIndex !== -1 && nextState.status === 'PLAYING') {
               const newPlayers = [...nextState.players]
@@ -172,6 +172,7 @@ export const useNetworking = () => {
               nextState.logs = [`${newPlayer.name} joined the game.`, ...nextState.logs]
             }
             break
+          }
           case 'START_COUNTDOWN':
             if (from !== lobbyId) return prev
             if (nextState.status === 'WAITING' && nextState.countdown === null) {
@@ -473,6 +474,7 @@ export const useNetworking = () => {
 
   useEffect(() => {
     handleActionRef.current = handleAction
+    // eslint-disable-next-line react-hooks/immutability
     isHostRef.current = isHost
     lobbyIdRef.current = lobbyId
   }, [handleAction, isHost, lobbyId])

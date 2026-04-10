@@ -104,7 +104,7 @@ export default function GameControls({
           loadedState.players.length === gameState.players.length
         ) {
           // Mapping existing IDs, names, avatars to the loaded state
-          loadedState.players = loadedState.players.map((p: any, index: number) => ({
+          loadedState.players = loadedState.players.map((p: Player, index: number) => ({
             ...p,
             id: gameState.players[index].id,
             name: gameState.players[index].name,
@@ -116,7 +116,7 @@ export default function GameControls({
         } else {
           setToastMessage('Cannot load game: Number of players does not match.')
         }
-      } catch (err) {
+      } catch {
         setToastMessage('Error parsing save file.')
       }
     }
