@@ -17,7 +17,14 @@ export const processDebtRepayment = (prevState: GameState, newState: GameState):
     const prevPlayer = prevState.players.find((p) => p.id === player.id)
 
     // Check if the player gained balance and has a debt
-    if (prevPlayer && player.balance > prevPlayer.balance && player.debtTo) {
+    // Do not process debt repayment if the player went bankrupt in this transition
+    // (bankruptcy sets their balance to 0, which is technically an "increase" from negative, but not a repayment).
+    if (
+      prevPlayer &&
+      player.balance > prevPlayer.balance &&
+      player.debtTo &&
+      !(player.isBankrupt && !prevPlayer.isBankrupt)
+    ) {
       // Wait, let's keep it simple: the amount they owe is tracked implicitly by their negative balance.
       // But we need to know exactly how much of their debt was repaid in this step.
       // E.g., prevBalance = -400, newBalance = +100. Gained = 500. Debt repaid = 400.
