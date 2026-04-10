@@ -106,6 +106,18 @@ function App() {
     }
   }, [isHost, gameState.status, gameState.countdown, sendAction])
 
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>
+    if (isHost && gameState.status === 'PLAYING') {
+      interval = setInterval(() => {
+        sendAction({ type: 'TICK_TURN_TIMER' })
+      }, 1000)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [isHost, gameState.status, sendAction])
+
   const handleShareLink = () => {
     const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`
     navigator.clipboard.writeText(shareUrl).then(() => {

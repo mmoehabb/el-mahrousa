@@ -144,8 +144,20 @@ export const useNetworking = () => {
             nextState = cancelTrade(nextState, action.tradeId)
             break
           }
-          case 'JOIN':
-            if (!prev.players.find((p) => p.id === from)) {
+          case 'JOIN': {
+            const existingPlayerIndex = prev.players.findIndex((p) => p.id === from)
+            if (existingPlayerIndex !== -1 && nextState.status === 'PLAYING') {
+              const newPlayers = [...nextState.players]
+              newPlayers[existingPlayerIndex] = {
+                ...newPlayers[existingPlayerIndex],
+                isDisconnected: false,
+              }
+              nextState = { ...nextState, players: newPlayers }
+              nextState.logs = [
+                `${newPlayers[existingPlayerIndex].name} reconnected.`,
+                ...nextState.logs,
+              ]
+            } else if (existingPlayerIndex === -1) {
               const newPlayer: Player = {
                 id: from,
                 name: sanitizeName(action.name, `Player ${prev.players.length + 1}`),
@@ -160,6 +172,7 @@ export const useNetworking = () => {
               nextState.logs = [`${newPlayer.name} joined the game.`, ...nextState.logs]
             }
             break
+          }
           case 'START_COUNTDOWN':
             if (from !== lobbyId) return prev
             if (nextState.status === 'WAITING' && nextState.countdown === null) {
@@ -174,7 +187,76 @@ export const useNetworking = () => {
               if (nextState.countdown <= 0) {
                 nextState.status = 'PLAYING'
                 nextState.countdown = null
+                nextState.turnTimer = 60
                 nextState.logs = ['Game started!', ...nextState.logs]
+              }
+            }
+            break
+          case 'LOAD_GAME':
+            if (from !== lobbyId) return prev
+            nextState = action.state
+            nextState.logs = ['Game loaded successfully by the host.', ...nextState.logs]
+            break
+          case 'RESET_TURN_TIMER':
+            nextState.turnTimer = 60
+            break
+          case 'TICK_TURN_TIMER':
+            if (from !== lobbyId) return prev
+
+            if (nextState.status === 'PLAYING' && typeof nextState.turnTimer === 'number') {
+              const cp = nextState.players[nextState.currentPlayerIndex]
+
+              nextState.turnTimer -= 1
+
+              // if player is in debt, pause the timer (or skip disconnected)
+              if (cp && cp.balance < 0) {
+                if (cp.isDisconnected && nextState.turnTimer <= 50) {
+                  nextState = handleBankrupt(nextState, cp.id)
+                  if (nextState.players[nextState.currentPlayerIndex]?.id === cp.id) {
+                    nextState = endTurn(nextState)
+                  }
+                } else if (!cp.isDisconnected) {
+                  nextState.turnTimer += 1
+                }
+                return nextState
+              }
+
+              if (nextState.turnTimer <= 0) {
+                if (cp.isDisconnected) {
+                  nextState = endTurn(nextState)
+                } else {
+                  if (nextState.turnPhase === 'ROLL') {
+                    // Only the host rolls the dice and broadcasts the state
+                    if (isHostRef.current) {
+                      const [d1, d2] = rollDice()
+                      nextState = { ...nextState, lastDice: [d1, d2], turnPhase: 'ROLLING' }
+                      nextState = { ...nextState, turnPhase: 'MOVING', stepsLeft: d1 + d2 }
+                      nextState.turnTimer = 10 // Give 10 seconds to finish moving and buying
+                    } else {
+                      // non-hosts wait for the host's sync
+                      nextState.turnTimer += 1
+                    }
+                  } else if (nextState.turnPhase === 'ACTION' || nextState.turnPhase === 'END') {
+                    nextState = endTurn(nextState)
+                  } else if (nextState.turnPhase === 'MOVING') {
+                    nextState = moveOneStep(nextState)
+                    nextState.stepsLeft = (nextState.stepsLeft || 1) - 1
+                    if (nextState.stepsLeft <= 0) {
+                      nextState.turnPhase = 'ACTION'
+                      nextState = applyLandingLogic(nextState)
+                      nextState.turnTimer = 10
+                    } else {
+                      nextState.turnTimer = 0
+                    }
+                  } else if (nextState.turnPhase === 'ROLLING') {
+                    nextState = {
+                      ...nextState,
+                      turnPhase: 'MOVING',
+                      stepsLeft: nextState.lastDice[0] + nextState.lastDice[1],
+                    }
+                    nextState.turnTimer = 0
+                  }
+                }
               }
             }
             break
@@ -189,10 +271,20 @@ export const useNetworking = () => {
             const disconnectedPlayerIndex = nextState.players.findIndex((p) => p.id === from)
             if (disconnectedPlayerIndex !== -1) {
               const disconnectedPlayer = nextState.players[disconnectedPlayerIndex]
-              const newPlayers = [...nextState.players]
-              newPlayers.splice(disconnectedPlayerIndex, 1)
-              nextState.players = newPlayers
-              nextState.logs = [`${disconnectedPlayer.name} left the game.`, ...nextState.logs]
+              if (nextState.status === 'PLAYING') {
+                const newPlayers = [...nextState.players]
+                newPlayers[disconnectedPlayerIndex] = {
+                  ...newPlayers[disconnectedPlayerIndex],
+                  isDisconnected: true,
+                }
+                nextState.players = newPlayers
+                nextState.logs = [`${disconnectedPlayer.name} disconnected.`, ...nextState.logs]
+              } else {
+                const newPlayers = [...nextState.players]
+                newPlayers.splice(disconnectedPlayerIndex, 1)
+                nextState.players = newPlayers
+                nextState.logs = [`${disconnectedPlayer.name} left the game.`, ...nextState.logs]
+              }
 
               if (nextState.status === 'WAITING' && nextState.countdown !== null) {
                 nextState.countdown = null
@@ -241,6 +333,7 @@ export const useNetworking = () => {
               turnPhase: 'ROLL',
               lastDice: [1, 1],
               countdown: null,
+              turnTimer: 60,
               prison: {},
               activeEvent: null,
               logs: ['Rematch initiated! Waiting to start...'],
@@ -381,6 +474,7 @@ export const useNetworking = () => {
 
   useEffect(() => {
     handleActionRef.current = handleAction
+    // eslint-disable-next-line react-hooks/immutability
     isHostRef.current = isHost
     lobbyIdRef.current = lobbyId
   }, [handleAction, isHost, lobbyId])

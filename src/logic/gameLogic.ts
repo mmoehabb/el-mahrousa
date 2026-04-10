@@ -426,6 +426,7 @@ export const endTurn = (state: GameState): GameState => {
     ...newState,
     currentPlayerIndex: nextIndex,
     turnPhase: isStillInPrison ? 'END' : 'ROLL',
+    turnTimer: 60,
   }
 }
 
