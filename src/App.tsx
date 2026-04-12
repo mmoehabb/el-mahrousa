@@ -145,7 +145,7 @@ function App() {
         <div className="star-layer star-3" />
       </div>
       <div
-        className={`min-h-screen ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center crt`}
+        className={`min-h-[100dvh] ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center crt`}
       >
         <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
