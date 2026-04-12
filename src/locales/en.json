@@ -25,7 +25,8 @@
       "version": "Version",
       "developer": "Developer",
       "sourceCode": "Source Code",
-      "viewSource": "View on GitHub"
+      "viewSource": "View on GitHub",
+      "fullscreen": "Fullscreen"
     }
   },
   "lobby": {

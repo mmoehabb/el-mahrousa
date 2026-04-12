@@ -472,7 +472,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         }}
         onCancel={() => setPlayerToKick(null)}
       />
-      <div className="game-screen-container flex flex-col w-full max-w-full justify-start items-center relative pb-16 lg:pb-0 fixed inset-0 h-screen w-screen overflow-hidden">
+      <div className="game-screen-container flex flex-col w-full max-w-full justify-start items-center relative pb-16 lg:pb-0 fixed inset-0 h-[100dvh] w-screen overflow-hidden">
         <PropertyModal
           isOpen={!!selectedTile}
           onClose={() => setSelectedTile(null)}
@@ -595,7 +595,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
               initial={{ x: -300, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -300, opacity: 0 }}
-              className="hidden lg:block fixed top-4 left-4 z-50 shadow-2xl rounded-lg overflow-hidden max-h-[calc(100vh-2rem)] overflow-y-auto"
+              className="hidden lg:block fixed top-4 left-4 z-50 shadow-2xl rounded-lg overflow-hidden max-h-[calc(100dvh-2rem)] overflow-y-auto"
             >
               <div className="bg-sand dark:bg-slate-900 w-72">
                 <div className="flex justify-between items-center p-3 border-b border-slate-200 dark:border-slate-800 bg-sand dark:bg-slate-900 sticky top-0 z-10">
@@ -646,7 +646,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
               initial={{ x: 300, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 300, opacity: 0 }}
-              className="hidden lg:block fixed top-4 right-4 z-50 shadow-2xl rounded-lg overflow-hidden max-h-[calc(100vh-2rem)] overflow-y-auto"
+              className="hidden lg:block fixed top-4 right-4 z-50 shadow-2xl rounded-lg overflow-hidden max-h-[calc(100dvh-2rem)] overflow-y-auto"
             >
               <div className="bg-sand dark:bg-slate-900 w-80">
                 <div className="flex justify-between items-center p-3 border-b border-slate-200 dark:border-slate-800 bg-sand dark:bg-slate-900 sticky top-0 z-10">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Settings, Server, Volume2, Music, Trash2, Info, Github, Mail } from 'lucide-react'
 import { useGame } from '../context/GameContext'
@@ -29,6 +29,25 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     document.documentElement.classList.contains('dark'),
   )
   const [iceUrl, setIceUrl] = useState('')
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`)
+      })
+    } else {
+      document.exitFullscreen()
+    }
+  }
 
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => {
@@ -178,6 +197,35 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       <span
                         className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
                           isDarkMode
+                            ? 'translate-x-9 rtl:-translate-x-9'
+                            : 'translate-x-1 rtl:-translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </section>
+
+                <section className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm mt-4">
+                  <h3 className="fs-lg md:fs-xl font-bold text-egyptian-blue dark:text-egyptian-gold mb-4">
+                    {t('common.settings.fullscreen')}
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <span className="font-bold text-slate-600 dark:text-slate-400">
+                      {t('common.settings.fullscreen')}
+                    </span>
+                    <button
+                      onClick={toggleFullscreen}
+                      className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-egyptian-blue focus:ring-offset-2 ${
+                        isFullscreen
+                          ? 'bg-egyptian-blue dark:bg-egyptian-gold'
+                          : 'bg-slate-300 dark:bg-slate-600'
+                      }`}
+                      role="switch"
+                      aria-checked={isFullscreen}
+                    >
+                      <span
+                        className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                          isFullscreen
                             ? 'translate-x-9 rtl:-translate-x-9'
                             : 'translate-x-1 rtl:-translate-x-1'
                         }`}

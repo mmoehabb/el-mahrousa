@@ -25,7 +25,8 @@
       "version": "الإصدار",
       "developer": "المطور",
       "sourceCode": "كود المصدر",
-      "viewSource": "عرض على GitHub"
+      "viewSource": "عرض على GitHub",
+      "fullscreen": "ملء الشاشة"
     }
   },
   "lobby": {

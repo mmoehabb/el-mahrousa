@@ -52,7 +52,7 @@ const LoginScreen: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 p-8 rounded-xl shadow-xl border-t-4 border-egyptian-gold">
         <h1 className="fs-3xl font-bold text-center mb-2 text-egyptian-blue dark:text-egyptian-gold uppercase tracking-widest font-english-pixel">
           {t('login.title')}
