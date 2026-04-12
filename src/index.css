@@ -291,7 +291,7 @@ body.font-arabic-pixel {
     );
 }
 
-/* Retro Dynamic Backgrounds */
+/* Retro Dynamic Backgrounds (GPU Accelerated) */
 .retro-clouds {
   position: fixed;
   top: 0;
@@ -300,44 +300,85 @@ body.font-arabic-pixel {
   bottom: 0;
   z-index: -2;
   background-color: #72c1f0; /* Richer Sky blue */
-  /* Combine pixel clouds with a subtle grid for a true retro day-time feel */
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px),
-    radial-gradient(circle, #fff 12%, transparent 12.5%),
-    radial-gradient(circle, #fff 12%, transparent 12.5%),
-    radial-gradient(circle, #fff 12%, transparent 12.5%);
-  background-size:
-    20px 20px,
-    20px 20px,
-    100px 100px,
-    150px 150px,
-    200px 200px;
-  background-position:
-    0 0,
-    0 0,
-    0 0,
-    50px 50px,
-    100px 100px;
-  animation: moveClouds 60s linear infinite;
+  overflow: hidden;
 }
 
-@keyframes moveClouds {
+.cloud-grid {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveGrid 60s linear infinite;
+  will-change: transform;
+}
+
+.cloud-layer {
+  position: absolute;
+  top: -200px;
+  left: -200px;
+  width: calc(100% + 400px);
+  height: calc(100% + 400px);
+  will-change: transform;
+}
+
+.cloud-1 {
+  background-image: radial-gradient(circle, #fff 12%, transparent 12.5%);
+  background-size: 100px 100px;
+  animation: moveLayer 60s linear infinite;
+}
+
+.cloud-2 {
+  background-image: radial-gradient(circle, #fff 12%, transparent 12.5%);
+  background-size: 150px 150px;
+  background-position: 50px 50px;
+  animation: moveLayer2 60s linear infinite;
+}
+
+.cloud-3 {
+  background-image: radial-gradient(circle, #fff 12%, transparent 12.5%);
+  background-size: 200px 200px;
+  background-position: 100px 100px;
+  animation: moveLayer3 60s linear infinite;
+}
+
+@keyframes moveGrid {
   from {
-    background-position:
-      0 0,
-      0 0,
-      0 0,
-      50px 50px,
-      100px 100px;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    background-position:
-      -100px -100px,
-      -100px -100px,
-      -100px 0,
-      -100px 50px,
-      -100px 100px;
+    transform: translate3d(-20px, -20px, 0);
+  }
+}
+
+@keyframes moveLayer {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100px, 0, 0);
+  }
+}
+
+@keyframes moveLayer2 {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100px, 0, 0);
+  }
+}
+
+@keyframes moveLayer3 {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100px, 0, 0);
   }
 }
 
@@ -358,45 +399,86 @@ body.font-arabic-pixel {
   bottom: 0;
   z-index: -2;
   background-color: #0b021a; /* Deep synthwave space blue/purple */
-  /* Synthwave moving grid + starry sky with glowing stars */
-  background-image:
-    linear-gradient(rgba(224, 17, 95, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16, 52, 166, 0.2) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255, 255, 255, 1) 2px, transparent 3px),
-    radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
-    radial-gradient(circle, rgba(212, 175, 55, 0.6) 1.5px, transparent 2.5px);
-  background-size:
-    30px 30px,
-    30px 30px,
-    150px 150px,
-    100px 100px,
-    80px 80px;
-  background-position:
-    0 0,
-    0 0,
-    0 0,
-    50px 50px,
-    25px 25px;
-  animation: moveSynthGrid 20s linear infinite;
   box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
 }
 
-@keyframes moveSynthGrid {
+.star-grid {
+  position: absolute;
+  top: -30px;
+  left: -30px;
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  background-image:
+    linear-gradient(rgba(224, 17, 95, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 52, 166, 0.2) 1px, transparent 1px);
+  background-size: 30px 30px;
+  animation: moveSynthGridLayer 20s linear infinite;
+  will-change: transform;
+}
+
+.star-layer {
+  position: absolute;
+  top: -150px;
+  left: -150px;
+  width: calc(100% + 300px);
+  height: calc(100% + 300px);
+  will-change: transform;
+}
+
+.star-1 {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 1) 2px, transparent 3px);
+  background-size: 150px 150px;
+  animation: moveStar1 20s linear infinite;
+}
+
+.star-2 {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 2px);
+  background-size: 100px 100px;
+  background-position: 50px 50px;
+  animation: moveStar2 20s linear infinite;
+}
+
+.star-3 {
+  background-image: radial-gradient(circle, rgba(212, 175, 55, 0.6) 1.5px, transparent 2.5px);
+  background-size: 80px 80px;
+  background-position: 25px 25px;
+  animation: moveStar3 20s linear infinite;
+}
+
+@keyframes moveSynthGridLayer {
   from {
-    background-position:
-      0 0,
-      0 0,
-      0 0,
-      50px 50px,
-      25px 25px;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    background-position:
-      30px 30px,
-      30px 30px,
-      -50px 20px,
-      -20px 70px,
-      15px 45px;
+    transform: translate3d(30px, 30px, 0);
+  }
+}
+
+@keyframes moveStar1 {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50px, 20px, 0);
+  }
+}
+
+@keyframes moveStar2 {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-20px, 70px, 0);
+  }
+}
+
+@keyframes moveStar3 {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(15px, 45px, 0);
   }
 }
 
@@ -417,6 +499,8 @@ body.font-arabic-pixel {
     100% 4px,
     6px 100%;
   pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .dark .crt::before {

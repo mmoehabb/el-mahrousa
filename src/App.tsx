@@ -132,8 +132,18 @@ function App() {
 
   return (
     <>
-      <div className="retro-clouds" />
-      <div className="retro-stars" />
+      <div className="retro-clouds">
+        <div className="cloud-grid" />
+        <div className="cloud-layer cloud-1" />
+        <div className="cloud-layer cloud-2" />
+        <div className="cloud-layer cloud-3" />
+      </div>
+      <div className="retro-stars">
+        <div className="star-grid" />
+        <div className="star-layer star-1" />
+        <div className="star-layer star-2" />
+        <div className="star-layer star-3" />
+      </div>
       <div
         className={`min-h-screen ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center crt`}
       >
