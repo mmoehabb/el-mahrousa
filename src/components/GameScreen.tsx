@@ -69,6 +69,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const prevPhaseRef = useRef(gameState.turnPhase)
   const prevLogsLengthRef = useRef(gameState.logs.length)
   const prevActiveEventRef = useRef(gameState.activeEvent)
+
+  // Separate refs for each effect so they don't overwrite each other prematurely
+  const prevLoadedAtActiveEventRef = useRef(gameState.lastLoadedAt)
+  const prevLoadedAtLogsRef = useRef(gameState.lastLoadedAt)
+  const prevLoadedAtTradesRef = useRef(gameState.lastLoadedAt)
+
   const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null)
 
   const [isFollowCameraOn, setIsFollowCameraOn] = useState(true)
@@ -77,60 +83,86 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const isMyTurn = currentPlayer?.id === myId
 
   useEffect(() => {
+    const isLoadedThisRender = gameState.lastLoadedAt !== prevLoadedAtActiveEventRef.current
+    if (isLoadedThisRender) {
+      prevLoadedAtActiveEventRef.current = gameState.lastLoadedAt
+    }
+
     const activeEventString = JSON.stringify(gameState.activeEvent)
     const prevActiveEventString = JSON.stringify(prevActiveEventRef.current)
 
     if (gameState.activeEvent && activeEventString !== prevActiveEventString) {
-      const type = gameState.activeEvent.type
-      if (type === 'gain') sounds.playGo()
-      if (type === 'loss') sounds.playRent()
-      if (type === 'move') sounds.playMove()
-      if (type === 'jail') sounds.playJail()
+      if (!isLoadedThisRender) {
+        const type = gameState.activeEvent.type
+        if (type === 'gain') sounds.playGo()
+        if (type === 'loss') sounds.playRent()
+        if (type === 'move') sounds.playMove()
+        if (type === 'jail') sounds.playJail()
+      }
 
       prevActiveEventRef.current = gameState.activeEvent
     } else if (!gameState.activeEvent) {
       prevActiveEventRef.current = null
     }
-  }, [gameState.activeEvent, sounds])
+  }, [gameState.activeEvent, gameState.lastLoadedAt, sounds])
 
   useEffect(() => {
+    const isLoadedThisRender = gameState.lastLoadedAt !== prevLoadedAtLogsRef.current
+    if (isLoadedThisRender) {
+      prevLoadedAtLogsRef.current = gameState.lastLoadedAt
+    }
+
     // Phase change sounds
     if (prevPhaseRef.current !== gameState.turnPhase) {
-      if (gameState.turnPhase === 'ROLLING') {
-        sounds.playRoll()
-      } else if (gameState.turnPhase === 'MOVING') {
-        // play Move sounds progressively in the setTimeout logic below instead
+      if (!isLoadedThisRender) {
+        if (gameState.turnPhase === 'ROLLING') {
+          sounds.playRoll()
+        } else if (gameState.turnPhase === 'MOVING') {
+          // play Move sounds progressively in the setTimeout logic below instead
+        }
       }
       prevPhaseRef.current = gameState.turnPhase
     }
 
+    // Fix prevLogsLengthRef shrinking (e.g. rematch or loading)
+    if (gameState.logs.length < prevLogsLengthRef.current || isLoadedThisRender) {
+      prevLogsLengthRef.current = gameState.logs.length
+    }
+
     // Log-based sounds
     if (gameState.logs.length > prevLogsLengthRef.current) {
-      const newLogs = gameState.logs.slice(0, gameState.logs.length - prevLogsLengthRef.current)
+      if (!isLoadedThisRender) {
+        const newLogs = gameState.logs.slice(0, gameState.logs.length - prevLogsLengthRef.current)
 
-      newLogs.forEach((log) => {
-        if (typeof log === 'string') {
-          if (log.includes('paid') && log.includes('tax')) sounds.playRent()
-          if (log.includes('was sent to Prison')) sounds.playJail()
-          if (log.includes('bankrupt')) sounds.playBankrupt()
-          if (log.includes('won')) sounds.playWin()
-        } else if (log.key) {
-          if (log.key === 'passedStart') sounds.playGo()
-          if (log.key === 'paidRent') sounds.playRent()
-          if (log.key === 'bought') sounds.playBuy()
-        }
-      })
+        newLogs.forEach((log) => {
+          if (typeof log === 'string') {
+            if (log.includes('paid') && log.includes('tax')) sounds.playRent()
+            if (log.includes('was sent to Prison')) sounds.playJail()
+            if (log.includes('bankrupt')) sounds.playBankrupt()
+            if (log.includes('won')) sounds.playWin()
+          } else if (log.key) {
+            if (log.key === 'passedStart') sounds.playGo()
+            if (log.key === 'paidRent') sounds.playRent()
+            if (log.key === 'bought') sounds.playBuy()
+          }
+        })
+      }
 
       prevLogsLengthRef.current = gameState.logs.length
     }
-  }, [gameState.turnPhase, gameState.logs, sounds])
+  }, [gameState.turnPhase, gameState.logs, gameState.lastLoadedAt, sounds])
 
   // Handle new trade notifications
   useEffect(() => {
+    const isLoadedThisRender = gameState.lastLoadedAt !== prevLoadedAtTradesRef.current
+    if (isLoadedThisRender) {
+      prevLoadedAtTradesRef.current = gameState.lastLoadedAt
+    }
+
     const prevTrades = prevTradesRef.current
     const currentTrades = gameState.trades
 
-    if (currentTrades.length > 0 && currentTrades !== prevTrades) {
+    if (!isLoadedThisRender && currentTrades.length > 0 && currentTrades !== prevTrades) {
       const newNotifications: TradeNotificationData[] = []
 
       // Check for new trades or status changes
@@ -191,7 +223,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
     }
 
     prevTradesRef.current = currentTrades
-  }, [gameState.trades, gameState.players, myId, sounds])
+  }, [gameState.trades, gameState.players, myId, sounds, gameState.lastLoadedAt])
 
   // DEBUG HOOK FOR PLAYWRIGHT
   useEffect(() => {

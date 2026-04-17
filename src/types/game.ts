@@ -119,4 +119,5 @@ export interface GameState {
   prison: Prison
   activeEvent: ActiveEvent | null
   trades: TradeOffer[]
+  lastLoadedAt?: number
 }
