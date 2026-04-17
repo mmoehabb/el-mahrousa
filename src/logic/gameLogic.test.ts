@@ -722,11 +722,11 @@ describe('proposeAndAcceptTrade', () => {
       partnerProperties: [],
     }
 
-    const newState = proposeAndAcceptTrade(state, 'p1', 'p2', offer)
+    const newState = proposeTrade(state, 'p1', 'p2', offer)
 
     const newP1 = newState.players.find((p) => p.id === 'p1')!
     assert.strictEqual(newP1.balance, 1000) // unchanged
-    assert.strictEqual(newState.logs[0], 'Trade failed: Insufficient funds.')
+    assert.strictEqual(newState.logs[0], 'Trade failed: Insufficient funds to propose trade.')
   })
 
   test('should fail if p2 has insufficient funds', () => {

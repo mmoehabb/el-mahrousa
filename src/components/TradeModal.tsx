@@ -403,7 +403,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 </button>
                 <button
                   onClick={handlePropose}
-                  disabled={others.length === 0}
+                  disabled={others.length === 0 || offer.myCash > me.balance}
                   className="px-4 py-2 fs-sm font-bold bg-egyptian-gold text-white rounded shadow hover:bg-yellow-600 border-none disabled:opacity-50"
                 >
                   {t('trade.proposeBtn')}

@@ -463,6 +463,22 @@ export const proposeTrade = (
   toId: string,
   offer: TradeOffer,
 ): GameState => {
+  const p1 = state.players.find((p) => p.id === fromId)
+
+  if (!p1) {
+    return {
+      ...state,
+      logs: [`Trade failed: Proposing player not found.`, ...state.logs],
+    }
+  }
+
+  if (offer.myCash > 0 && p1.balance < offer.myCash) {
+    return {
+      ...state,
+      logs: [`Trade failed: Insufficient funds to propose trade.`, ...state.logs],
+    }
+  }
+
   const newTrade: TradeOffer = {
     ...offer,
     id: crypto.randomUUID(),
