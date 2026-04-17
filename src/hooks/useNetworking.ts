@@ -195,6 +195,7 @@ export const useNetworking = () => {
           case 'LOAD_GAME':
             if (from !== lobbyId) return prev
             nextState = action.state
+            nextState.lastLoadedAt = Date.now()
             nextState.logs = ['Game loaded successfully by the host.', ...nextState.logs]
             break
           case 'RESET_TURN_TIMER':
