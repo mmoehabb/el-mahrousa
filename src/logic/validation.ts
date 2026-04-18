@@ -83,6 +83,13 @@ export const isValidGameAction = (action: unknown): action is GameAction => {
     case 'TICK_TURN_TIMER':
     case 'RESET_TURN_TIMER':
       return true
+    case 'PING':
+      return (
+        typeof a.timestamp === 'number' &&
+        (a.targetId === undefined || typeof a.targetId === 'string')
+      )
+    case 'PONG':
+      return typeof a.timestamp === 'number'
     case 'BUY_HOUSE':
     case 'SELL_HOUSE':
     case 'SELL_PROPERTY':
