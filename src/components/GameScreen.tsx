@@ -65,8 +65,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
   const [tradeNotifications, setTradeNotifications] = useState<TradeNotificationData[]>([])
 
-  const renderPingIndicator = (mobile: boolean) => {
+  const renderPingIndicator = () => {
     if (latency === null) return null
+    if (latency < 100) return null
+
     let Icon = Wifi
     let colorClass = 'text-green-500'
     if (latency > 250) {
@@ -79,14 +81,11 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
     return (
       <div
-        className={`flex items-center gap-1 ${
-          mobile
-            ? ''
-            : 'bg-white/90 dark:bg-slate-900/90 p-2 rounded-full shadow-lg border-2 border-slate-300 dark:border-slate-600'
-        } ${colorClass}`}
+        className={`flex items-center gap-1 bg-white/90 dark:bg-slate-900/90 p-2 rounded-full
+        shadow-lg border-2 border-slate-300 dark:border-slate-600 ${colorClass}`}
         title={`Ping: ${latency}ms`}
       >
-        <Icon size={mobile ? 20 : 20} />
+        <Icon size={20} />
         <span className="text-white font-mono fs-xs">{latency}ms</span>
       </div>
     )
@@ -681,7 +680,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* Desktop Right Panel Toggle Button */}
         <div className="hidden lg:block fixed top-4 right-4 z-40 flex flex-col gap-2 items-end">
-          {renderPingIndicator(false)}
           <AnimatePresence>
             {!showDesktopRight && (
               <motion.button
@@ -737,7 +735,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
           className="w-full h-full flex-1 max-w-full overflow-hidden flex justify-center relative z-10 sm:scale-100 origin-top"
         >
           {/* Top-Middle Floating Button for Camera Follow */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
+          <div className="absolute flex gap-2 top-4 left-1/2 -translate-x-1/2 z-50">
             <button
               onClick={() => setIsFollowCameraOn(!isFollowCameraOn)}
               className={`p-2 rounded-full shadow-lg border-2 transition-colors ${
@@ -749,6 +747,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
             >
               <Camera size={20} />
             </button>
+            {renderPingIndicator()}
           </div>
 
           <TransformWrapper

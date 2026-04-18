@@ -536,7 +536,7 @@ export const useNetworking = () => {
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [myId])
+  }, [myId, gameStateRef.current.status])
 
   // Bot logic integration
   useEffect(() => {
