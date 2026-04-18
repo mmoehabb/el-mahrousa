@@ -50,6 +50,7 @@ function App() {
     hasJoinedVoice,
     connectionError,
     setConnectionError,
+    latency,
   } = useNetworking()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [showCopied, setShowCopied] = useState(false)
@@ -230,6 +231,7 @@ function App() {
                 sendAction={sendAction}
                 showCopied={showCopied}
                 handleShareLink={handleShareLink}
+                latency={latency}
                 toggleVoiceChat={toggleVoiceChat}
                 isMuted={isMuted}
                 hasJoinedVoice={hasJoinedVoice}

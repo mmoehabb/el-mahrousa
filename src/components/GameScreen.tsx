@@ -25,7 +25,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
-import { Home } from 'lucide-react'
+import { Home, Wifi, WifiHigh, WifiLow } from 'lucide-react'
 import Toast from './Toast'
 import TradeNotification, {
   type TradeNotificationData,
@@ -43,6 +43,7 @@ interface GameScreenProps {
   voiceError?: string | null
   setVoiceError?: (err: string | null) => void
   hasJoinedVoice?: boolean
+  latency?: number | null
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({
@@ -53,6 +54,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   toggleVoiceChat,
   isMuted,
   hasJoinedVoice,
+  latency = null,
 }) => {
   const { t } = useTranslation()
   const { gameState, myId, isHost } = useGame()
@@ -62,6 +64,33 @@ const GameScreen: React.FC<GameScreenProps> = ({
   >('PROPOSE')
   const [selectedTile, setSelectedTile] = useState<Tile | null>(null)
   const [tradeNotifications, setTradeNotifications] = useState<TradeNotificationData[]>([])
+
+  const renderPingIndicator = (mobile: boolean) => {
+    if (latency === null) return null
+    let Icon = Wifi
+    let colorClass = 'text-green-500'
+    if (latency > 250) {
+      Icon = WifiLow
+      colorClass = 'text-red-500'
+    } else if (latency > 100) {
+      Icon = WifiHigh
+      colorClass = 'text-yellow-500'
+    }
+
+    return (
+      <div
+        className={`flex items-center gap-1 ${
+          mobile
+            ? ''
+            : 'bg-white/90 dark:bg-slate-900/90 p-2 rounded-full shadow-lg border-2 border-slate-300 dark:border-slate-600'
+        } ${colorClass}`}
+        title={`Ping: ${latency}ms`}
+      >
+        <Icon size={mobile ? 20 : 20} />
+        <span className="text-white font-mono fs-xs">{latency}ms</span>
+      </div>
+    )
+  }
   const [playerToKick, setPlayerToKick] = useState<string | null>(null)
   const prevTradesRef = useRef(gameState.trades)
   const isRollingRef = useRef(false)
@@ -619,7 +648,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
         </AnimatePresence>
 
         {/* Desktop Right Panel Toggle Button */}
-        <div className="hidden lg:block fixed top-4 right-4 z-40">
+        <div className="hidden lg:block fixed top-4 right-4 z-40 flex flex-col gap-2 items-end">
+          {renderPingIndicator(false)}
           <AnimatePresence>
             {!showDesktopRight && (
               <motion.button

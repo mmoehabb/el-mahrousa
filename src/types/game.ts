@@ -95,6 +95,8 @@ export type GameAction =
   | { type: 'LOAD_GAME'; state: GameState }
   | { type: 'TICK_TURN_TIMER' }
   | { type: 'RESET_TURN_TIMER' }
+  | { type: 'PING'; timestamp: number; targetId?: string }
+  | { type: 'PONG'; timestamp: number }
 
 export interface ActiveEvent {
   title: string

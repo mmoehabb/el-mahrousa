@@ -37,6 +37,8 @@ export const useNetworking = () => {
   const [peer, setPeer] = useState<Peer | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
+  const [latency, setLatency] = useState<number | null>(null)
+  const clientLatenciesRef = useRef<{ [id: string]: number }>({})
   const connections = useRef<{ [id: string]: DataConnection }>({})
   const [lobbyId, setLobbyId] = useState<string>('')
 
@@ -481,6 +483,60 @@ export const useNetworking = () => {
 
   const hasJoinedVoice = !!myStream
 
+  const gameStateRef = useRef(gameState)
+  const peerRef = useRef(peer)
+  const broadcastActionRef = useRef((action: GameAction) => {
+    Object.values(connections.current).forEach((conn) => {
+      if (conn.open) {
+        conn.send({ type: 'ACTION', action })
+      }
+    })
+  })
+
+  useEffect(() => {
+    gameStateRef.current = gameState
+    peerRef.current = peer
+  }, [gameState, peer])
+
+  // --- PING interval ---
+  useEffect(() => {
+    if (!peerRef.current || gameStateRef.current.status !== 'PLAYING') return
+
+    const interval = setInterval(() => {
+      if (isHostRef.current) {
+        // Host pings clients
+        const clients = gameStateRef.current.players.filter((p) => !p.isBot && p.id !== myId)
+        if (clients.length > 0) {
+          clients.forEach((client) => {
+            const action: GameAction = { type: 'PING', timestamp: Date.now(), targetId: client.id }
+            broadcastActionRef.current(action)
+          })
+
+          // Calculate average latency for host based on client PONGs
+          const latencies = Object.values(clientLatenciesRef.current)
+          if (latencies.length > 0) {
+            const avg = latencies.reduce((a, b) => a + b, 0) / latencies.length
+            setLatency(Math.round(avg))
+          } else {
+            setLatency(0) // 0 for host if no clients yet
+          }
+        } else {
+          setLatency(0)
+        }
+      } else {
+        const hostId = gameStateRef.current.players[0]?.id
+        if (hostId && connections.current[hostId]) {
+          connections.current[hostId].send({
+            type: 'ACTION',
+            action: { type: 'PING', timestamp: Date.now(), targetId: hostId },
+          })
+        }
+      }
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [myId])
+
   // Bot logic integration
   useEffect(() => {
     if (!isHostRef.current || gameState.status !== 'PLAYING') return
@@ -795,5 +851,6 @@ export const useNetworking = () => {
     voiceError,
     setVoiceError,
     hasJoinedVoice,
+    latency,
   }
 }
