@@ -15,6 +15,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^8.0.0",
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.36.0",
     "i18next": "^25.8.18",
@@ -28,6 +31,7 @@
     "use-sound": "^5.0.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.3.1",
     "@eslint/js": "^9.39.4",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "^24.12.0",
