@@ -10,8 +10,9 @@ let isAdMobInitialized = false
 
 const initializeAdMob = async () => {
   if (isAdMobInitialized) return
+  const isTesting = import.meta.env.VITE_ADMOB_IS_TESTING === 'true'
   const options: AdMobInitializationOptions = {
-    initializeForTesting: true,
+    initializeForTesting: isTesting,
   }
   await AdMob.initialize(options)
   isAdMobInitialized = true
@@ -27,11 +28,13 @@ export function useAdBreak() {
         try {
           await initializeAdMob()
 
-          // TODO: Replace test Ad IDs with production IDs before release
+          const isTesting = import.meta.env.VITE_ADMOB_IS_TESTING === 'true'
           const adId =
             Capacitor.getPlatform() === 'android'
-              ? 'ca-app-pub-3940256099942544/1033173712' // Test Ad Unit ID for Interstitial
-              : 'ca-app-pub-3940256099942544/4411468910' // Test Ad Unit ID for iOS (if needed)
+              ? import.meta.env.VITE_ANDROID_INTERSTITIAL_AD_ID ||
+                'ca-app-pub-3940256099942544/1033173712'
+              : import.meta.env.VITE_IOS_INTERSTITIAL_AD_ID ||
+                'ca-app-pub-3940256099942544/4411468910'
 
           let hasCompleted = false
           const listeners: PluginListenerHandle[] = []
@@ -64,7 +67,7 @@ export function useAdBreak() {
             }),
           )
 
-          await AdMob.prepareInterstitial({ adId, isTesting: true })
+          await AdMob.prepareInterstitial({ adId, isTesting })
           await AdMob.showInterstitial()
           return
         } catch (error) {

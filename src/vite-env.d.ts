@@ -18,6 +18,9 @@ interface Window {
 interface ImportMetaEnv {
   readonly VITE_ADSENSE_PUB_ID: string
   readonly VITE_IS_PROD: string
+  readonly VITE_ANDROID_INTERSTITIAL_AD_ID?: string
+  readonly VITE_IOS_INTERSTITIAL_AD_ID?: string
+  readonly VITE_ADMOB_IS_TESTING?: string
 }
 
 interface ImportMeta {
