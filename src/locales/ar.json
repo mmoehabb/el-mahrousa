@@ -1,5 +1,6 @@
 {
   "common": {
+    "downloadApk": "قم بالتحميل على الهاتف",
     "languageToggle": {
       "en": "English",
       "ar": "عربي"

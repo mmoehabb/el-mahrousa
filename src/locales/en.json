@@ -1,5 +1,6 @@
 {
   "common": {
+    "downloadApk": "Download APK",
     "languageToggle": {
       "en": "English",
       "ar": "عربي"
