@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Download } from 'lucide-react'
 import { useAdBreak } from '../hooks/useAdBreak'
+import { isAndroidWeb } from '../utils/device'
 
 interface LobbyScreenProps {
   createLobby: () => void
@@ -82,6 +83,19 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
             {t('lobby.joinBtn')}
           </button>
         </div>
+
+        {isAndroidWeb() && (
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+            <a
+              href={`/elmahrousa-v${__APP_VERSION__}.apk`}
+              download
+              className="flex items-center justify-center gap-2 w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-egyptian-blue dark:text-egyptian-gold py-3 rounded-lg font-bold transition-colors border border-slate-200 dark:border-slate-700"
+            >
+              <Download size={20} />
+              {t('common.downloadApk')}
+            </a>
+          </div>
+        )}
       </div>
     </div>
   )
