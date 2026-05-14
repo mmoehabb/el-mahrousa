@@ -12,8 +12,8 @@ const config: CapacitorConfig = {
       keystoreAlias: 'elmahrousa',
       keystoreAliasPassword: process.env.KEYSTORE_ALIAS_PASSWORD ?? '',
       releaseType: 'APK',
-    }
-  }
+    },
+  },
 }
 
 export default config
