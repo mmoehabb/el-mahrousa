@@ -206,21 +206,21 @@ export default function GameControls({
             </button>
           )}
 
-          {isHost && (
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={handleSaveGame}
-                className="flex-1 fs-lg border-2 border-slate-600 text-slate-600 dark:border-slate-400 dark:text-slate-400 py-2 rounded-lg font-bold hover:bg-slate-600 hover:text-white dark:hover:bg-slate-400 dark:hover:text-slate-900 transition-all flex items-center justify-center gap-1 fs-2xs"
-                title="Save Game"
-              >
-                <Save size={14} /> Save
-              </button>
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={handleSaveGame}
+              className="flex-1 fs-lg border-2 border-slate-600 text-slate-600 dark:border-slate-400 dark:text-slate-400 py-2 rounded-lg font-bold hover:bg-slate-600 hover:text-white dark:hover:bg-slate-400 dark:hover:text-slate-900 transition-all flex items-center justify-center gap-1 fs-2xs"
+              title="Save Game"
+            >
+              <Save size={14} /> Save
+            </button>
+            {isHost && (
               <label className="flex-1 fs-lg border-2 border-slate-600 text-slate-600 dark:border-slate-400 dark:text-slate-400 py-2 rounded-lg font-bold hover:bg-slate-600 hover:text-white dark:hover:bg-slate-400 dark:hover:text-slate-900 transition-all flex items-center justify-center gap-1 fs-2xs cursor-pointer">
                 <Upload size={14} /> Load
                 <input type="file" accept=".json" onChange={handleLoadGame} className="hidden" />
               </label>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
