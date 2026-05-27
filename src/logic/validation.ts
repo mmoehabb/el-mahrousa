@@ -68,7 +68,6 @@ export const isValidGameAction = (action: unknown): action is GameAction => {
   switch (a.type) {
     case 'ROLL':
     case 'FINISH_ROLL':
-    case 'MOVE_STEP':
     case 'BUY':
     case 'END_TURN':
     case 'START_COUNTDOWN':

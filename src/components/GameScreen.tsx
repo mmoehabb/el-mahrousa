@@ -21,6 +21,7 @@ import WinnerModal from './WinnerModal'
 import InformationDialog from './InformationDialog'
 import type { GameAction, Tile } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
+import { moveOneStep, applyLandingLogic } from '../logic/gameLogic'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
@@ -57,7 +58,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   latency = null,
 }) => {
   const { t } = useTranslation()
-  const { gameState, myId, isHost } = useGame()
+  const { gameState, setGameState, myId, isHost } = useGame()
   const [isTradeOpen, setIsTradeOpen] = useState(false)
   const [tradeModalTab, setTradeModalTab] = useState<
     'PROPOSE' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
@@ -337,9 +338,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
   // Handle auto-advance for dice roll and movement animations
   useEffect(() => {
-    if (!isMyTurn || gameState.status !== 'PLAYING') return
+    if (gameState.status !== 'PLAYING') return
 
-    if (gameState.turnPhase === 'ROLLING') {
+    if (isMyTurn && gameState.turnPhase === 'ROLLING') {
       const timer = setTimeout(() => {
         sendAction({ type: 'FINISH_ROLL' })
       }, 1500) // Wait 1.5s for dice animation
@@ -349,11 +350,31 @@ const GameScreen: React.FC<GameScreenProps> = ({
     if (gameState.turnPhase === 'MOVING') {
       const timer = setTimeout(() => {
         sounds.playMove()
-        sendAction({ type: 'MOVE_STEP' })
+
+        setGameState((prev) => {
+          let nextState = moveOneStep(prev)
+          nextState.stepsLeft = (nextState.stepsLeft || 1) - 1
+          if (nextState.stepsLeft === 0) {
+            nextState.turnPhase = 'ACTION'
+            if (isHost) {
+              nextState = applyLandingLogic(nextState)
+            }
+          }
+          return nextState
+        })
       }, 300) // 300ms per step hop
       return () => clearTimeout(timer)
     }
-  }, [gameState.turnPhase, gameState.stepsLeft, isMyTurn, sendAction, gameState.status, sounds])
+  }, [
+    gameState.turnPhase,
+    gameState.stepsLeft,
+    isMyTurn,
+    sendAction,
+    gameState.status,
+    sounds,
+    setGameState,
+    isHost,
+  ])
 
   const handleRoll = () => {
     sounds.playClick()
