@@ -510,9 +510,6 @@ body.font-arabic-pixel {
 }
 
 @media (max-width: 1023px) {
-  .mobile-board-scale {
-    transform: scale(calc(min(100vw, 100dvh) / 1280));
-  }
 }
 
 @media (max-width: 1023px) {
