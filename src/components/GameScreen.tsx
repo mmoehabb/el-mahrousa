@@ -676,7 +676,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {/* Center: Board */}
         <div
           dir="ltr"
-          className="w-full h-full flex-1 max-w-full relative z-10 lg:origin-top lg:flex lg:justify-center lg:items-center mobile-board-wrapper"
+          className="w-full h-full flex-1 max-w-full relative z-10 lg:flex lg:justify-center lg:items-center mobile-board-wrapper"
         >
           <div className="absolute flex gap-2 top-4 left-1/2 -translate-x-1/2 z-50">
             {renderPingIndicator()}
@@ -684,7 +684,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
           <div className="w-full h-full flex items-center justify-center overflow-hidden">
             <div
-              className="origin-center lg:scale-100 lg:origin-top flex justify-center items-center"
+              className="origin-center lg:scale-100 flex justify-center items-center"
               style={{
                 transform: scale !== 1 ? `scale(${scale})` : undefined,
               }}
