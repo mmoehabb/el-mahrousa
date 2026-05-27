@@ -69,7 +69,6 @@ export interface TradeOffer {
 export type GameAction =
   | { type: 'ROLL' }
   | { type: 'FINISH_ROLL' }
-  | { type: 'MOVE_STEP' }
   | { type: 'BUY' }
   | { type: 'BUY_HOUSE'; tileId: number }
   | { type: 'SELL_HOUSE'; tileId: number }

@@ -84,16 +84,6 @@ export const useNetworking = () => {
               stepsLeft: nextState.lastDice[0] + nextState.lastDice[1],
             }
             break
-          case 'MOVE_STEP':
-            if (!currentPlayer || currentPlayer.id !== from) return prev
-            if (nextState.turnPhase !== 'MOVING' || (nextState.stepsLeft || 0) <= 0) return prev
-            nextState = moveOneStep(nextState)
-            nextState.stepsLeft = (nextState.stepsLeft || 1) - 1
-            if (nextState.stepsLeft === 0) {
-              nextState.turnPhase = 'ACTION'
-              nextState = applyLandingLogic(nextState)
-            }
-            break
           case 'BUY':
             if (!currentPlayer || currentPlayer.id !== from) return prev
             nextState = buyProperty(nextState, currentPlayer.position)
@@ -689,9 +679,16 @@ export const useNetworking = () => {
     }
   }, [myId, setGameState, iceServers])
 
+  const prevPhaseBroadcastRef = useRef(gameState.turnPhase)
   useEffect(() => {
     if (isHost) {
-      broadcastState(gameState)
+      // Don't broadcast every step during MOVING phase unless phase just changed
+      const phaseChanged = prevPhaseBroadcastRef.current !== gameState.turnPhase
+      prevPhaseBroadcastRef.current = gameState.turnPhase
+
+      if (gameState.turnPhase !== 'MOVING' || phaseChanged) {
+        broadcastState(gameState)
+      }
     }
   }, [gameState, isHost, broadcastState])
 
