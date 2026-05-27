@@ -155,7 +155,7 @@ export const getBotAction = (gameState: GameState): GameAction | null => {
       return { type: 'FINISH_ROLL' }
 
     case 'MOVING':
-      return { type: 'MOVE_STEP' }
+      return null // Movement is handled locally by clients simulating steps
 
     case 'ACTION': {
       // If balance is negative, we MUST sell, trade, or bankrupt
