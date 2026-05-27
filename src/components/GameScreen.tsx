@@ -1,17 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Users,
-  Info,
-  Settings2,
-  X,
-  UserMinus,
-  Mic,
-  MicOff,
-  Menu,
-  Gamepad2,
-  Camera,
-} from 'lucide-react'
+import { Users, Info, Settings2, X, UserMinus, Mic, MicOff, Menu, Gamepad2 } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import Board from './Board'
 import PropertyModal from './PropertyModal'
@@ -23,8 +12,6 @@ import type { GameAction, Tile } from '../types/game'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameSounds } from '../hooks/useGameSounds'
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
-import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import { Home, Wifi, WifiHigh, WifiLow } from 'lucide-react'
 import Toast from './Toast'
 import TradeNotification, {
@@ -103,9 +90,26 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const prevLoadedAtLogsRef = useRef(gameState.lastLoadedAt)
   const prevLoadedAtTradesRef = useRef(gameState.lastLoadedAt)
 
-  const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null)
+  const [scale, setScale] = useState(1)
+  useEffect(() => {
+    const handleResize = () => {
+      // Always adapt to screen size if the window is too small, regardless of mobile/desktop
+      const availableHeight = window.innerHeight - (window.innerWidth < 1024 ? 130 : 50) // Less UI overhead on desktop
+      const minDimension = Math.min(window.innerWidth, availableHeight)
 
-  const [isFollowCameraOn, setIsFollowCameraOn] = useState(true)
+      // We want some padding so it doesn't touch the exact edges
+      const targetSize = minDimension * 0.95
+
+      if (targetSize < 1280) {
+        setScale(targetSize / 1280)
+      } else {
+        setScale(1)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const isMyTurn = currentPlayer?.id === myId
@@ -274,66 +278,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
     window.addEventListener('action', handleDebug as EventListener)
     return () => window.removeEventListener('action', handleDebug as EventListener)
   }, [sounds])
-
-  // Handle camera follow logic
-  useEffect(() => {
-    if (isFollowCameraOn && currentPlayer) {
-      const tileId = `tile-${currentPlayer.position}`
-      const el = document.getElementById(tileId)
-      if (transformComponentRef.current && el) {
-        const { instance, setTransform } = transformComponentRef.current
-        const scale = instance.transformState.scale
-
-        const wrapper = instance.wrapperComponent
-        if (wrapper) {
-          const wrapperRect = wrapper.getBoundingClientRect()
-          const elRect = el.getBoundingClientRect()
-          const contentRect = instance.contentComponent?.getBoundingClientRect()
-
-          if (contentRect) {
-            // Calculate the element's center relative to the unscaled content
-            const relativeLeft = (elRect.left - contentRect.left) / scale
-            const relativeTop = (elRect.top - contentRect.top) / scale
-            const elCenterX = relativeLeft + elRect.width / scale / 2
-            const elCenterY = relativeTop + elRect.height / scale / 2
-
-            // Calculate desired X and Y to center the element
-            let targetX = wrapperRect.width / 2 - elCenterX * scale
-            let targetY = wrapperRect.height / 2 - elCenterY * scale
-
-            // Clamp to boundaries. Since we added a 20px padding wrapper to Board.tsx,
-            // the content size is actually 1240x1240.
-            // limitToBounds natively handles panning limits.
-            // We just need to compute the max and min bounds for our setTransform here.
-
-            const contentWidth = 1240 * scale
-            const contentHeight = 1240 * scale
-
-            const minX = wrapperRect.width - contentWidth
-            const minY = wrapperRect.height - contentHeight
-            const maxX = 0
-            const maxY = 0
-
-            // If the content is smaller than the wrapper, limitToBounds natively centers it,
-            // or we center it here.
-            if (contentWidth < wrapperRect.width) {
-              targetX = (wrapperRect.width - contentWidth) / 2
-            } else {
-              targetX = Math.max(minX, Math.min(targetX, maxX))
-            }
-
-            if (contentHeight < wrapperRect.height) {
-              targetY = (wrapperRect.height - contentHeight) / 2
-            } else {
-              targetY = Math.max(minY, Math.min(targetY, maxY))
-            }
-
-            setTransform(targetX, targetY, scale, 500, 'easeInOutQuad')
-          }
-        }
-      }
-    }
-  }, [currentPlayer, isFollowCameraOn])
 
   // Handle auto-advance for dice roll and movement animations
   useEffect(() => {
@@ -732,38 +676,19 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {/* Center: Board */}
         <div
           dir="ltr"
-          className="w-full h-full flex-1 max-w-full overflow-hidden flex justify-center relative z-10 sm:scale-100 origin-top"
+          className="w-full h-full flex-1 max-w-full relative z-10 lg:flex lg:justify-center lg:items-center mobile-board-wrapper"
         >
-          {/* Top-Middle Floating Button for Camera Follow */}
           <div className="absolute flex gap-2 top-4 left-1/2 -translate-x-1/2 z-50">
-            <button
-              onClick={() => setIsFollowCameraOn(!isFollowCameraOn)}
-              className={`p-2 rounded-full shadow-lg border-2 transition-colors ${
-                isFollowCameraOn
-                  ? 'bg-egyptian-blue text-white border-egyptian-blue'
-                  : 'bg-white/90 text-slate-500 border-slate-300 dark:bg-slate-800/90 dark:text-slate-400 dark:border-slate-600'
-              }`}
-              title={isFollowCameraOn ? 'Follow Camera: ON' : 'Follow Camera: OFF'}
-            >
-              <Camera size={20} />
-            </button>
             {renderPingIndicator()}
           </div>
 
-          <TransformWrapper
-            ref={transformComponentRef}
-            initialScale={0.7}
-            minScale={0.2}
-            maxScale={3}
-            pinch={{ step: 5 }}
-            doubleClick={{ disabled: true }}
-            panning={{ disabled: false }}
-            limitToBounds={true}
-            centerOnInit={true}
-            onPanning={() => setIsFollowCameraOn(false)}
-            onWheel={() => setIsFollowCameraOn(false)}
-          >
-            <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
+          <div className="w-full h-full flex items-center justify-center overflow-hidden">
+            <div
+              className="origin-center lg:scale-100 flex justify-center items-center"
+              style={{
+                transform: scale !== 1 ? `scale(${scale})` : undefined,
+              }}
+            >
               <Board
                 handleRoll={handleRoll}
                 isMyTurn={isMyTurn}
@@ -771,8 +696,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 onTileClick={setSelectedTile}
                 setToastMessage={setToastMessage}
               />
-            </TransformComponent>
-          </TransformWrapper>
+            </div>
+          </div>
         </div>
 
         <WinnerModal

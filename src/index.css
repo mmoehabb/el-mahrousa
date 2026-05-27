@@ -508,3 +508,18 @@ body.font-arabic-pixel {
     linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 255, 255, 0.03) 50%),
     linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
 }
+
+@media (max-width: 1023px) {
+  .crt::before,
+  .dark .crt::before {
+    display: none !important;
+  }
+
+  .retro-clouds {
+    display: none !important;
+  }
+
+  .dark .retro-stars {
+    display: none !important;
+  }
+}
