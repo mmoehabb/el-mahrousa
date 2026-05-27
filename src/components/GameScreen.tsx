@@ -93,8 +93,15 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const [scale, setScale] = useState(1)
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setScale(Math.min(window.innerWidth, window.innerHeight) / 1280)
+      // Always adapt to screen size if the window is too small, regardless of mobile/desktop
+      const availableHeight = window.innerHeight - (window.innerWidth < 1024 ? 130 : 50) // Less UI overhead on desktop
+      const minDimension = Math.min(window.innerWidth, availableHeight)
+
+      // We want some padding so it doesn't touch the exact edges
+      const targetSize = minDimension * 0.95
+
+      if (targetSize < 1280) {
+        setScale(targetSize / 1280)
       } else {
         setScale(1)
       }

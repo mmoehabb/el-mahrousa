@@ -509,8 +509,6 @@ body.font-arabic-pixel {
     linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
 }
 
-@media (max-width: 1023px) {
-}
 
 @media (max-width: 1023px) {
   .crt::before,
