@@ -119,6 +119,24 @@ function App() {
     }
   }, [isHost, gameState.status, sendAction])
 
+  const gameStateRef = useRef(gameState)
+  useEffect(() => {
+    gameStateRef.current = gameState
+  }, [gameState])
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>
+    if (isHost && gameState.status === 'PLAYING') {
+      interval = setInterval(() => {
+        const stateToSave = gameStateRef.current
+        localStorage.setItem('monopoly_save_auto', JSON.stringify(stateToSave))
+      }, 60000)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [isHost, gameState.status])
+
   const handleShareLink = () => {
     const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`
     navigator.clipboard.writeText(shareUrl).then(() => {

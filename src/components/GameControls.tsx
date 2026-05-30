@@ -6,6 +6,7 @@ import { useGameSounds } from '../hooks/useGameSounds'
 import { useGame } from '../context/GameContext'
 import ConfirmDialog from './ConfirmDialog'
 import Toast from './Toast'
+import LoadGameModal from './LoadGameModal'
 
 const MAX_CHAT_LENGTH = 200
 
@@ -47,6 +48,7 @@ export default function GameControls({
   const [isBankruptDialogOpen, setIsBankruptDialogOpen] = useState(false)
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [isLoadModalOpen, setIsLoadModalOpen] = useState(false)
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex]
   const me = gameState.players.find((p) => p.id === myId)
@@ -81,48 +83,37 @@ export default function GameControls({
   }
 
   const handleSaveGame = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(gameState))
-    const downloadAnchorNode = document.createElement('a')
-    downloadAnchorNode.setAttribute('href', dataStr)
-    downloadAnchorNode.setAttribute('download', 'monopoly_save.json')
-    document.body.appendChild(downloadAnchorNode)
-    downloadAnchorNode.click()
-    downloadAnchorNode.remove()
+    const timestamp = Date.now()
+    const key = `monopoly_save_${timestamp}`
+    try {
+      localStorage.setItem(key, JSON.stringify(gameState))
+      setToastMessage(t('game.gameSaved', 'Game saved successfully!'))
+    } catch (e) {
+      console.error('Failed to save game', e)
+      setToastMessage(t('game.saveError', 'Failed to save game.'))
+    }
   }
 
-  const handleLoadGame = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      try {
-        const loadedState = JSON.parse(e.target?.result as string)
-        if (
-          loadedState &&
-          loadedState.players &&
-          loadedState.players.length === gameState.players.length
-        ) {
-          // Mapping existing IDs, names, avatars to the loaded state
-          loadedState.players = loadedState.players.map((p: Player, index: number) => ({
-            ...p,
-            id: gameState.players[index].id,
-            name: gameState.players[index].name,
-            avatar: gameState.players[index].avatar,
-            isDisconnected: gameState.players[index].isDisconnected,
-          }))
-          sendAction({ type: 'LOAD_GAME', state: loadedState })
-          setToastMessage('Game loaded successfully!')
-        } else {
-          setToastMessage('Cannot load game: Number of players does not match.')
-        }
-      } catch {
-        setToastMessage('Error parsing save file.')
-      }
+  const handleLoadGameState = (loadedState: GameState) => {
+    if (
+      loadedState &&
+      loadedState.players &&
+      loadedState.players.length === gameState.players.length
+    ) {
+      // Mapping existing IDs, names, avatars to the loaded state
+      loadedState.players = loadedState.players.map((p: Player, index: number) => ({
+        ...p,
+        id: gameState.players[index].id,
+        name: gameState.players[index].name,
+        avatar: gameState.players[index].avatar,
+        isDisconnected: gameState.players[index].isDisconnected,
+      }))
+      sendAction({ type: 'LOAD_GAME', state: loadedState })
+      setToastMessage('Game loaded successfully!')
+      setIsLoadModalOpen(false)
+    } else {
+      setToastMessage('Cannot load game: Number of players does not match.')
     }
-    reader.readAsText(file)
-    // clear input
-    event.target.value = ''
   }
 
   const myPendingTrades = (gameState.trades || []).filter(
@@ -215,10 +206,12 @@ export default function GameControls({
               <Save size={14} /> Save
             </button>
             {isHost && (
-              <label className="flex-1 fs-lg border-2 border-slate-600 text-slate-600 dark:border-slate-400 dark:text-slate-400 py-2 rounded-lg font-bold hover:bg-slate-600 hover:text-white dark:hover:bg-slate-400 dark:hover:text-slate-900 transition-all flex items-center justify-center gap-1 fs-2xs cursor-pointer">
+              <button
+                onClick={() => setIsLoadModalOpen(true)}
+                className="flex-1 fs-lg border-2 border-slate-600 text-slate-600 dark:border-slate-400 dark:text-slate-400 py-2 rounded-lg font-bold hover:bg-slate-600 hover:text-white dark:hover:bg-slate-400 dark:hover:text-slate-900 transition-all flex items-center justify-center gap-1 fs-2xs"
+              >
                 <Upload size={14} /> Load
-                <input type="file" accept=".json" onChange={handleLoadGame} className="hidden" />
-              </label>
+              </button>
             )}
           </div>
         </div>
@@ -239,6 +232,14 @@ export default function GameControls({
       />
 
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+
+      {isHost && (
+        <LoadGameModal
+          isOpen={isLoadModalOpen}
+          onClose={() => setIsLoadModalOpen(false)}
+          onLoad={handleLoadGameState}
+        />
+      )}
 
       <div className="bg-white/90 dark:bg-slate-900/90 p-4 rounded-lg shadow-md border-r-4 border-egyptian-gold rtl:border-l-4 rtl:border-r-0">
         <h3 className="font-bold flex items-center gap-2 mb-2 uppercase fs-sm">
