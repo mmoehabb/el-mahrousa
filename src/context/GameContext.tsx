@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { GameState } from '../types/game'
 import { createInitialState } from '../logic/gameLogic'
 import { getStoredItem } from '../logic/utils/storageUtils'
+import { DEFAULT_ICE_SERVERS } from '../config/gameConfig'
 
 interface GameContextType {
   gameState: GameState
@@ -60,7 +61,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [iceServers, setIceServersState] = useState<string[]>(() =>
     getStoredItem(
       'iceServers',
-      [],
+      DEFAULT_ICE_SERVERS,
       (v): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string'),
     ),
   )

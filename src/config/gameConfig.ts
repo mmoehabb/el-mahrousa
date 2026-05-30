@@ -1,5 +1,15 @@
 import { TileType, type Tile } from '../types/game.ts'
 
+export const DEFAULT_ICE_SERVERS = [
+  'stun:stun.l.google.com:19302',
+  'stun:stun1.l.google.com:19302',
+  'stun:stun2.l.google.com:19302',
+  'stun:stun3.l.google.com:19302',
+  'stun:stun.services.mozilla.com:3478',
+  'stun:stun.nextcloud.com:3478',
+  'stun:stunserver.stunprotocol.org:3478',
+]
+
 export const GAME_CONFIG = {
   CURRENCY: 'EGP',
   STARTING_BALANCE: 1500,
