@@ -46,7 +46,7 @@ const LoadGameModal: React.FC<LoadGameModalProps> = ({ isOpen, onClose, onLoad }
               key,
               label: isAuto ? 'Auto-save' : `Save ${date.toLocaleString()}`,
               date,
-              state
+              state,
             })
           }
         } catch (e) {
