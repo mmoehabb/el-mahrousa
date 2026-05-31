@@ -63,6 +63,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     })
   }
 
+  const isRtl = i18n.language === 'ar'
+
   if (!isOpen) return null
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -197,8 +199,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       <span
                         className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
                           isDarkMode
-                            ? 'translate-x-9 rtl:-translate-x-9'
-                            : 'translate-x-1 rtl:-translate-x-1'
+                            ? isRtl
+                              ? '-translate-x-9'
+                              : 'translate-x-9'
+                            : isRtl
+                              ? '-translate-x-1'
+                              : 'translate-x-1'
                         }`}
                       />
                     </button>
@@ -226,8 +232,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       <span
                         className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
                           isFullscreen
-                            ? 'translate-x-9 rtl:-translate-x-9'
-                            : 'translate-x-1 rtl:-translate-x-1'
+                            ? isRtl
+                              ? '-translate-x-9'
+                              : 'translate-x-9'
+                            : isRtl
+                              ? '-translate-x-1'
+                              : 'translate-x-1'
                         }`}
                       />
                     </button>
@@ -257,8 +267,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           <span
                             className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
                               isSfxEnabled
-                                ? 'translate-x-9 rtl:-translate-x-9'
-                                : 'translate-x-1 rtl:-translate-x-1'
+                                ? isRtl
+                                  ? '-translate-x-9'
+                                  : 'translate-x-9'
+                                : isRtl
+                                  ? '-translate-x-1'
+                                  : 'translate-x-1'
                             }`}
                           />
                         </button>
@@ -299,8 +313,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           <span
                             className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
                               isBgmEnabled
-                                ? 'translate-x-9 rtl:-translate-x-9'
-                                : 'translate-x-1 rtl:-translate-x-1'
+                                ? isRtl
+                                  ? '-translate-x-9'
+                                  : 'translate-x-9'
+                                : isRtl
+                                  ? '-translate-x-1'
+                                  : 'translate-x-1'
                             }`}
                           />
                         </button>

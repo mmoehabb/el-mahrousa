@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next'
 import enTranslation from './locales/en.json'
 import arTranslation from './locales/ar.json'
 
-const savedLanguage = localStorage.getItem('appLanguage') || 'en'
+const savedLanguage = localStorage.getItem('appLanguage') || 'ar'
 document.documentElement.dir = savedLanguage === 'ar' ? 'rtl' : 'ltr'
 
 // Update font class based on language
@@ -16,7 +16,7 @@ i18n.use(initReactI18next).init({
     ar: { translation: arTranslation },
   },
   lng: savedLanguage,
-  fallbackLng: 'en',
+  fallbackLng: 'ar',
   interpolation: {
     escapeValue: false,
   },
