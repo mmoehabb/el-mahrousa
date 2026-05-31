@@ -35,7 +35,7 @@ export default function LobbyScreen({ createLobby, joinLobby }: LobbyScreenProps
     setIsJoining(true)
     showInterstitialAd(() => {
       setIsJoining(false)
-      joinLobby(sanitizedId)
+      joinLobby(sanitizedId.toUpperCase())
     })
   }
 
