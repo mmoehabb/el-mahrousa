@@ -21,6 +21,7 @@ import {
 import { isValidGameAction, isValidGameState } from '../logic/validation.ts'
 import { getBotAction } from '../logic/bots.ts'
 import { GAME_CONFIG } from '../config/gameConfig.ts'
+import { generateLobbyId } from '../utils/idGenerator.ts'
 
 const COLORS = ['#1034A6', '#E0115F', '#D4AF37', '#008080']
 
@@ -41,6 +42,13 @@ export const useNetworking = () => {
   const clientLatenciesRef = useRef<{ [id: string]: number }>({})
   const connections = useRef<{ [id: string]: DataConnection }>({})
   const [lobbyId, setLobbyId] = useState<string>('')
+  const [localPeerId, setLocalPeerId] = useState<string>(myId)
+
+  useEffect(() => {
+    if (gameState.status === 'LOBBY') {
+      setLocalPeerId(myId)
+    }
+  }, [gameState.status, myId])
 
   const [myStream, setMyStream] = useState<MediaStream | null>(null)
   const [remoteStreams, setRemoteStreams] = useState<{ [id: string]: MediaStream }>({})
@@ -166,14 +174,14 @@ export const useNetworking = () => {
             break
           }
           case 'START_COUNTDOWN':
-            if (from !== lobbyId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             if (nextState.status === 'WAITING' && nextState.countdown === null) {
               nextState.countdown = 5
               nextState.logs = ['Host started the game countdown.', ...nextState.logs]
             }
             break
           case 'TICK_COUNTDOWN':
-            if (from !== lobbyId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             if (nextState.status === 'WAITING' && typeof nextState.countdown === 'number') {
               nextState.countdown -= 1
               if (nextState.countdown <= 0) {
@@ -185,7 +193,7 @@ export const useNetworking = () => {
             }
             break
           case 'LOAD_GAME':
-            if (from !== lobbyId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             nextState = action.state
             nextState.lastLoadedAt = Date.now()
             nextState.logs = ['Game loaded successfully by the host.', ...nextState.logs]
@@ -194,7 +202,7 @@ export const useNetworking = () => {
             nextState.turnTimer = 60
             break
           case 'TICK_TURN_TIMER':
-            if (from !== lobbyId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
 
             if (nextState.status === 'PLAYING' && typeof nextState.turnTimer === 'number') {
               const cp = nextState.players[nextState.currentPlayerIndex]
@@ -254,7 +262,7 @@ export const useNetworking = () => {
             }
             break
           case 'CANCEL_COUNTDOWN':
-            if (from !== lobbyId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             if (nextState.status === 'WAITING' && nextState.countdown !== null) {
               nextState.countdown = null
               nextState.logs = ['Host cancelled the game start.', ...nextState.logs]
@@ -318,7 +326,7 @@ export const useNetworking = () => {
           }
           case 'REMATCH': {
             // Only accept REMATCH if it's from the lobby host (whose ID is the lobbyId)
-            if (from !== lobbyId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             nextState = {
               ...nextState,
               status: 'WAITING',
@@ -342,12 +350,17 @@ export const useNetworking = () => {
           }
           case 'CLEAR_EVENT': {
             // Only the current player or the host can clear the event
-            if (from !== lobbyId && (!currentPlayer || from !== currentPlayer.id)) return prev
+            if (
+              from !== lobbyId &&
+              from !== gameState.players[0]?.id &&
+              (!currentPlayer || from !== currentPlayer.id)
+            )
+              return prev
             nextState.activeEvent = null
             break
           }
           case 'ADD_BOT': {
-            if (from !== lobbyId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             const botCount = prev.players.filter((p) => p.isBot).length
             const newBot: Player = {
               id: crypto.randomUUID(), // Assign random ID
@@ -387,7 +400,7 @@ export const useNetworking = () => {
             break
           }
           case 'KICK_PLAYER': {
-            if (from !== lobbyId && from !== myId) return prev
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             const kickedPlayerIndex = nextState.players.findIndex((p) => p.id === action.playerId)
             if (kickedPlayerIndex !== -1) {
               const kickedPlayer = nextState.players[kickedPlayerIndex]
@@ -590,13 +603,19 @@ export const useNetworking = () => {
       call.answer(myStream || undefined)
 
       call.on('stream', (remoteStream) => {
-        setRemoteStreams((prev) => ({ ...prev, [call.peer]: remoteStream }))
+        setRemoteStreams((prev) => ({
+          ...prev,
+          [call.peer === lobbyIdRef.current ? gameStateRef.current.players[0]?.id : call.peer]:
+            remoteStream,
+        }))
       })
 
       call.on('close', () => {
         setRemoteStreams((prev) => {
           const newState = { ...prev }
-          delete newState[call.peer]
+          delete newState[
+            call.peer === lobbyIdRef.current ? gameStateRef.current.players[0]?.id : call.peer
+          ]
           return newState
         })
       })
@@ -619,7 +638,7 @@ export const useNetworking = () => {
       iceServers.length > 0
         ? { config: { iceServers: iceServers.map((url) => ({ urls: url })) } }
         : undefined
-    const newPeer = new Peer(myId, config)
+    const newPeer = new Peer(localPeerId, config)
     newPeer.on('open', () => {
       setPeer(newPeer)
       setConnectionError(null)
@@ -659,7 +678,12 @@ export const useNetworking = () => {
           }
         } else if (d.type === 'ACTION' && isHostRef.current) {
           if (isValidGameAction(d.action)) {
-            handleActionRef.current(d.action, conn.peer)
+            handleActionRef.current(
+              d.action,
+              conn.peer === lobbyIdRef.current
+                ? gameStateRef.current.players[0]?.id || conn.peer
+                : conn.peer,
+            )
           } else {
             setConnectionError('errors.invalidAction')
           }
@@ -669,7 +693,12 @@ export const useNetworking = () => {
       conn.on('close', () => {
         delete connections.current[conn.peer]
         if (isHostRef.current) {
-          handleActionRef.current({ type: 'PLAYER_DISCONNECT' }, conn.peer)
+          handleActionRef.current(
+            { type: 'PLAYER_DISCONNECT' },
+            conn.peer === lobbyIdRef.current
+              ? gameStateRef.current.players[0]?.id || conn.peer
+              : conn.peer,
+          )
         }
       })
     })
@@ -677,7 +706,7 @@ export const useNetworking = () => {
     return () => {
       newPeer.destroy()
     }
-  }, [myId, setGameState, iceServers])
+  }, [localPeerId, setGameState, iceServers])
 
   const prevPhaseBroadcastRef = useRef(gameState.turnPhase)
   useEffect(() => {
@@ -694,7 +723,9 @@ export const useNetworking = () => {
 
   const createLobby = useCallback(() => {
     setIsHost(true)
-    setLobbyId(myId)
+    const newLobbyId = generateLobbyId()
+    setLocalPeerId(newLobbyId)
+    setLobbyId(newLobbyId)
     setGameState((prev) => ({
       ...prev,
       status: 'WAITING',
@@ -779,7 +810,11 @@ export const useNetworking = () => {
     gameState.players.forEach((p) => {
       // Call them if they joined voice, and we haven't already connected, and they are not us
       if (p.id !== myId && p.hasJoinedVoice && !mediaConnections.current[p.id]) {
-        const call = peer.call(p.id, myStream)
+        const targetPeerId =
+          p.id === gameStateRef.current.players[0]?.id && !isHostRef.current
+            ? lobbyIdRef.current
+            : p.id
+        const call = peer.call(targetPeerId, myStream)
         if (call) {
           call.on('stream', (remoteStream) => {
             setRemoteStreams((prev) => ({ ...prev, [p.id]: remoteStream }))
@@ -807,7 +842,11 @@ export const useNetworking = () => {
         if (peer) {
           gameState.players.forEach((p) => {
             if (p.id !== myId && p.hasJoinedVoice) {
-              const call = peer.call(p.id, stream)
+              const targetPeerId =
+                p.id === gameStateRef.current.players[0]?.id && !isHostRef.current
+                  ? lobbyIdRef.current
+                  : p.id
+              const call = peer.call(targetPeerId, stream)
               if (call) {
                 call.on('stream', (remoteStream) => {
                   setRemoteStreams((prev) => ({ ...prev, [p.id]: remoteStream }))

@@ -87,7 +87,7 @@ function App() {
       const lobbyFromUrl = urlParams.get('lobby')
       if (lobbyFromUrl) {
         showInterstitialAd(() => {
-          joinLobby(lobbyFromUrl)
+          joinLobby(lobbyFromUrl.toUpperCase())
         })
         // Clean up the URL
         window.history.replaceState({}, '', window.location.pathname)
