@@ -1,6 +1,18 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dice5, Send, Handshake, Flag, Mic, MicOff, PhoneCall, Save, Upload } from 'lucide-react'
+import {
+  Dice5,
+  Send,
+  Handshake,
+  Flag,
+  Mic,
+  MicOff,
+  PhoneCall,
+  Save,
+  Upload,
+  Pause,
+  Play,
+} from 'lucide-react'
 import type { Player, GameState, GameAction } from '../types/game'
 import { useGameSounds } from '../hooks/useGameSounds'
 import { useGame } from '../context/GameContext'
@@ -214,6 +226,30 @@ export default function GameControls({
               </button>
             )}
           </div>
+
+          {isHost && (
+            <button
+              onClick={() => {
+                sounds.playClick()
+                sendAction({ type: 'TOGGLE_PAUSE' })
+              }}
+              className={`w-full mt-4 fs-lg py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2 fs-2xs ${
+                gameState.status === 'PAUSED'
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-yellow-600 text-white hover:bg-yellow-700'
+              }`}
+            >
+              {gameState.status === 'PAUSED' ? (
+                <>
+                  <Play size={14} /> {t('game.resumeBtn', 'RESUME GAME')}
+                </>
+              ) : (
+                <>
+                  <Pause size={14} /> {t('game.pauseBtn', 'PAUSE GAME')}
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
 

@@ -843,6 +843,37 @@ const GameScreen: React.FC<GameScreenProps> = ({
           </div>
         )}
 
+        <AnimatePresence>
+          {gameState.status === 'PAUSED' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[65] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            >
+              <div className="bg-sand dark:bg-slate-800 p-8 rounded-2xl shadow-2xl border-4 border-egyptian-gold text-center max-w-sm w-[90%] pointer-events-auto">
+                <h2 className="text-4xl md:text-5xl font-black text-egyptian-gold mb-4 uppercase drop-shadow-md">
+                  {t('game.gamePaused', 'GAME PAUSED')}
+                </h2>
+                <p className="text-slate-700 dark:text-slate-300 fs-lg font-bold">
+                  {t('game.waitingForHost', 'Waiting for host to resume...')}
+                </p>
+                {isHost && (
+                  <button
+                    onClick={() => {
+                      sounds.playClick()
+                      sendAction({ type: 'TOGGLE_PAUSE' })
+                    }}
+                    className="mt-6 w-full fs-lg bg-green-600 text-white py-3 rounded-xl font-black shadow-lg hover:scale-105 active:scale-95 transition-all"
+                  >
+                    {t('game.resumeBtn', 'RESUME GAME')}
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Mobile Modals */}
         <AnimatePresence>
           {showMobileLeft && (
