@@ -96,6 +96,7 @@ export type GameAction =
   | { type: 'RESET_TURN_TIMER' }
   | { type: 'PING'; timestamp: number; targetId?: string }
   | { type: 'PONG'; timestamp: number }
+  | { type: 'TOGGLE_PAUSE' }
 
 export interface ActiveEvent {
   title: string
@@ -109,7 +110,7 @@ export interface GameState {
   players: Player[]
   currentPlayerIndex: number
   tiles: Tile[]
-  status: 'LOBBY' | 'PLAYING' | 'FINISHED' | 'WAITING'
+  status: 'LOBBY' | 'PLAYING' | 'FINISHED' | 'WAITING' | 'PAUSED'
   turnPhase: 'ROLL' | 'ROLLING' | 'MOVING' | 'ACTION' | 'END'
   lastDice: [number, number]
   stepsLeft?: number

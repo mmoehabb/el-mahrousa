@@ -126,7 +126,7 @@ function App() {
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>
-    if (isHost && gameState.status === 'PLAYING') {
+    if (isHost && (gameState.status === 'PLAYING' || gameState.status === 'PAUSED')) {
       interval = setInterval(() => {
         const stateToSave = gameStateRef.current
         localStorage.setItem('monopoly_save_auto', JSON.stringify(stateToSave))
@@ -164,7 +164,7 @@ function App() {
         <div className="star-layer star-3" />
       </div>
       <div
-        className={`min-h-[100dvh] ${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center crt`}
+        className={`min-h-[100dvh] ${gameState.status === 'PLAYING' || gameState.status === 'PAUSED' || gameState.status === 'FINISHED' ? '' : 'p-4'} flex flex-col items-center crt`}
       >
         <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
@@ -174,7 +174,7 @@ function App() {
           onClose={() => setConnectionError?.(null)}
         />
         <div
-          className={`${gameState.status === 'PLAYING' || gameState.status === 'FINISHED' ? 'hidden lg:block ' : ''}fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]`}
+          className={`${gameState.status === 'PLAYING' || gameState.status === 'PAUSED' || gameState.status === 'FINISHED' ? 'hidden lg:block ' : ''}fixed bottom-4 right-4 rtl:left-4 rtl:right-auto z-[60]`}
         >
           <button
             id="global-settings-btn"

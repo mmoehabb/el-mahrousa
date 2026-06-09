@@ -146,7 +146,10 @@ export const useNetworking = () => {
           }
           case 'JOIN': {
             const existingPlayerIndex = prev.players.findIndex((p) => p.id === from)
-            if (existingPlayerIndex !== -1 && nextState.status === 'PLAYING') {
+            if (
+              existingPlayerIndex !== -1 &&
+              (nextState.status === 'PLAYING' || nextState.status === 'PAUSED')
+            ) {
               const newPlayers = [...nextState.players]
               newPlayers[existingPlayerIndex] = {
                 ...newPlayers[existingPlayerIndex],
@@ -272,7 +275,7 @@ export const useNetworking = () => {
             const disconnectedPlayerIndex = nextState.players.findIndex((p) => p.id === from)
             if (disconnectedPlayerIndex !== -1) {
               const disconnectedPlayer = nextState.players[disconnectedPlayerIndex]
-              if (nextState.status === 'PLAYING') {
+              if (nextState.status === 'PLAYING' || nextState.status === 'PAUSED') {
                 const newPlayers = [...nextState.players]
                 newPlayers[disconnectedPlayerIndex] = {
                   ...newPlayers[disconnectedPlayerIndex],
@@ -399,13 +402,24 @@ export const useNetworking = () => {
             }
             break
           }
+          case 'TOGGLE_PAUSE': {
+            if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
+            if (nextState.status === 'PLAYING') {
+              nextState.status = 'PAUSED'
+              nextState.logs = [{ key: 'gamePausedLog', params: {} }, ...nextState.logs]
+            } else if (nextState.status === 'PAUSED') {
+              nextState.status = 'PLAYING'
+              nextState.logs = [{ key: 'gameResumedLog', params: {} }, ...nextState.logs]
+            }
+            break
+          }
           case 'KICK_PLAYER': {
             if (from !== lobbyId && from !== gameState.players[0]?.id) return prev
             const kickedPlayerIndex = nextState.players.findIndex((p) => p.id === action.playerId)
             if (kickedPlayerIndex !== -1) {
               const kickedPlayer = nextState.players[kickedPlayerIndex]
 
-              if (nextState.status === 'PLAYING') {
+              if (nextState.status === 'PLAYING' || nextState.status === 'PAUSED') {
                 // To keep index safe and clear properties, we handle them as bankrupt
                 nextState = handleBankrupt(nextState, action.playerId)
                 nextState.logs = [`${kickedPlayer.name} was kicked by the host.`, ...nextState.logs]
@@ -504,7 +518,11 @@ export const useNetworking = () => {
 
   // --- PING interval ---
   useEffect(() => {
-    if (!peerRef.current || gameStateRef.current.status !== 'PLAYING') return
+    if (
+      !peerRef.current ||
+      (gameStateRef.current.status !== 'PLAYING' && gameStateRef.current.status !== 'PAUSED')
+    )
+      return
 
     const interval = setInterval(() => {
       if (isHostRef.current) {
