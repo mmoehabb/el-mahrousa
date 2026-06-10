@@ -81,6 +81,7 @@ export const isValidGameAction = (action: unknown): action is GameAction => {
     case 'ADD_BOT':
     case 'TICK_TURN_TIMER':
     case 'RESET_TURN_TIMER':
+    case 'TOGGLE_PAUSE':
       return true
     case 'PING':
       return (

@@ -124,6 +124,7 @@ describe('isValidGameAction', () => {
   test('should validate simple actions', () => {
     assert.strictEqual(isValidGameAction({ type: 'ROLL' }), true)
     assert.strictEqual(isValidGameAction({ type: 'END_TURN' }), true)
+    assert.strictEqual(isValidGameAction({ type: 'TOGGLE_PAUSE' }), true)
   })
 
   test('should validate actions with payloads', () => {
