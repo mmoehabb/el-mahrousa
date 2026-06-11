@@ -122,4 +122,5 @@ export interface GameState {
   activeEvent: ActiveEvent | null
   trades: TradeOffer[]
   lastLoadedAt?: number
+  bankBalance: number
 }

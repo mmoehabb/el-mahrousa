@@ -85,6 +85,7 @@ export const createInitialState = (): GameState => ({
   prison: {},
   activeEvent: null,
   trades: [],
+  bankBalance: 5000,
 })
 
 // Generates a float between 0 (inclusive) and 1 (exclusive) using crypto
@@ -107,13 +108,15 @@ export const moveOneStep = (state: GameState): GameState => {
 
   // Passed GO
   if (newPosition < player.position) {
+    const reward = Math.min(GAME_CONFIG.GO_REWARD, state.bankBalance)
     newPlayers[state.currentPlayerIndex] = {
       ...player,
       position: newPosition,
-      balance: player.balance + GAME_CONFIG.GO_REWARD,
+      balance: player.balance + reward,
     }
+    newState.bankBalance = state.bankBalance - reward
     newState.logs = [
-      { key: 'passedStart', params: { name: player.name, amount: GAME_CONFIG.GO_REWARD } },
+      { key: 'passedStart', params: { name: player.name, amount: reward } },
       ...newState.logs,
     ]
   } else {
@@ -270,6 +273,7 @@ export const buyHouse = (state: GameState, tileId: number): GameState => {
     ...state,
     players: newPlayers,
     tiles: newTiles,
+    bankBalance: state.bankBalance + cost,
     logs: [
       { key: 'boughtHouse', params: { name: player.name, property: tile.name, price: cost } },
       ...state.logs,
@@ -291,6 +295,8 @@ export const sellHouse = (state: GameState, tileId: number): GameState => {
   // Refund is half of what they paid for the current house level
   const refund = (tile.housePrice * Math.pow(2, currentHouses - 1)) / 2
 
+  if (state.bankBalance < refund) return state // Bank cannot afford
+
   const newPlayers = [...state.players]
   newPlayers[state.currentPlayerIndex] = {
     ...player,
@@ -307,6 +313,7 @@ export const sellHouse = (state: GameState, tileId: number): GameState => {
     ...state,
     players: newPlayers,
     tiles: newTiles,
+    bankBalance: state.bankBalance - refund,
     logs: [
       { key: 'soldHouse', params: { name: player.name, property: tile.name, price: refund } },
       ...state.logs,
@@ -327,6 +334,8 @@ export const sellProperty = (state: GameState, tileId: number): GameState => {
 
   const refund = tile.price / 2
 
+  if (state.bankBalance < refund) return state // Bank cannot afford
+
   const newPlayers = [...state.players]
   newPlayers[state.currentPlayerIndex] = {
     ...player,
@@ -337,6 +346,7 @@ export const sellProperty = (state: GameState, tileId: number): GameState => {
   return {
     ...state,
     players: newPlayers,
+    bankBalance: state.bankBalance - refund,
     logs: [
       { key: 'soldProperty', params: { name: player.name, property: tile.name, price: refund } },
       ...state.logs,
@@ -361,6 +371,7 @@ export const buyProperty = (state: GameState, tileId: number): GameState => {
   return {
     ...state,
     players: newPlayers,
+    bankBalance: state.bankBalance + tile.price,
     logs: [
       { key: 'bought', params: { name: player.name, property: tile.name, price: tile.price } },
       ...state.logs,
@@ -440,7 +451,15 @@ export const handleBankrupt = (state: GameState, playerId: string): GameState =>
     return p
   })
 
-  return { ...state, players: newPlayers, tiles: newTiles }
+  // Add remaining positive balance to bank (if bankrupt due to debts, balance might be negative or 0)
+  // Wait, if player has 500 but owes 1000, balance is -500.
+  // Actually, the prompt says: "When a player declares bankruptcy, all his/her money and properties go to the bank."
+  // If their balance is negative, it just means they are in debt. The bank shouldn't inherit debt.
+  // So we only add money if balance > 0. But they wouldn't be bankrupt if balance > 0 usually,
+  // unless they manually declare it while still having some cash (which is allowed in some games).
+  const balanceToAdd = bankruptPlayer && bankruptPlayer.balance > 0 ? bankruptPlayer.balance : 0
+
+  return { ...state, players: newPlayers, tiles: newTiles, bankBalance: state.bankBalance + balanceToAdd }
 }
 
 export const proposeTrade = (

@@ -32,6 +32,7 @@ const createMockState = (player: Player, tile: Tile): GameState => ({
   prison: {},
   activeEvent: null,
   trades: [],
+  bankBalance: 5000,
 })
 
 describe('handleTaxLanding', () => {
@@ -266,6 +267,7 @@ describe('landingUtils', () => {
       prison: {},
       activeEvent: null,
       trades: [],
+    bankBalance: 5000,
     }
 
     test('should deduct fixed price for generic tax tile', () => {
@@ -372,6 +374,7 @@ describe('landingUtils', () => {
       prison: {},
       activeEvent: null,
       trades: [],
+    bankBalance: 5000,
     }
 
     test('should do nothing if property is unowned', () => {
@@ -463,6 +466,7 @@ describe('landingUtils', () => {
       prison: {},
       activeEvent: null,
       trades: [],
+    bankBalance: 5000,
     }
 
     test('should move player to Prison and set turnsLeft to 2', () => {

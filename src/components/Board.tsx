@@ -358,6 +358,11 @@ const Board: React.FC<BoardProps> = ({
 
           {/* Center */}
           <div className="col-start-2 col-end-11 row-start-2 row-end-11 flex flex-col items-center justify-center bg-sand/20 dark:bg-slate-900/50 backdrop-blur-sm m-1 sm:m-4 md:m-8 lg:m-12 border-2 md:border-4 border-egyptian-gold/40 rounded-lg relative p-4 sm:p-8 space-y-4 sm:space-y-6">
+            {/* Bank Balance Display */}
+            <div className="absolute top-2 left-2 sm:top-4 sm:left-4 md:top-6 md:left-6 lg:top-8 lg:left-8 bg-green-100 dark:bg-green-900/80 text-green-800 dark:text-green-100 font-bold fs-base md:fs-lg px-3 py-1 md:px-4 md:py-2 rounded-lg shadow-md backdrop-blur border border-green-300 dark:border-green-700 flex items-center gap-2">
+              🏦 {t('game.bank')}: £{gameState.bankBalance}
+            </div>
+
             {gameState.status === 'PLAYING' && typeof gameState.turnTimer === 'number' && (
               <div className="absolute top-2 sm:top-4 md:top-6 lg:top-8 text-red-500 font-bold fs-lg md:fs-xl bg-white/80 dark:bg-slate-800/80 px-3 py-1 md:px-4 md:py-2 rounded-full shadow-md backdrop-blur">
                 ⏳ {gameState.turnTimer}s
