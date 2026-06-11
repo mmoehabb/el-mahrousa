@@ -459,7 +459,12 @@ export const handleBankrupt = (state: GameState, playerId: string): GameState =>
   // unless they manually declare it while still having some cash (which is allowed in some games).
   const balanceToAdd = bankruptPlayer && bankruptPlayer.balance > 0 ? bankruptPlayer.balance : 0
 
-  return { ...state, players: newPlayers, tiles: newTiles, bankBalance: state.bankBalance + balanceToAdd }
+  return {
+    ...state,
+    players: newPlayers,
+    tiles: newTiles,
+    bankBalance: state.bankBalance + balanceToAdd,
+  }
 }
 
 export const proposeTrade = (
