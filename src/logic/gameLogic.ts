@@ -144,22 +144,9 @@ export const applyEventLogic = (state: GameState): GameState => {
     } else if (event.type === 'loss') {
       newPlayers[state.currentPlayerIndex] = { ...player, balance: player.balance - event.amount }
     } else if (event.type === 'move') {
-      // If moving passes start (and not just going backward to start), collect Go Reward
-      if (event.target < player.position && event.target !== 0) {
-        newPlayers[state.currentPlayerIndex] = {
-          ...player,
-          position: event.target,
-          balance: player.balance + GAME_CONFIG.GO_REWARD,
-        }
-      } else if (event.target === 0) {
-        newPlayers[state.currentPlayerIndex] = {
-          ...player,
-          position: event.target,
-          balance: player.balance + GAME_CONFIG.GO_REWARD,
-        }
-      } else {
-        newPlayers[state.currentPlayerIndex] = { ...player, position: event.target }
-      }
+      const stepsLeft = (event.target - player.position + state.tiles.length) % state.tiles.length
+      newState.turnPhase = 'MOVING'
+      newState.stepsLeft = stepsLeft
     } else if (event.type === 'jail') {
       newPlayers[state.currentPlayerIndex] = { ...player, position: event.target }
       newState.prison = { ...newState.prison, [player.id]: { turnsLeft: 2 } }
@@ -180,10 +167,13 @@ export const applyEventLogic = (state: GameState): GameState => {
     ]
 
     // Check if debt forces turn to stay ACTION
-    if (newPlayers[state.currentPlayerIndex].balance >= 0) {
-      newState.turnPhase = 'END'
-    } else {
-      newState.turnPhase = 'ACTION' // Must sell properties or bankrupt
+    // Do not override if we're moving!
+    if (newState.turnPhase !== 'MOVING') {
+      if (newPlayers[state.currentPlayerIndex].balance >= 0) {
+        newState.turnPhase = 'END'
+      } else {
+        newState.turnPhase = 'ACTION' // Must sell properties or bankrupt
+      }
     }
   } else if (tile.name === 'Sodfa') {
     // Sodfa Random Teleportation
@@ -195,7 +185,9 @@ export const applyEventLogic = (state: GameState): GameState => {
     const randomTile = properties[Math.floor(secureRandom() * properties.length)]
     const newPlayers = [...state.players]
 
-    newPlayers[state.currentPlayerIndex] = { ...player, position: randomTile.id }
+    const stepsLeft = (randomTile.id - player.position + state.tiles.length) % state.tiles.length
+    newState.turnPhase = 'MOVING'
+    newState.stepsLeft = stepsLeft
 
     newState.players = newPlayers
     newState.activeEvent = {
@@ -211,13 +203,7 @@ export const applyEventLogic = (state: GameState): GameState => {
       ...newState.logs,
     ]
 
-    // Since they moved, we should apply landing logic for their new tile immediately,
-    // but without clearing the event popup.
-    // However, they can only land on PROPERTY, AIRPORT, UTILITY, so we can run a subset of logic or recurse safely.
-    // For safety, let's just let them end their turn or pay rent here.
-    const tempState = applyLandingLogic({ ...newState, turnPhase: 'ACTION' })
-    tempState.activeEvent = newState.activeEvent // keep event
-    return tempState
+    return newState
   }
 
   return newState
