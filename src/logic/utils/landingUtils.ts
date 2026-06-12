@@ -43,7 +43,17 @@ export const handleTaxLanding = (state: GameState): GameState => {
     newPlayers[state.currentPlayerIndex].debtTo = 'bank'
   }
 
-  const newState = { ...state, players: newPlayers }
+  // The player owes taxAmount.
+  // If the player can't afford it all immediately, they'll be in debt.
+  // In our game, the debt is resolved by selling stuff. Does the bank get all taxAmount?
+  // Actually, we'll just add taxAmount to the bank. If player is bankrupt to the bank, the handleBankrupt logic
+  // handles whatever the bank gets instead.
+  // Let's add the money directly. Wait, if the player goes bankrupt, they'll give whatever is remaining,
+  // but if they just go into negative balance, we probably shouldn't give the bank money yet?
+  // Wait, if balance goes negative, it's just debt.
+  // Let's just add the exact taxAmount they have paid if any, or full taxAmount and allow negative balance.
+  // We can just add taxAmount to bankBalance, because the player's balance decreases by taxAmount, keeping conservation of money.
+  const newState = { ...state, players: newPlayers, bankBalance: state.bankBalance + taxAmount }
   newState.logs = [
     { key: 'paidTax', params: { name: player.name, amount: taxAmount, property: tile.name } },
     ...newState.logs,

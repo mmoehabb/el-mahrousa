@@ -620,6 +620,7 @@ describe('buyProperty', () => {
     prison: {},
     activeEvent: null,
     trades: [],
+    bankBalance: 5000,
     ...overrides,
   })
 
@@ -917,6 +918,7 @@ describe('buyHouse', () => {
     chatMessages: [],
     prison: {},
     trades: [],
+    bankBalance: 5000,
     ...overrides,
     activeEvent: overrides.activeEvent || null,
   })
@@ -987,6 +989,7 @@ describe('rejectTrade', () => {
     prison: {},
     activeEvent: null,
     trades,
+    bankBalance: 5000,
   })
 
   test('should successfully reject a PENDING trade and append the correct log', () => {
@@ -1141,6 +1144,7 @@ describe('sellProperty', () => {
     chatMessages: [],
     prison: {},
     trades: [],
+    bankBalance: 5000,
     ...overrides,
     activeEvent: overrides.activeEvent || null,
   })

@@ -39,5 +39,6 @@ export const createMockState = (
   prison: {},
   trades: [],
   activeEvent: overrides.activeEvent || null,
+  bankBalance: 5000,
   ...overrides,
 })
